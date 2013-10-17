@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" type="text/css" href="style.css">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script>
+			var require = {
+				urlArgs: 'bust=' + (new Date()).getTime()
+			};
+		</script>
 		<script src="js/require.js" data-main="js/main.js"></script>
 	</head>
 	<body>
