@@ -6,7 +6,7 @@ define ['core/app', 'core/entities', 'core/graphics', 'core/input'], (app, ents,
 	}
 
 	ent = new ents.Entity(50, 50, new gfx.Rect(100, 100, 'red'))
-	ent.render()
+	app.entities.push ent
 
 	input.define
 		up: 87

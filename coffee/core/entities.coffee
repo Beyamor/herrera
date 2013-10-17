@@ -3,6 +3,9 @@ define ['core/app'], (app) ->
 		constructor: (x=0, y=0, @graphic=null) ->
 			@pos = {x: x, y: y}
 
+		update: ->
+			@pos.x += 100 * app.elapsed
+
 		render: ->
 			return unless @graphic
 
