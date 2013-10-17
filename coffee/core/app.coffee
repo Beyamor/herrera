@@ -12,11 +12,19 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 
 			@previousTime = newTime
 
+		start: ->
+			# there's better ways to do this (request anim)
+			# but for now, who cares
+			@previousTime = new Date
+			setInterval =>
+				@loop()
+			, 1000 / @fps
+
 		init: (opts) ->
 			@width = opts.width
 			@height = opts.height
 
-			fps = (opts.fps or 30)
+			@fps = (opts.fps or 30)
 
 			@canvas = new cnvs.Canvas {
 				width: @width
@@ -28,10 +36,13 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 
 			input.watch @canvas.$el
 
-			# there's better ways to do this (request anim)
-			# but for now, who cares
-			@previousTime = new Date
-			setInterval =>
-				@loop()
-			, 1000 / fps
+			if @assets
+				queue = new createjs.LoadQueue true
+				queue.addEventListener 'complete', => @start()
+				queue.addEventListener 'fileload', (e) -> console.log "loaded #{e.item.src}"
+					
+				for [id, src] in @assets
+					queue.loadFile {id: id, src: src}
+			else
+				@start()
 	}
