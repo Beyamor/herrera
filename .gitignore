@@ -1,2 +1,5 @@
 *.sw[op]
 main.js
+js
+.sass-cache
+css
