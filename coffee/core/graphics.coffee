@@ -1,34 +1,19 @@
-define ->
-	class Canvas
-		constructor: (opts) ->
-			if opts.id?
-				@$el = $("##{opts.id}")
-			else if opts.$el?
-				@$el = opts.$el
-			else
-				@$el = $('<canvas>')
+define ['core/canvas'], (cnvs) ->
+	Canvas = cnvs.Canvas
 
-			@el = @$el[0]
-			@context = @el.getContext '2d'
+	class Rect
+		constructor: (width, height, color) ->
+			@canvas = new Canvas {width: width, height: height}
+			context = @canvas.context
+			context.beginPath()
+			context.rect 0, 0, width, height
+			context.fillStyle = color
+			context.fill()
+			context.closePath()
 
-			if opts.clearColor
-				@$el.css 'background-color', opts.clearColor
-
-			opts.width or= @$el.width()
-			opts.height or= @$el.height()
-
-			@setDims opts.width, opts.height
-
-		clear: ->
-			@context.clearRect 0, 0, @$el.width(), @$el.height()
-			return this
-
-		setDims: (width, height) ->
-			@$el.width width
-			@$el.height height
-			@context.canvas.width = width
-			@context.canvas.height = height
+		render: (target, point) ->
+			target.context.drawImage @canvas.el, point.x, point.y
 
 	return {
-		Canvas: Canvas
+		Rect: Rect
 	}

@@ -1,11 +1,9 @@
-define ['core/graphics'], (gfx) ->
-	canvas = new gfx.Canvas {
+define ['core/app', 'core/entities', 'core/graphics'], (app, ents, gfx) ->
+	app.init {
+		width: 800
+		height: 600
 		id: 'game'
-		clearColor: 'white'
 	}
 
-	canvas.clear()
-	canvas.context.beginPath()
-	canvas.context.rect 50, 50, 100, 100
-	canvas.context.fillStyle = 'red'
-	canvas.context.fill()
+	ent = new ents.Entity(50, 50, new gfx.Rect(100, 100, 'red'))
+	ent.render()
