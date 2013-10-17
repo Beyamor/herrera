@@ -1,11 +1,25 @@
-define ['core/app', 'core/scenes', 'core/entities', 'core/graphics'],
-	(app, scenes, entities, gfx) ->
+define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
+	'core/input'],
+	(app, scenes, entities, gfx, input) ->
 		class Player extends entities.Entity
 			constructor: (x, y) ->
-				super x, y, new gfx.Rect 100, 100, 'red'
+				super x, y, new gfx.Rect 48, 48, 'red'
+
+				@speed = 200
 
 			update: ->
-				@pos.x += app.elapsed * 100
+				dx = dy = 0
+				dx += 1 if input.isDown 'right'
+				dx -= 1 if input.isDown 'left'
+				dy += 1 if input.isDown 'down'
+				dy -= 1 if input.isDown 'up'
+
+				if dx isnt 0 and dy isnt 0
+					dx *= Math.SQRT1_2
+					dy *= Math.SQRT1_2
+
+				@pos.x += dx * @speed * app.elapsed
+				@pos.y += dy * @speed * app.elapsed
 
 		class PlayScene extends scenes.Scene
 			constructor: ->
