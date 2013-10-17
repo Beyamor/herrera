@@ -4,7 +4,6 @@ define ['core/app'], (app) ->
 			@pos = {x: x, y: y}
 
 		update: ->
-			@pos.x += 100 * app.elapsed
 
 		render: ->
 			return unless @graphic

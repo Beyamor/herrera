@@ -5,12 +5,10 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 			newTime = new Date
 			@elapsed =  (newTime - @previousTime) * 0.001
 
-			for entity in @entities
-				entity.update()
+			@scene.update() if @scene
 
 			@canvas.clear()
-			for entity in @entities
-				entity.render()
+			@scene.render() if @scene
 
 			@previousTime = newTime
 
@@ -29,9 +27,6 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 			@canvas.$el.attr('tabindex', 0).focus()
 
 			input.watch @canvas.$el
-
-			# temporary
-			@entities = []
 
 			# there's better ways to do this (request anim)
 			# but for now, who cares

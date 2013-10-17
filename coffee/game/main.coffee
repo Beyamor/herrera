@@ -1,15 +1,14 @@
-define ['core/app', 'core/entities', 'core/graphics', 'core/input'], (app, ents, gfx, input) ->
+define ['core/app', 'core/input', 'game/play'], (app, input, play) ->
 	app.init {
 		width: 800
 		height: 600
 		id: 'game'
 	}
 
-	ent = new ents.Entity(50, 50, new gfx.Rect(100, 100, 'red'))
-	app.entities.push ent
-
 	input.define
 		up: 87
 		down: 83
 		left: 65
 		right: 68
+
+	app.scene = new play.PlayScene
