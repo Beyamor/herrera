@@ -5,11 +5,19 @@
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<script>
 			var require = {
-				urlArgs: 'bust=' + (new Date()).getTime()
+				urlArgs: 'bust=' + (new Date()).getTime(),
+				baseUrl: 'js/',
+				paths: {
+					"core": "core",
+					"game": "game"
+				}
 			};
 		</script>
-		<script src="js/require.js" data-main="js/main.js"></script>
+		<script src="js/require.js" data-main="game/main.js"></script>
 	</head>
 	<body>
+		<canvas id="game" width="800" height="600">
+			Whoa, looks like canvas isn't supported by your browser.
+		</canvas>
 	</body>
 </html>
