@@ -1,3 +1,11 @@
+SPECIAL_BROWSER_KEYS = [
+	32, # space
+	37, # left
+	38, # right
+	39, # down
+	40, # up
+]
+
 define {
 	state: {}
 	mappings: {}
@@ -22,10 +30,10 @@ define {
 
 	watch: ($el) ->
 		$el.keydown((e) =>
-			e.preventDefault()
+			e.preventDefault() if SPECIAL_BROWSER_KEYS.indexOf(e.which) isnt -1
 			@state[e.which] = 'down'
 		).keyup((e) =>
-			e.preventDefault()
+			e.preventDefault() if SPECIAL_BROWSER_KEYS.indexOf(e.which) isnt -1
 			@state[e.which] = 'up'
 		)
 }
