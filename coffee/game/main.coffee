@@ -3,7 +3,7 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		enabled: true
 		types:
 			load: false
-			fps: false
+			fps: true
 			hitboxes: false
 
 	app.assets = [

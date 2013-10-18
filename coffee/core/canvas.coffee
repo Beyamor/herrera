@@ -1,12 +1,7 @@
 define ->
 	class Canvas
 		constructor: (opts) ->
-			if opts.id?
-				@$el = $("##{opts.id}")
-			else if opts.$el?
-				@$el = opts.$el
-			else
-				@$el = $('<canvas>')
+			@$el = $('<canvas>')
 
 			@el = @$el[0]
 			@context = @el.getContext '2d'

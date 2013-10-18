@@ -4,7 +4,7 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 		loop: ->
 			newTime = new Date
 			@elapsed =  (newTime - @previousTime) * 0.001
-			debug.logType 'fps', @elapsed
+			debug.showFPS @elapsed
 
 			@scene.update() if @scene
 
@@ -14,6 +14,7 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			@previousTime = newTime
 
 		start: ->
+			debug.init this
 			@init() if @init
 
 			# there's better ways to do this (request anim)
@@ -29,15 +30,19 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			@fps	= (opts.fps or 30)
 			@init	= opts.init
 
+			@container = $("##{opts.id}")
+				.width(@width)
+				.height(@height)
+
 			@canvas = new cnvs.Canvas {
 				width: @width
 				height: @height
-				id: opts.id
 				clearColor: (opts.clearColor or 'white')
 			}
-			@canvas.$el.attr('tabindex', 0).focus()
+			@container.append @canvas.$el
 
-			input.watch @canvas.$el
+			@container.attr('tabindex', 0).focus()
+			input.watch @container
 
 			if @assets
 				queue = new createjs.LoadQueue true
