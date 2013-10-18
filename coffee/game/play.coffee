@@ -1,6 +1,6 @@
 define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
-	'core/input'],
-	(app, scenes, entities, gfx, input) ->
+	'core/input', 'core/cameras'],
+	(app, scenes, entities, gfx, input, cameras) ->
 		Entity	= entities.Entity
 		Image	= gfx.Image
 
@@ -75,16 +75,19 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 		class PlayScene extends scenes.Scene
 			constructor: ->
 				super()
-				@add new Player app.width / 2, app.height / 2
+				player = new Player app.width / 2, app.height / 2
+				@add player
 
-				for x in [0..app.width] by Wall.WIDTH
+				for x in [0..app.width * 2] by Wall.WIDTH
 					@add new Wall x, 0
 					@add new Wall x, app.height - Wall.WIDTH
 				for y in [0..app.height] by Wall.WIDTH
 					@add new Wall 0, y
-					@add new Wall app.width - Wall.WIDTH, y
+					@add new Wall app.width * 2 - Wall.WIDTH, y
 
 				@add new Wall 500, 400
+
+				@camera = new cameras.EntityFollower player, @camera
 
 		return {
 			PlayScene: PlayScene

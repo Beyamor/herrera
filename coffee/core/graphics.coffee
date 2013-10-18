@@ -12,8 +12,10 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			context.fill()
 			context.closePath()
 
-		render: (target, point) ->
-			target.context.drawImage @canvas.el, point.x, point.y
+		render: (target, point, camera) ->
+			x = point.x - camera.x
+			y = point.y - camera.y
+			target.context.drawImage @canvas.el, x, y
 
 	class ns.Image
 		constructor: (asset) ->
@@ -52,10 +54,10 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			context.restore()
 			@dirty = false
 
-		render: (target, point) ->
+		render: (target, point, camera) ->
 			@prerender() if @dirty
-			x = point.x - @origin.x
-			y = point.y - @origin.y
+			x = point.x - @origin.x - camera.x
+			y = point.y - @origin.y - camera.y
 			target.context.drawImage @canvas.el, x, y
 
 	return ns

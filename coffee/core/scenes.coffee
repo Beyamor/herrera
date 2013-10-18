@@ -1,9 +1,10 @@
-define ['core/debug', 'core/app'], (debug, app) ->
+define ['core/debug', 'core/app', 'core/cameras'], (debug, app, cameras) ->
 	class Scene
 		constructor: ->
 			@entities	= []
 			@toAdd		= []
 			@toRemove	= []
+			@camera		= new cameras.Camera
 
 		add: (e) ->
 			return unless e?
@@ -31,6 +32,8 @@ define ['core/debug', 'core/app'], (debug, app) ->
 					entity.scene = null
 				@toRemove = []
 
+			@camera.update()
+
 		render: ->
 			entity.render() for entity in @entities
 
@@ -39,8 +42,8 @@ define ['core/debug', 'core/app'], (debug, app) ->
 					context = app.canvas.context
 					context.beginPath()
 					context.rect(
-						entity.pos.x + entity.offset.x,
-						entity.pos.y + entity.offset.y,
+						entity.pos.x + entity.offset.x - @camera.x,
+						entity.pos.y + entity.offset.y - @camera.y,
 						entity.width,
 						entity.height
 					)
