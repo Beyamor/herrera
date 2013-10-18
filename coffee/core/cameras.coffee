@@ -16,7 +16,25 @@ define ['core/util', 'core/app'], (util, app) ->
 			get: -> @pos.y
 			set: (y) -> @pos.y = y
 
-	class ns.CameraWrapper
+		@define 'width',
+			get: -> app.width
+
+		@define 'height',
+			get: -> app.height
+
+		@define 'left',
+			get: -> @x
+
+		@define 'right',
+			get: -> @left + @width
+
+		@define 'top',
+			get: -> @y
+
+		@define 'bottom',
+			get: -> @top + @height
+
+	class ns.CameraWrapper extends ns.Camera
 		constructor: (@base) ->
 
 		update: ->
@@ -29,6 +47,12 @@ define ['core/util', 'core/app'], (util, app) ->
 		@define 'y',
 			get: -> @base.y
 			set: (y) -> @base.y = y
+
+		@define 'width',
+			get: -> @base.width
+
+		@define 'height',
+			get: -> @base.height
 
 	class ns.EntityFollower extends ns.CameraWrapper
 		constructor: (@ent, base) ->

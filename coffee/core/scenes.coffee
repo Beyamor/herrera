@@ -1,4 +1,4 @@
-define ['core/debug', 'core/app', 'core/cameras'], (debug, app, cameras) ->
+define ['core/debug', 'core/app', 'core/cameras', 'core/util'], (debug, app, cameras, util) ->
 	class Scene
 		constructor: ->
 			@entities	= []
@@ -52,11 +52,7 @@ define ['core/debug', 'core/app', 'core/cameras'], (debug, app, cameras) ->
 
 		collide: (e1, type) ->
 			for e2 in @entities when e2 isnt e1 and e2.hasType type
-				noCollision = (e1.right < e2.left or
-						e1.left > e2.right or
-						e1.bottom < e2.top or
-						e1.top > e2.bottom)
-				return e2 if not noCollision
+				return e2 if util.aabbsIntersect e1, e2
 			return null
 
 	return {

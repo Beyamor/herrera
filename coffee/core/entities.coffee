@@ -68,6 +68,7 @@ define ['core/app', 'core/util'], (app, util) ->
 			
 		render: ->
 			return unless @graphic
+			return unless util.aabbsIntersect this, @scene.camera
 
 			@graphic.render app.canvas, @pos, @scene.camera
 
