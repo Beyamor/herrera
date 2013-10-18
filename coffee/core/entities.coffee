@@ -7,15 +7,65 @@ define ['core/app', 'core/util'], (app, util) ->
 			@width	= 0
 			@height	= 0
 			@offset	= {x: 0, y: 0}
+			@collisionHandlers = {}
 
 		center: ->
 			@offset.x = -@width * 0.5
 			@offset.y = -@height * 0.5
 
-		update: ->
-			@pos.x += @vel.x * app.elapsed
-			@pos.y += @vel.y * app.elapsed
+		collide: (type, x, y) ->
+			return null unless @scene
+			prevX = @pos.x
+			prevY = @pos.y
+			@pos.x = x
+			@pos.y = y
 
+			result = @scene.collide this, type
+
+			@pos.x = prevX
+			@pos.y = prevY
+
+			return result
+
+		move: ->
+			xSteps	= Math.floor(Math.abs(@vel.x * app.elapsed))
+			xInc 	= util.sign(@vel.x)
+
+			stop = false
+			while xSteps > 0
+				for type, handler of @collisionHandlers
+					collision = @collide type, @pos.x + xInc, @pos.y
+					if collision
+						stop = handler(collision)
+					break if stop
+
+				break if stop
+				@pos.x += xInc
+				xSteps -= 1
+
+			ySteps	= Math.floor(Math.abs(@vel.y * app.elapsed))
+			yInc 	= util.sign(@vel.y)
+
+			stop = false
+			while ySteps > 0
+				for type, handler of @collisionHandlers
+					collision = @collide type, @pos.x, @pos.y + yInc
+					if collision
+						stop = handler(collision)
+					break if stop
+
+				break if stop
+				@pos.y += yInc
+				ySteps -= 1
+
+		update: ->
+			if @vel.x isnt 0 or @vel.y isnt 0
+				@move()
+			else
+				for type, handler of @collisionHandlers
+					collision = @collide type, @pos.x, @pos.y
+					handler(collision) if collision
+			
 		render: ->
 			return unless @graphic
 

@@ -30,11 +30,11 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				@graphic.rotate(direction).centerOrigin()
 				@layer = 100
 
-			update: ->
-				super()
-
-				if @scene.collide this, 'wall'
-					@scene.remove this
+				@collisionHandlers =
+					wall: =>
+						@scene.remove this
+						@vel.x = @vel.y = 0
+						return true
 
 		class Player extends Entity
 			constructor: (x, y) ->
@@ -46,6 +46,9 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				@center()
 
 				@speed = 200
+
+				@collisionHandlers =
+					wall: -> return true
 
 			update: ->
 				super()
@@ -80,6 +83,8 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				for y in [0..app.height] by Wall.WIDTH
 					@add new Wall 0, y
 					@add new Wall app.width - Wall.WIDTH, y
+
+				@add new Wall 500, 400
 
 		return {
 			PlayScene: PlayScene
