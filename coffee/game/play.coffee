@@ -1,6 +1,10 @@
 define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 	'core/input'],
 	(app, scenes, entities, gfx, input) ->
+		class Shot extends entities.Entity
+			constructor: (x, y) ->
+				super x, y, new gfx.Image 'shot-sprite'
+
 		class Player extends entities.Entity
 			constructor: (x, y) ->
 				super x, y, new gfx.Image 'player-sprite'
@@ -20,6 +24,10 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 
 				@pos.x += dx * @speed * app.elapsed
 				@pos.y += dy * @speed * app.elapsed
+
+				if input.isDown 'shoot'
+					shot = new Shot @pos.x, @pos.y
+					@scene.add shot
 
 		class PlayScene extends scenes.Scene
 			constructor: ->

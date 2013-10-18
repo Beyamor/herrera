@@ -2,7 +2,8 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 	debug.loading = false
 
 	app.assets = [
-		['player-sprite', 'res/img/player.png']
+		['player-sprite', 'res/img/player.png'],
+		['shot-sprite', 'res/img/shot.png']
 	]
 
 	input.define
@@ -10,6 +11,7 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		down: 83
 		left: 65
 		right: 68
+		shoot: 32
 
 	app.launch
 		width: 800

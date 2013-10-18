@@ -5,12 +5,16 @@ define ->
 
 		add: (e) ->
 			return unless e?
+			e.scene = this
 			@entities.push e
 
 		remove: (e) ->
 			return unless e?
+
 			index = @entities.indexOf e
 			return unless index >= -1
+
+			@entities[e].scene = null
 			@entities.splice index, 1
 
 		update: ->

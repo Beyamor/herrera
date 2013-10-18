@@ -22,8 +22,10 @@ define {
 
 	watch: ($el) ->
 		$el.keydown((e) =>
+			e.preventDefault()
 			@state[e.which] = 'down'
 		).keyup((e) =>
+			e.preventDefault()
 			@state[e.which] = 'up'
 		)
 }
