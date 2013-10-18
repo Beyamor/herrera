@@ -11,19 +11,31 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				super x, y, new Image 'wall-sprite'
 				@layer = 200
 
+				@width	= @graphic.width
+				@height	= @graphic.height
+
 		class Shot extends Entity
 			constructor: (x, y, speed, direction) ->
 				super x, y, new Image 'shot-sprite'
-				@layer = 100
+
 				@vel.x = speed * Math.cos direction
 				@vel.y = speed * Math.sin direction
 
+				@width	= @graphic.width
+				@height	= @graphic.height
+				@center()
+
 				@graphic.rotate(direction).centerOrigin()
+				@layer = 100
 
 		class Player extends Entity
 			constructor: (x, y) ->
 				super x, y, new Image 'player-sprite'
 				@graphic.centerOrigin()
+				
+				@width = @graphic.width
+				@height = @graphic.height
+				@center()
 
 				@speed = 200
 

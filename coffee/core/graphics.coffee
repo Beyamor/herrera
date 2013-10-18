@@ -22,6 +22,8 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			@origin		= x: 0, y: 0
 			@rotation	= 0
 			@dirty		= true
+			@width		= @img.width
+			@height		= @img.height
 
 		centerOrigin: ->
 			@origin.x = @img.width / 2

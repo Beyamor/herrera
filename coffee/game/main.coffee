@@ -4,6 +4,7 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		types:
 			load: false
 			fps: false
+			hitboxes: true
 
 	app.assets = [
 		['player-sprite', 'res/img/player.png'],

@@ -10,4 +10,7 @@ define {
 	config: (opts) ->
 		for k, v of opts
 			@[k] = v
+
+	isEnabled: (type) ->
+		return @enabled and @types[type]
 }

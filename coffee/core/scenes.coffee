@@ -1,4 +1,4 @@
-define ->
+define ['core/debug', 'core/app'], (debug, app) ->
 	class Scene
 		constructor: ->
 			@entities = []
@@ -23,6 +23,19 @@ define ->
 
 		render: ->
 			entity.render() for entity in @entities
+
+			if debug.isEnabled 'hitboxes'
+				for entity in @entities
+					context = app.canvas.context
+					context.beginPath()
+					context.rect(
+						entity.pos.x + entity.offset.x,
+						entity.pos.y + entity.offset.y,
+						entity.width,
+						entity.height
+					)
+					context.strokeStyle = 'red'
+					context.stroke()
 
 	return {
 		Scene: Scene
