@@ -8,6 +8,8 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				@vel.x = speed * Math.cos direction
 				@vel.y = speed * Math.sin direction
 
+				@graphic.rotate(direction).centerOrigin()
+
 		class Player extends entities.Entity
 			constructor: (x, y) ->
 				super x, y, new gfx.Image 'player-sprite'
