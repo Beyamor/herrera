@@ -32,6 +32,12 @@ define {
 			@mappings[from] = to
 
 	watch: ($el) ->
+		eventToMouseButton = (e) ->
+			switch e.which
+				when 1 then 'mouse-left'
+				when 2 then 'mouse-middle'
+				when 3 then 'mouse-right'
+
 		$el.keydown (e) =>
 			e.preventDefault() if SPECIAL_BROWSER_KEYS.indexOf(e.which) isnt -1
 			@state[e.which] = 'down'
@@ -43,4 +49,10 @@ define {
 		.mousemove (e) =>
 			@mouseX = e.pageX - $el.parent().offset().left
 			@mouseY = e.pageY - $el.parent().offset().top
+
+		.mousedown (e) =>
+			@state[eventToMouseButton(e)] = 'down'
+
+		.mouseup (e) =>
+			@state[eventToMouseButton(e)] = 'up'
 }
