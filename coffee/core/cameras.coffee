@@ -16,7 +16,7 @@ define ['core/util', 'core/app'], (util, app) ->
 			get: -> @pos.y
 			set: (y) -> @pos.y = y
 
-	class ns.CameraWrapper extends ns.Camera
+	class ns.CameraWrapper
 		constructor: (@base) ->
 
 		update: ->
