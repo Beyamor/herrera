@@ -13,6 +13,8 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				@speed = 200
 
 			update: ->
+				super()
+
 				dx = dy = 0
 				dx += 1 if input.isDown 'right'
 				dx -= 1 if input.isDown 'left'
@@ -23,8 +25,8 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 					dx *= Math.SQRT1_2
 					dy *= Math.SQRT1_2
 
-				@pos.x += dx * @speed * app.elapsed
-				@pos.y += dy * @speed * app.elapsed
+				@vel.x = dx * @speed
+				@vel.y = dy * @speed
 
 				if input.isDown 'shoot'
 					shot = new Shot @pos.x, @pos.y
