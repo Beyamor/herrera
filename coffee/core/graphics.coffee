@@ -17,9 +17,17 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 
 	class ns.Image
 		constructor: (asset) ->
-			@img = app.assets.get asset
+			@img	= app.assets.get asset
+			@origin	= {x: 0, y: 0}
+
+		centerOrigin: ->
+			@origin.x = @img.width / 2
+			@origin.y = @img.height / 2
+			return this
 
 		render: (target, point) ->
-			target.context.drawImage @img, point.x, point.y
+			x = point.x - @origin.x
+			y = point.y - @origin.y
+			target.context.drawImage @img, x, y
 
 	return ns

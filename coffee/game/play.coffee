@@ -11,6 +11,7 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 		class Player extends entities.Entity
 			constructor: (x, y) ->
 				super x, y, new gfx.Image 'player-sprite'
+				@graphic.centerOrigin()
 
 				@speed = 200
 
@@ -39,7 +40,7 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 		class PlayScene extends scenes.Scene
 			constructor: ->
 				super()
-				@add new Player 50, 50
+				@add new Player 0, 0
 
 		return {
 			PlayScene: PlayScene
