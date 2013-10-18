@@ -1,7 +1,8 @@
-define ['core/canvas'], (cnvs) ->
+define ['core/app', 'core/canvas'], (app, cnvs) ->
 	Canvas = cnvs.Canvas
+	ns = {}
 
-	class Rect
+	class ns.Rect
 		constructor: (width, height, color) ->
 			@canvas = new Canvas {width: width, height: height}
 			context = @canvas.context
@@ -14,6 +15,11 @@ define ['core/canvas'], (cnvs) ->
 		render: (target, point) ->
 			target.context.drawImage @canvas.el, point.x, point.y
 
-	return {
-		Rect: Rect
-	}
+	class ns.Image
+		constructor: (asset) ->
+			@img = app.assets.get asset
+
+		render: (target, point) ->
+			target.context.drawImage @img, point.x, point.y
+
+	return ns

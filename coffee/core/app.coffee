@@ -13,6 +13,8 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 			@previousTime = newTime
 
 		start: ->
+			@init() if @init
+
 			# there's better ways to do this (request anim)
 			# but for now, who cares
 			@previousTime = new Date
@@ -20,11 +22,11 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 				@loop()
 			, 1000 / @fps
 
-		init: (opts) ->
-			@width = opts.width
-			@height = opts.height
-
-			@fps = (opts.fps or 30)
+		launch: (opts) ->
+			@width	= opts.width
+			@height	= opts.height
+			@fps	= (opts.fps or 30)
+			@init	= opts.init
 
 			@canvas = new cnvs.Canvas {
 				width: @width
@@ -43,6 +45,11 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 					
 				for [id, src] in @assets
 					queue.loadFile {id: id, src: src}
+
+				# cool. uh, now, let's give 'em some way of getting those assets
+				@assets = {
+					get: (which) -> queue.getResult which
+				}
 			else
 				@start()
 	}

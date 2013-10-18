@@ -3,7 +3,7 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 	(app, scenes, entities, gfx, input) ->
 		class Player extends entities.Entity
 			constructor: (x, y) ->
-				super x, y, new gfx.Rect 48, 48, 'red'
+				super x, y, new gfx.Image 'player-sprite'
 
 				@speed = 200
 
