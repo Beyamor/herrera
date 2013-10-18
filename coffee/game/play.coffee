@@ -67,8 +67,8 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				@vel.y = dy * @speed
 
 				if input.isDown 'shoot'
-					dx = input.mouseX - @pos.x
-					dy = input.mouseY - @pos.y
+					dx = input.mouseX - @pos.x + @scene.camera.x
+					dy = input.mouseY - @pos.y + @scene.camera.y
 					shot = new Shot @pos.x, @pos.y, 300, Math.atan2 dy, dx
 					@scene.add shot
 
