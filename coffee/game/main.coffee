@@ -7,7 +7,8 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 
 	app.assets = [
 		['player-sprite', 'res/img/player.png'],
-		['shot-sprite', 'res/img/shot.png']
+		['shot-sprite', 'res/img/shot.png'],
+		['wall-sprite', 'res/img/wall.png']
 	]
 
 	input.define

@@ -1,18 +1,28 @@
 define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 	'core/input'],
 	(app, scenes, entities, gfx, input) ->
-		class Shot extends entities.Entity
+		Entity	= entities.Entity
+		Image	= gfx.Image
+
+		class Wall extends Entity
+			@WIDTH: 48
+
+			constructor: (x, y) ->
+				super x, y, new Image 'wall-sprite'
+				@layer = 200
+
+		class Shot extends Entity
 			constructor: (x, y, speed, direction) ->
-				super x, y, new gfx.Image 'shot-sprite'
+				super x, y, new Image 'shot-sprite'
 				@layer = 100
 				@vel.x = speed * Math.cos direction
 				@vel.y = speed * Math.sin direction
 
 				@graphic.rotate(direction).centerOrigin()
 
-		class Player extends entities.Entity
+		class Player extends Entity
 			constructor: (x, y) ->
-				super x, y, new gfx.Image 'player-sprite'
+				super x, y, new Image 'player-sprite'
 				@graphic.centerOrigin()
 
 				@speed = 200
@@ -42,7 +52,14 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 		class PlayScene extends scenes.Scene
 			constructor: ->
 				super()
-				@add new Player 0, 0
+				@add new Player app.width / 2, app.height / 2
+
+				for x in [0..app.width] by Wall.WIDTH
+					@add new Wall x, 0
+					@add new Wall x, app.height - Wall.WIDTH
+				for y in [0..app.height] by Wall.WIDTH
+					@add new Wall 0, y
+					@add new Wall app.width - Wall.WIDTH, y
 
 		return {
 			PlayScene: PlayScene
