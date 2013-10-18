@@ -10,6 +10,9 @@ define {
 	state: {}
 	mappings: {}
 
+	mouseX: 0
+	mouseY: 0
+
 	isDown: (key) ->
 		if @mappings[key]?
 			return @isDown @mappings[key]
@@ -29,11 +32,15 @@ define {
 			@mappings[from] = to
 
 	watch: ($el) ->
-		$el.keydown((e) =>
+		$el.keydown (e) =>
 			e.preventDefault() if SPECIAL_BROWSER_KEYS.indexOf(e.which) isnt -1
 			@state[e.which] = 'down'
-		).keyup((e) =>
+
+		.keyup (e) =>
 			e.preventDefault() if SPECIAL_BROWSER_KEYS.indexOf(e.which) isnt -1
 			@state[e.which] = 'up'
-		)
+
+		.mousemove (e) =>
+			@mouseX = e.pageX - $el.parent().offset().left
+			@mouseY = e.pageY - $el.parent().offset().top
 }

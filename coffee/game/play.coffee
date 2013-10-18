@@ -31,7 +31,9 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				@vel.y = dy * @speed
 
 				if input.isDown 'shoot'
-					shot = new Shot @pos.x, @pos.y, 300, 0
+					dx = input.mouseX - @pos.x
+					dy = input.mouseY - @pos.y
+					shot = new Shot @pos.x, @pos.y, 300, Math.atan2 dy, dx
 					@scene.add shot
 
 		class PlayScene extends scenes.Scene
