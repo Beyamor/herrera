@@ -1,25 +1,35 @@
 define ['core/debug', 'core/app'], (debug, app) ->
 	class Scene
 		constructor: ->
-			@entities = []
+			@entities	= []
+			@toAdd		= []
+			@toRemove	= []
 
 		add: (e) ->
 			return unless e?
-			e.scene = this
-			@entities.push e
-			@entities.sort (a, b) -> b.layer - a.layer
+			@toAdd.push e
 
 		remove: (e) ->
 			return unless e?
-
-			index = @entities.indexOf e
-			return unless index >= -1
-
-			@entities[e].scene = null
-			@entities.splice index, 1
+			@toRemove.push e
 
 		update: ->
 			entity.update() for entity in @entities
+
+			if @toAdd.length isnt 0
+				for entity in @toAdd
+					entity.scene = this
+					@entities.push entity
+				@entities.sort (a, b) -> b.layer - a.layer
+				@toAdd = []
+
+			if @toRemove.length isnt 0
+				for entity in @toRemove
+					index = @entities.indexOf entity
+					if index != -1
+						@entities.splice index, 1
+					entity.scene = null
+				@toRemove = []
 
 		render: ->
 			entity.render() for entity in @entities
@@ -36,6 +46,15 @@ define ['core/debug', 'core/app'], (debug, app) ->
 					)
 					context.strokeStyle = 'red'
 					context.stroke()
+
+		collide: (e1, type) ->
+			for e2 in @entities when e2 isnt e1 and e2.hasType type
+				noCollision = (e1.right < e2.left or
+						e1.left > e2.right or
+						e1.bottom < e2.top or
+						e1.top > e2.bottom)
+				return e2 if not noCollision
+			return null
 
 	return {
 		Scene: Scene

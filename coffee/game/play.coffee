@@ -14,6 +14,8 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 				@width	= @graphic.width
 				@height	= @graphic.height
 
+				@type = 'wall'
+
 		class Shot extends Entity
 			constructor: (x, y, speed, direction) ->
 				super x, y, new Image 'shot-sprite'
@@ -27,6 +29,12 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 
 				@graphic.rotate(direction).centerOrigin()
 				@layer = 100
+
+			update: ->
+				super()
+
+				if @scene.collide this, 'wall'
+					@scene.remove this
 
 		class Player extends Entity
 			constructor: (x, y) ->
