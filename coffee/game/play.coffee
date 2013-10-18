@@ -4,6 +4,7 @@ define ['core/app', 'core/scenes', 'core/entities', 'core/graphics',
 		class Shot extends entities.Entity
 			constructor: (x, y) ->
 				super x, y, new gfx.Image 'shot-sprite'
+				@layer = 100
 
 		class Player extends entities.Entity
 			constructor: (x, y) ->

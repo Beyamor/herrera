@@ -7,6 +7,7 @@ define ->
 			return unless e?
 			e.scene = this
 			@entities.push e
+			@entities.sort (a, b) -> b.layer - a.layer
 
 		remove: (e) ->
 			return unless e?
