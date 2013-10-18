@@ -1,5 +1,9 @@
 define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play, debug) ->
-	debug.loading = false
+	debug.config
+		enabled: true
+		types:
+			load: false
+			fps: false
 
 	app.assets = [
 		['player-sprite', 'res/img/player.png'],

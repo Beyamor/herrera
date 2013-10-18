@@ -4,6 +4,7 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 		loop: ->
 			newTime = new Date
 			@elapsed =  (newTime - @previousTime) * 0.001
+			debug.logType 'fps', @elapsed
 
 			@scene.update() if @scene
 
@@ -42,7 +43,7 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 				queue = new createjs.LoadQueue true
 				queue.addEventListener 'complete', => @start()
 				queue.addEventListener 'fileload', (e) ->
-					debug.log "loaded #{e.item.src}" if debug.loading
+					debug.logType 'load', "loaded #{e.item.src}"
 					
 				for [id, src] in @assets
 					queue.loadFile {id: id, src: src}
