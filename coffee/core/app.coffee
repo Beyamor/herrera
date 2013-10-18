@@ -1,4 +1,4 @@
-define ['core/canvas', 'core/input'], (cnvs, input) ->
+define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 
 	return {
 		loop: ->
@@ -41,7 +41,8 @@ define ['core/canvas', 'core/input'], (cnvs, input) ->
 			if @assets
 				queue = new createjs.LoadQueue true
 				queue.addEventListener 'complete', => @start()
-				queue.addEventListener 'fileload', (e) -> console.log "loaded #{e.item.src}"
+				queue.addEventListener 'fileload', (e) ->
+					debug.log "loaded #{e.item.src}" if debug.loading
 					
 				for [id, src] in @assets
 					queue.loadFile {id: id, src: src}

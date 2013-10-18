@@ -1,4 +1,6 @@
-define ['core/app', 'core/input', 'game/play'], (app, input, play) ->
+define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play, debug) ->
+	debug.loading = false
+
 	app.assets = [
 		['player-sprite', 'res/img/player.png']
 	]
