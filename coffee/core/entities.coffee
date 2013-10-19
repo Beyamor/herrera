@@ -101,7 +101,7 @@ define ['core/app', 'core/util'], (app, util) ->
 
 	class ns.EntityList
 		constructor: ->
-			@entities	= []
+			@list	= []
 			@toAdd	 	= []
 			@toRemove	= []
 
@@ -139,8 +139,8 @@ define ['core/app', 'core/util'], (app, util) ->
 			minX = minY = Infinity
 			maxX = maxY = -Infinity
 
-			if @entities.length > 0
-				for entity in @entities
+			if @list.length > 0
+				for entity in @list
 					minX = Math.min minX, entity.x
 					maxX = Math.max maxX, entity.x
 					minY = Math.min minY, entity.y
@@ -157,9 +157,9 @@ define ['core/app', 'core/util'], (app, util) ->
 						@entityCells[x] or= {}
 						@entityCells[x][y] or= []
 
-			@addToCells(entity) for entity in @entities
+			@addToCells(entity) for entity in @list
 
-			for entity in @entities
+			for entity in @list
 				# so, this isn't perfect
 				# cause, like, what if this entity moves some other one?
 				# but whatever, probably good enough to just handle this case
@@ -182,19 +182,19 @@ define ['core/app', 'core/util'], (app, util) ->
 
 			if @toAdd.length isnt 0
 				for entity in @toAdd
-					@entities.push entity
-				@entities.sort (a, b) -> b.layer - a.layer
+					@list.push entity
+				@list.sort (a, b) -> b.layer - a.layer
 				@toAdd = []
 
 			if @toRemove.length isnt 0
 				for entity in @toRemove
-					index = @entities.indexOf entity
+					index = @list.indexOf entity
 					if index != -1
-						@entities.splice index, 1
+						@list.splice index, 1
 				@toRemove = []
 
 		render: ->
-			entity.render() for entity in @entities
+			entity.render() for entity in @list
 
 		roughCollisions: (entity) ->
 			bounds = @cellBounds entity
