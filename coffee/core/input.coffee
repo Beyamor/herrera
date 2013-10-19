@@ -55,4 +55,6 @@ define {
 
 		.mouseup (e) =>
 			@state[eventToMouseButton(e)] = 'up'
+
+		$el.attr 'oncontextmenu', 'return false;'
 }
