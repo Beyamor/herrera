@@ -7,7 +7,7 @@ define ['core/app', 'core/scenes', 'game/entities', 'core/cameras', 'game/levels
 		class ns.PlayScene extends scenes.Scene
 			constructor: ->
 				super()
-				player = new Player app.width / 2, app.height / 2
+				player = new Player 100, 100
 				@add player
 
 				level = new levels.Level

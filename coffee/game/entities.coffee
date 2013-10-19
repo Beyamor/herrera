@@ -43,11 +43,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 				super x, y, new Image 'player-sprite'
 				@graphic.centerOrigin()
 				
-				@width = @graphic.width
-				@height = @graphic.height
+				@width = @height = 40
 				@center()
 
-				@speed = 200
+				@speed = 400
 
 				@collisionHandlers =
 					wall: -> return true
@@ -71,7 +70,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				if input.isDown 'shoot'
 					dx = input.mouseX - @pos.x + @scene.camera.x
 					dy = input.mouseY - @pos.y + @scene.camera.y
-					shot = new ns.Shot @pos.x, @pos.y, 300, Math.atan2 dy, dx
+					shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
 					@scene.add shot
 
 		return ns

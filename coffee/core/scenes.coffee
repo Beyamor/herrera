@@ -24,7 +24,7 @@ define ['core/debug', 'core/app', 'core/cameras', 'core/util', 'core/entities'],
 				@entities.render()
 
 				if debug.isEnabled 'hitboxes'
-					for entity in @entities
+					for entity in @entities.entities
 						context = app.canvas.context
 						context.beginPath()
 						context.rect(
