@@ -151,7 +151,35 @@ define ['core/app', 'core/util'], (app, util) ->
 					for y in [bounds.minCellY..bounds.maxCellY]
 						@entityCells[x][y].push entity
 
-			entity.update() for entity in @entities
+			for entity in @entities
+				# so, this isn't perfect
+				# cause, like, what if this entity moves some other one?
+				# but whatever, probably good enough to just handle this case
+				prevX = entity.x
+				prevY = entity.y
+
+				entity.update()
+
+				if entity.x isnt prevX or entity.y isnt prevY
+					newX		= entity.x
+					newY		= entity.y
+					entity.x	= prevX
+					entity.y	= prevY
+					prevBounds	= @cellBounds entity
+
+					for x in [prevBounds.minCellX..prevBounds.maxCellX]
+						for y in [prevBounds.minCellY..prevBounds.maxCellY]
+							@entityCells[x][y].remove entity
+
+					entity.x	= newX
+					entity.y	= newY
+					newBounds	= @cellBounds entity
+
+					for x in [newBounds.minCellX..newBounds.maxCellX]
+						for y in [newBounds.minCellY..newBounds.maxCellY]
+							@entityCells[x] or= {}
+							@entityCells[x][y] or= []
+							@entityCells[x][y].push entity
 
 			if @toAdd.length isnt 0
 				for entity in @toAdd

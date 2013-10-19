@@ -2,6 +2,11 @@ define ->
 	Function::define = (prop, desc) ->
 		Object.defineProperty this.prototype, prop, desc
 
+	Array::remove = (val) ->
+		index = this.indexOf val
+		return unless index > -1
+		@splice index, 1
+
 	array2d = (width, height, constructor) ->
 		a = []
 		for i in [0...width]
