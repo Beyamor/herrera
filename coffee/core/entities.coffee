@@ -138,7 +138,11 @@ define ['core/app', 'core/util'], (app, util) ->
 				@minCellY = Math.floor(minY / CELL_HEIGHT)
 				@maxCellY = Math.ceil(maxY / CELL_HEIGHT)
 
-				@entityCells = util.array2d (@maxCellX - @minCellX + 1), (@maxCellY - @minCellY + 1), -> []
+				@entityCells = {}
+				for x in [@minCellX..@maxCellX]
+					for y in [@minCellY..@maxCellY]
+						@entityCells[x] or= {}
+						@entityCells[x][y] or= []
 
 			for entity in @entities
 				bounds = @cellBounds entity
