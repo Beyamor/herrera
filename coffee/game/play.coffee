@@ -10,8 +10,8 @@ define ['core/app', 'core/scenes', 'game/entities', 'core/cameras', 'game/levels
 				player = new Player app.width / 2, app.height / 2
 				@add player
 
-				room = new levels.Room
-				for e in room.realize()
+				level = new levels.Level
+				for e in level.realize()
 					@add e
 
 				@camera = new cameras.EntityFollower player, @camera
