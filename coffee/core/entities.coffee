@@ -121,6 +121,19 @@ define ['core/app', 'core/util'], (app, util) ->
 				maxCellY: Math.ceil(e.bottom / CELL_HEIGHT)
 			}
 
+		addToCells: (e) ->
+			bounds = @cellBounds e
+
+			for x in [bounds.minCellX..bounds.maxCellX]
+				for y in [bounds.minCellY..bounds.maxCellY]
+					@entityCells[x][y].push e
+
+		removeFromCells: (e) ->
+			bounds = @cellBounds e
+
+			for x in [bounds.minCellX..bounds.maxCellX]
+				for y in [bounds.minCellY..bounds.maxCellY]
+					@entityCells[x][y].remove e
 
 		update: ->
 			minX = minY = Infinity
@@ -144,12 +157,7 @@ define ['core/app', 'core/util'], (app, util) ->
 						@entityCells[x] or= {}
 						@entityCells[x][y] or= []
 
-			for entity in @entities
-				bounds = @cellBounds entity
-
-				for x in [bounds.minCellX..bounds.maxCellX]
-					for y in [bounds.minCellY..bounds.maxCellY]
-						@entityCells[x][y].push entity
+			@addToCells(entity) for entity in @entities
 
 			for entity in @entities
 				# so, this isn't perfect
@@ -161,25 +169,16 @@ define ['core/app', 'core/util'], (app, util) ->
 				entity.update()
 
 				if entity.x isnt prevX or entity.y isnt prevY
-					newX		= entity.x
-					newY		= entity.y
-					entity.x	= prevX
-					entity.y	= prevY
-					prevBounds	= @cellBounds entity
+					newX = entity.x
+					newY = entity.y
 
-					for x in [prevBounds.minCellX..prevBounds.maxCellX]
-						for y in [prevBounds.minCellY..prevBounds.maxCellY]
-							@entityCells[x][y].remove entity
+					entity.x = prevX
+					entity.y = prevY
+					@removeFromCells(entity)
 
-					entity.x	= newX
-					entity.y	= newY
-					newBounds	= @cellBounds entity
-
-					for x in [newBounds.minCellX..newBounds.maxCellX]
-						for y in [newBounds.minCellY..newBounds.maxCellY]
-							@entityCells[x] or= {}
-							@entityCells[x][y] or= []
-							@entityCells[x][y].push entity
+					entity.x = newX
+					entity.y = newY
+					@addToCells(entity)
 
 			if @toAdd.length isnt 0
 				for entity in @toAdd
