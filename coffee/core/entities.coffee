@@ -113,6 +113,15 @@ define ['core/app', 'core/util'], (app, util) ->
 			return unless e?
 			@toRemove.push e
 
+		cellBounds: (e) ->
+			return {
+				minCellX: Math.floor(e.left / CELL_WIDTH)
+				maxCellX: Math.ceil(e.right / CELL_WIDTH)
+				minCellY: Math.floor(e.top / CELL_HEIGHT)
+				maxCellY: Math.ceil(e.bottom / CELL_HEIGHT)
+			}
+
+
 		update: ->
 			minX = minY = Infinity
 			maxX = maxY = -Infinity
@@ -132,13 +141,10 @@ define ['core/app', 'core/util'], (app, util) ->
 				@entityCells = util.array2d (@maxCellX - @minCellX + 1), (@maxCellY - @minCellY + 1), -> []
 
 			for entity in @entities
-				minCellX = Math.floor(entity.left / CELL_WIDTH)
-				maxCellX = Math.ceil(entity.right / CELL_WIDTH)
-				minCellY = Math.floor(entity.top / CELL_HEIGHT)
-				maxCellY = Math.ceil(entity.bottom / CELL_HEIGHT)
+				bounds = @cellBounds entity
 
-				for x in [minCellX..maxCellX]
-					for y in [minCellY..maxCellY]
+				for x in [bounds.minCellX..bounds.maxCellX]
+					for y in [bounds.minCellY..bounds.maxCellY]
 						@entityCells[x][y].push entity
 
 			entity.update() for entity in @entities
@@ -160,14 +166,11 @@ define ['core/app', 'core/util'], (app, util) ->
 			entity.render() for entity in @entities
 
 		roughCollisions: (entity) ->
-			minCellX = Math.floor(entity.left / CELL_WIDTH)
-			maxCellX = Math.ceil(entity.right / CELL_WIDTH)
-			minCellY = Math.floor(entity.top / CELL_HEIGHT)
-			maxCellY = Math.ceil(entity.bottom / CELL_HEIGHT)
+			bounds = @cellBounds entity
 
 			candidates = []
-			for x in [minCellX..maxCellX]
-				for y in [minCellY..maxCellY]
+			for x in [bounds.minCellX..bounds.maxCellX]
+				for y in [bounds.minCellY..bounds.maxCellY]
 					candidates = candidates.concat @entityCells[x][y]
 
 			return candidates
