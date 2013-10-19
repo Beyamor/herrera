@@ -38,11 +38,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 							type: "burst"
 							x: @x
 							y: @y
-							amount: 1
+							amount: 3
 							particle:
 								image: "shot-spark-sprite"
-								lifespan: [0.1, 0.2]
-								speed: [50, 150]
+								lifespan: [0.08, 0.12]
+								speed: [20, 50]
 								direction: Math.atan2(@vel.y, @vel.x) - Math.PI
 								directionWiggle: 0.5
 
