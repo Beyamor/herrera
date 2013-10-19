@@ -46,14 +46,33 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 	class ns.Burst
 		constructor: (@opts) ->
 			@isFinished = true
+			@x = @opts.x
+			@y = @opts.y
+			@particle = @opts.particle
 
 		update: ->
 			amount = @opts.amount or 1
 
-			@opts.particle.x = @opts.x
-			@opts.particle.y = @opts.y
+			@opts.particle.x = @x
+			@opts.particle.y = @y
 			for i in [0...amount]
-				@system.addParticle @opts.particle
+				@system.addParticle @particle
+
+	class ns.Continuous
+		constructor: (@opts) ->
+			@x = @opts.x
+			@y = @opts.y
+			@particle = @opts.particle
+
+		kill: ->
+			@isFinished = true
+
+		update: ->
+			amount = @opts.amount or 1
+			@opts.particle.x = @x
+			@opts.particle.y = @y
+			for i in [0...amount]
+				@system.addParticle @particle
 
 	class ns.ParticleSystem
 		constructor: (@scene) ->
@@ -63,9 +82,11 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 		addEmitter: (opts) ->
 			switch opts.type
 				when "burst" then emitter = new ns.Burst opts
+				when "continuous" then emitter = new ns.Continuous opts
 				else throw new Error "Uknown emitter type #{opts.type}"
 			emitter.system = this
 			@emitters.push emitter
+			return emitter
 
 		addParticle: (particle) ->
 			@particles.push new ns.Particle particle

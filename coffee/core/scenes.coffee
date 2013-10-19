@@ -11,9 +11,11 @@ define ['core/debug', 'core/app', 'core/cameras', 'core/util', 'core/entities', 
 				return unless e?
 				e.scene = this
 				@entities.add e
+				e.added() if e.added?
 
 			remove: (e) ->
 				return unless e?
+				e.removed() if e.removed?
 				@entities.remove e
 				e.scene = null
 
