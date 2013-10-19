@@ -1,5 +1,9 @@
 define ['core/app', 'core/util'], (app, util) ->
-	class Entity
+	ns = {}
+
+	CELL_WIDTH = CELL_HEIGHT = 200
+
+	class ns.Entity
 		constructor: (x=0, y=0, @graphic=null) ->
 			@pos	= {x: x, y: y}
 			@vel	= {x: 0, y: 0}
@@ -20,7 +24,7 @@ define ['core/app', 'core/util'], (app, util) ->
 			@pos.x = x
 			@pos.y = y
 
-			result = @scene.collide this, type
+			result = @scene.entities.collide this, type
 
 			@pos.x = prevX
 			@pos.y = prevY
@@ -95,6 +99,83 @@ define ['core/app', 'core/util'], (app, util) ->
 			get: -> @pos.y
 			set: (y) -> @pos.y = y
 
-	return {
-		Entity: Entity
-	}
+	class ns.EntityList
+		constructor: ->
+			@entities	= []
+			@toAdd	 	= []
+			@toRemove	= []
+
+		add: (e) ->
+			return unless e?
+			@toAdd.push e
+
+		remove: (e) ->
+			return unless e?
+			@toRemove.push e
+
+		update: ->
+			minX = minY = Infinity
+			maxX = maxY = -Infinity
+
+			if @entities.length > 0
+				for entity in @entities
+					minX = Math.min minX, entity.x
+					maxX = Math.max maxX, entity.x
+					minY = Math.min minY, entity.y
+					maxY = Math.max maxY, entity.y
+
+				@minCellX = Math.floor(minX / CELL_WIDTH)
+				@maxCellX = Math.ceil(maxX / CELL_WIDTH)
+				@minCellY = Math.floor(minY / CELL_HEIGHT)
+				@maxCellY = Math.ceil(maxY / CELL_HEIGHT)
+
+				@entityCells = util.array2d (@maxCellX - @minCellX + 1), (@maxCellY - @minCellY + 1), -> []
+
+			for entity in @entities
+				minCellX = Math.floor(entity.left / CELL_WIDTH)
+				maxCellX = Math.ceil(entity.right / CELL_WIDTH)
+				minCellY = Math.floor(entity.top / CELL_HEIGHT)
+				maxCellY = Math.ceil(entity.bottom / CELL_HEIGHT)
+
+				for x in [minCellX..maxCellX]
+					for y in [minCellY..maxCellY]
+						@entityCells[x][y].push entity
+
+			entity.update() for entity in @entities
+
+			if @toAdd.length isnt 0
+				for entity in @toAdd
+					@entities.push entity
+				@entities.sort (a, b) -> b.layer - a.layer
+				@toAdd = []
+
+			if @toRemove.length isnt 0
+				for entity in @toRemove
+					index = @entities.indexOf entity
+					if index != -1
+						@entities.splice index, 1
+				@toRemove = []
+
+		render: ->
+			entity.render() for entity in @entities
+
+		roughCollisions: (entity) ->
+			minCellX = Math.floor(entity.left / CELL_WIDTH)
+			maxCellX = Math.ceil(entity.right / CELL_WIDTH)
+			minCellY = Math.floor(entity.top / CELL_HEIGHT)
+			maxCellY = Math.ceil(entity.bottom / CELL_HEIGHT)
+
+			candidates = []
+			for x in [minCellX..maxCellX]
+				for y in [minCellY..maxCellY]
+					candidates = candidates.concat @entityCells[x][y]
+
+			return candidates
+
+
+		collide: (e1, type) ->
+			for e2 in @roughCollisions(e1) when e2 isnt e1 and e2.hasType type
+				return e2 if util.aabbsIntersect e1, e2
+			return null
+
+	return ns
