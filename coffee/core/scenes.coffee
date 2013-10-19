@@ -1,10 +1,11 @@
-define ['core/debug', 'core/app', 'core/cameras', 'core/util', 'core/entities'],
-	(debug, app, cameras, util, entities) ->
+define ['core/debug', 'core/app', 'core/cameras', 'core/util', 'core/entities', 'core/particles'],
+	(debug, app, cameras, util, entities, particles) ->
 
 		class Scene
 			constructor: ->
 				@camera		= new cameras.Camera
 				@entities	= new entities.EntityList
+				@particles	= new particles.ParticleSystem this
 
 			add: (e) ->
 				return unless e?
@@ -18,10 +19,13 @@ define ['core/debug', 'core/app', 'core/cameras', 'core/util', 'core/entities'],
 
 			update: ->
 				@entities.update()
+				@particles.update()
 				@camera.update()
 
 			render: ->
+				# TODO: maybe merge entity and particle lists
 				@entities.render()
+				@particles.render()
 
 				if debug.isEnabled 'hitboxes'
 					for entity in @entities.list

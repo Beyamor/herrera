@@ -55,7 +55,10 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 
 				# cool. uh, now, let's give 'em some way of getting those assets
 				@assets = {
-					get: (which) -> queue.getResult which
+					get: (which) ->
+						result = queue.getResult which
+						throw new Error "Uknown asset #{which}" unless result
+						return result
 				}
 			else
 				@start()

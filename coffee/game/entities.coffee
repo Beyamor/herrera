@@ -1,6 +1,6 @@
 define ['core/app', 'core/entities', 'core/graphics',
-	'core/input'],
-	(app, entities, gfx, input) ->
+	'core/input', 'core/particles'],
+	(app, entities, gfx, input, particles) ->
 		ns = {}
 
 		Entity	= entities.Entity
@@ -34,6 +34,18 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 				@collisionHandlers =
 					wall: =>
+						@scene.particles.addEmitter
+							type: "burst"
+							x: @x
+							y: @y
+							amount: 1
+							particle:
+								image: "shot-spark-sprite"
+								lifespan: [0.1, 0.2]
+								speed: [50, 150]
+								direction: Math.atan2(@vel.y, @vel.x) - Math.PI
+								directionWiggle: 0.5
+
 						@scene.remove this
 						@vel.x = @vel.y = 0
 						return true
