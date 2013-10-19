@@ -2,12 +2,12 @@ define ->
 	Function::define = (prop, desc) ->
 		Object.defineProperty this.prototype, prop, desc
 
-	array2d = (width, height) ->
+	array2d = (width, height, constructor) ->
 		a = []
 		for i in [0...width]
 			a.push []
 			for j in [0...height]
-				a[i].push j
+				a[i].push if constructor then constructor() else null
 
 		a.each = (f) ->
 			for i in [0...a.length]
