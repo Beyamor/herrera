@@ -12,8 +12,7 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 
 			@pos = {x: args.x, y: args.y}
 
-			@image = new gfx.Image args.image
-			@image.centerOrigin()
+			@image = new gfx.Image args.image, centered: true
 
 			@elapsed	= 0
 			@lifespan	= realizeArg args.lifespan

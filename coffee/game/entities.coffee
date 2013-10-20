@@ -21,7 +21,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 		class ns.Shot extends Entity
 			constructor: (x, y, speed, direction) ->
-				super x, y, new Image 'shot-sprite'
+				super x, y, new Image 'shot-sprite', centered: true
 
 				@vel.x = speed * Math.cos direction
 				@vel.y = speed * Math.sin direction
@@ -73,8 +73,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 		class ns.Player extends Entity
 			constructor: (x, y) ->
-				super x, y, new Image 'player-sprite'
-				@graphic.centerOrigin()
+				super x, y, new Image 'player-sprite', centered: true
 				
 				@width = @height = 40
 				@center()

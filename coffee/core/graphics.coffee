@@ -18,14 +18,16 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			target.context.drawImage @canvas.el, x, y
 
 	class ns.Image
-		constructor: (asset) ->
-			@img		= app.assets.get asset
+		constructor: (src, args) ->
+			@img		= app.assets.get src
 			@canvas		= new Canvas width: @img.width, height: @img.height
 			@origin		= x: 0, y: 0
 			@rotation	= 0
 			@dirty		= true
 			@width		= @img.width
 			@height		= @img.height
+
+			@centerOrigin() if args? and args.centered?
 
 		centerOrigin: ->
 			@origin.x = @img.width / 2
