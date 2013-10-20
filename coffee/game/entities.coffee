@@ -122,7 +122,12 @@ define ['core/app', 'core/entities', 'core/graphics',
 					centered: true
 					type: 'enemy'
 
+				@hits = 3
+
 			hit: ->
-				@scene.remove this
+				--@hits
+
+				if @hits <= 0
+					@scene.remove this
 
 		return ns
