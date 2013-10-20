@@ -15,8 +15,9 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 			@image = new gfx.Image args.image
 			@image.centerOrigin()
 
-			@elapsed = 0
-			@lifespan = realizeArg args.lifespan
+			@elapsed	= 0
+			@lifespan	= realizeArg args.lifespan
+			@layer		= args.layer or 0
 
 			if args.speed? and args.direction?
 				direction = realizeArg args.direction

@@ -25,9 +25,11 @@ define ['core/debug', 'core/app', 'core/cameras', 'core/util', 'core/entities', 
 				@camera.update()
 
 			render: ->
-				# TODO: maybe merge entity and particle lists
-				@entities.render()
-				@particles.render()
+				onscreenEntities = @entities.inBounds @camera
+				renderables = onscreenEntities.concat @particles.particles
+
+				renderables.sort (a, b) -> b.layer - a.layer
+				renderable.render() for renderable in renderables
 
 				if debug.isEnabled 'hitboxes'
 					for entity in @entities.list

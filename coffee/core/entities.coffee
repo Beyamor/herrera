@@ -71,7 +71,7 @@ define ['core/app', 'core/util'], (app, util) ->
 					handler(collision) if collision
 			
 		render: ->
-			return unless @graphic
+			return unless @graphic and @scene and @scene.camera
 			@graphic.render app.canvas, @pos, @scene.camera
 
 		hasType: (type) ->
@@ -181,7 +181,6 @@ define ['core/app', 'core/util'], (app, util) ->
 			if @toAdd.length isnt 0
 				for entity in @toAdd
 					@list.push entity
-				@list.sort (a, b) -> b.layer - a.layer
 				@toAdd = []
 
 			if @toRemove.length isnt 0
@@ -194,19 +193,22 @@ define ['core/app', 'core/util'], (app, util) ->
 		render: ->
 			entity.render() for entity in @list
 
-		roughCollisions: (entity) ->
-			bounds = @cellBounds entity
+		inBounds: (rect) ->
+			bounds = @cellBounds rect
 
-			candidates = []
-			for x in [bounds.minCellX..bounds.maxCellX]
-				for y in [bounds.minCellY..bounds.maxCellY]
-					candidates = candidates.concat @entityCells[x][y]
+			es = []
 
-			return candidates
+			if @entityCells
+				for x in [bounds.minCellX..bounds.maxCellX]
+					for y in [bounds.minCellY..bounds.maxCellY]
+						if @entityCells[x] and @entityCells[x][y]
+							es = es.concat @entityCells[x][y]
+
+			return es
 
 
 		collide: (e1, type) ->
-			for e2 in @roughCollisions(e1) when e2 isnt e1 and e2.hasType type
+			for e2 in @inBounds(e1) when e2 isnt e1 and e2.hasType type
 				return e2 if util.aabbsIntersect e1, e2
 			return null
 

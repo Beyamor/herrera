@@ -8,10 +8,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 		class ns.Wall extends Entity
 			@WIDTH: 48
+			@LAYER: 200
 
 			constructor: (x, y) ->
 				super x, y, new Image 'wall-sprite'
-				@layer = 200
+				@layer = ns.Wall.LAYER
 
 				@width	= @graphic.width
 				@height	= @graphic.height
@@ -45,6 +46,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 								speed: [10, 40]
 								direction: Math.atan2(@vel.y, @vel.x) - Math.PI
 								directionWiggle: 2
+								layer: ns.Wall.LAYER + 1
+
 						@scene.remove this
 						@vel.x = @vel.y = 0
 						return true
