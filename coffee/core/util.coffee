@@ -34,4 +34,7 @@ define ->
 
 		directionFrom: (a, b) ->
 			Math.atan2 (b.y-a.y), (b.x-a.x)
+
+		random:
+			inRange: (min, max) -> min + Math.random() * (max - min)
 	}
