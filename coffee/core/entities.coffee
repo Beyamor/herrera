@@ -128,7 +128,9 @@ define ['core/app', 'core/util'], (app, util) ->
 			bounds = @cellBounds e
 
 			for x in [bounds.minCellX..bounds.maxCellX]
+				@entityCells[x] or= {}
 				for y in [bounds.minCellY..bounds.maxCellY]
+					@entityCells[x][y] or= []
 					@entityCells[x][y].push e
 
 		removeFromCells: (e) ->
@@ -139,27 +141,7 @@ define ['core/app', 'core/util'], (app, util) ->
 					@entityCells[x][y].remove e
 
 		update: ->
-			minX = minY = Infinity
-			maxX = maxY = -Infinity
-
-			if @list.length > 0
-				for entity in @list
-					minX = Math.min minX, entity.x
-					maxX = Math.max maxX, entity.x
-					minY = Math.min minY, entity.y
-					maxY = Math.max maxY, entity.y
-
-				@minCellX = Math.floor(minX / CELL_WIDTH)
-				@maxCellX = Math.ceil(maxX / CELL_WIDTH)
-				@minCellY = Math.floor(minY / CELL_HEIGHT)
-				@maxCellY = Math.ceil(maxY / CELL_HEIGHT)
-
-				@entityCells = {}
-				for x in [@minCellX..@maxCellX]
-					for y in [@minCellY..@maxCellY]
-						@entityCells[x] or= {}
-						@entityCells[x][y] or= []
-
+			@entityCells = {}
 			@addToCells(entity) for entity in @list
 
 			for entity in @list
