@@ -50,7 +50,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 								layer: ns.Wall.LAYER + 1
 
 						@scene.remove this
-						@vel.x = @vel.y = 0
+						return true
+
+					enemy: (enemy) =>
+						@scene.remove this
+						enemy.hit()
 						return true
 
 			#added: ->
@@ -116,5 +120,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 					graphic: (new Image 'silverfish-sprite', centered: true)
 					width: 40
 					centered: true
+					type: 'enemy'
+
+			hit: ->
+				@scene.remove this
 
 		return ns
