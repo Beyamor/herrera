@@ -52,11 +52,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 								directionWiggle: 2
 								layer: ns.Wall.LAYER + 1
 
-						@scene.remove this
+						@scene.remove this if @scene
 						return true
 
 					enemy: (enemy) =>
-						@scene.remove this
+						@scene.remove this if @scene
 						enemy.hit()
 						return true
 
@@ -165,6 +165,6 @@ define ['core/app', 'core/entities', 'core/graphics',
 				--@hits
 
 				if @hits <= 0
-					@scene.remove this
+					@scene.remove(this) if @scene
 
 		return ns
