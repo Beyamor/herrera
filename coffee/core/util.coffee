@@ -31,4 +31,7 @@ define ->
 				a.top > b.bottom)
 
 		array2d: array2d
+
+		directionFrom: (a, b) ->
+			Math.atan2 (b.y-a.y), (b.x-a.x)
 	}

@@ -1,6 +1,6 @@
 define ['core/app', 'core/entities', 'core/graphics',
-	'core/input', 'core/particles'],
-	(app, entities, gfx, input, particles) ->
+	'core/input', 'core/particles', 'core/util'],
+	(app, entities, gfx, input, particles, util) ->
 		ns = {}
 
 		Entity	= entities.Entity
@@ -84,6 +84,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					graphic: (new Image 'player-sprite', centered: true)
 					width: 40
 					centered: true
+					type: 'player'
 				
 				@speed = 400
 
@@ -123,6 +124,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 					type: 'enemy'
 
 				@hits = 3
+
+			update: ->
+				player	= @scene.entities.first 'player'
+				@graphic.rotate util.directionFrom this, player
 
 			hit: ->
 				--@hits

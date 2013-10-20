@@ -199,4 +199,8 @@ define ['core/app', 'core/util'], (app, util) ->
 				return e2 if util.aabbsIntersect e1, e2
 			return null
 
+		first: (type) ->
+			(return e) for e in @list when e.hasType type
+			return null
+
 	return ns
