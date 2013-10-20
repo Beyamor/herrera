@@ -6,10 +6,11 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			@elapsed =  (newTime - @previousTime) * 0.001
 			debug.showFPS @elapsed
 
-			@scene.update() if @scene
+			if @hasFocus
+				@scene.update() if @scene
 
-			@canvas.clear()
-			@scene.render() if @scene
+				@canvas.clear()
+				@scene.render() if @scene
 
 			@previousTime = newTime
 
@@ -25,14 +26,17 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			, 1000 / @fps
 
 		launch: (opts) ->
-			@width	= opts.width
-			@height	= opts.height
-			@fps	= (opts.fps or 30)
-			@init	= opts.init
+			@hasFocus	= true
+			@width		= opts.width
+			@height		= opts.height
+			@fps		= (opts.fps or 30)
+			@init		= opts.init
 
 			@container = $("##{opts.id}")
 				.width(@width)
 				.height(@height)
+				.focusin(=> @hasFocus = true)
+				.focusout(=> @hasFocus = false)
 
 			@canvas = new cnvs.Canvas {
 				width: @width
