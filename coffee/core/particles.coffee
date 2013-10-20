@@ -37,8 +37,9 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 		render: ->
 			@image.render @target, @pos, @camera
 
-		@define 'isDead',
-			get: -> @elapsed >= @lifespan
+		@accessors
+			isDead:
+				get: -> @elapsed >= @lifespan
 
 	class ns.Burst
 		constructor: (@opts) ->

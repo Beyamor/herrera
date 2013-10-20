@@ -1,6 +1,7 @@
 define ->
-	Function::define = (prop, desc) ->
-		Object.defineProperty this.prototype, prop, desc
+	Function::accessors = (definitions) ->
+		for prop, desc of definitions
+			Object.defineProperty this.prototype, prop, desc
 
 	Array::remove = (val) ->
 		index = this.indexOf val

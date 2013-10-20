@@ -77,25 +77,26 @@ define ['core/app', 'core/util'], (app, util) ->
 		hasType: (type) ->
 			@type? and @type is type
 
-		@define 'left',
-			get: -> @pos.x + @offset.x
+		@accessors
+			left:
+				get: -> @pos.x + @offset.x
 
-		@define 'right',
-			get: -> @left + @width
+			right:
+				get: -> @left + @width
 
-		@define 'top',
-			get: -> @pos.y + @offset.y
+			top:
+				get: -> @pos.y + @offset.y
 
-		@define 'bottom',
-			get: -> @top + @height
+			bottom:
+				get: -> @top + @height
 
-		@define 'x',
-			get: -> @pos.x
-			set: (x) -> @pos.x = x
+			x:
+				get: -> @pos.x
+				set: (x) -> @pos.x = x
 
-		@define 'y',
-			get: -> @pos.y
-			set: (y) -> @pos.y = y
+			y:
+				get: -> @pos.y
+				set: (y) -> @pos.y = y
 
 	class ns.EntityList
 		constructor: ->
