@@ -1,33 +1,29 @@
 define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 	ns = {}
 
+	realizeArg = (arg) ->
+		if Array.isArray arg
+			arg[0] + Math.random() * (arg[1] - arg[0])
+		else
+			arg
+
 	class ns.Particle
-		constructor: ({x: x, y: y, image: image, lifespan: lifespan, \
-				speed: speed, direction: direction, directionWiggle: directionWiggle}, \
-				@target, @camera) ->
+		constructor: (args, @target, @camera) ->
 
-			@pos = {x: x, y: y}
+			@pos = {x: args.x, y: args.y}
 
-			@image = new gfx.Image image
+			@image = new gfx.Image args.image
 			@image.centerOrigin()
 
 			@elapsed = 0
+			@lifespan = realizeArg args.lifespan
 
-			@lifespan =
-				if Array.isArray lifespan
-					lifespan[0] + Math.random() * (lifespan[1] - lifespan[0])
-				else
-					lifespan
+			if args.speed? and args.direction?
+				direction = realizeArg args.direction
+				if args.directionWiggle?
+					direction += -args.directionWiggle + Math.random() * args.directionWiggle * 2
 
-			if speed? and direction?
-				if directionWiggle?
-					direction += -directionWiggle + Math.random() * directionWiggle * 2
-
-				speed =
-					if Array.isArray speed
-						speed[0] + Math.random() * (speed[1] - speed[0])
-					else
-						speed
+				speed = realizeArg args.speed
 
 				@vel = {x: speed * Math.cos(direction), y: speed * Math.sin(direction)}
 
