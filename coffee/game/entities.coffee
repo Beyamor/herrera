@@ -11,27 +11,28 @@ define ['core/app', 'core/entities', 'core/graphics',
 			@LAYER: 200
 
 			constructor: (x, y) ->
-				super x, y, new Image 'wall-sprite'
-				@layer = ns.Wall.LAYER
-
-				@width	= @graphic.width
-				@height	= @graphic.height
-
-				@type = 'wall'
+				super
+					x: x
+					y: y
+					graphic: new Image 'wall-sprite'
+					width: ns.Wall.WIDTH
+					layer: ns.Wall.LAYER
+					type: 'wall'
 
 		class ns.Shot extends Entity
 			constructor: (x, y, speed, direction) ->
-				super x, y, new Image 'shot-sprite', centered: true
+				super
+					x: x
+					y: y
+					graphic: (new Image 'shot-sprite', centered: true)
+					width: 8
+					layer: 100
+					centered: true
 
 				@vel.x = speed * Math.cos direction
 				@vel.y = speed * Math.sin direction
 
-				@width	= @graphic.width
-				@height	= @graphic.height
-				@center()
-
 				@graphic.rotate(direction).centerOrigin()
-				@layer = 100
 
 				@collisionHandlers =
 					wall: =>
@@ -73,11 +74,13 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 		class ns.Player extends Entity
 			constructor: (x, y) ->
-				super x, y, new Image 'player-sprite', centered: true
+				super
+					x: x
+					y: y
+					graphic: (new Image 'player-sprite', centered: true)
+					width: 40
+					centered: true
 				
-				@width = @height = 40
-				@center()
-
 				@speed = 400
 
 				@collisionHandlers =
@@ -107,8 +110,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 		class ns.Silverfish extends Entity
 			constructor: (x, y) ->
-				super x, y, new Image 'silverfish-sprite', centered: true
-				@width = @height = 40
-				@center()
+				super
+					x: x
+					y: y
+					graphic: (new Image 'silverfish-sprite', centered: true)
+					width: 40
+					centered: true
 
 		return ns

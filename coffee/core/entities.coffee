@@ -4,14 +4,18 @@ define ['core/app', 'core/util'], (app, util) ->
 	CELL_WIDTH = CELL_HEIGHT = 200
 
 	class ns.Entity
-		constructor: (x=0, y=0, @graphic=null) ->
-			@pos	= {x: x, y: y}
-			@vel	= {x: 0, y: 0}
-			@layer	= 0
-			@width	= 0
-			@height	= 0
-			@offset	= {x: 0, y: 0}
-			@collisionHandlers = {}
+		constructor: (args) ->
+			@pos			= {x: args.x, y: args.y}
+			@graphic		= args.graphic
+			@vel			= {x: 0, y: 0}
+			@layer			= args.layer or 0
+			@width			= args.width or 0
+			@height			= args.height or args.width or 0
+			@offset			= {x: 0, y: 0}
+			@collisionHandlers	= {}
+			@type			= args.type
+
+			@center() if args.centered?
 
 		center: ->
 			@offset.x = -@width * 0.5
