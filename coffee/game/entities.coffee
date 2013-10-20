@@ -105,4 +105,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 					shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
 					@scene.add shot
 
+		class ns.Silverfish extends Entity
+			constructor: (x, y) ->
+				super x, y, new Image 'silverfish-sprite', centered: true
+				@width = @height = 40
+				@center()
+
 		return ns
