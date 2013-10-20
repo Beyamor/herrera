@@ -40,12 +40,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 							y: @y
 							amount: 3
 							particle:
-								image: "shot-spark-sprite"
-								lifespan: [0.08, 0.12]
-								speed: [20, 50]
+								image: "shot-smoke-sprite"
+								lifespan: [0.2, 0.4]
+								speed: [10, 40]
 								direction: Math.atan2(@vel.y, @vel.x) - Math.PI
-								directionWiggle: 0.5
-
+								directionWiggle: 2
 						@scene.remove this
 						@vel.x = @vel.y = 0
 						return true
