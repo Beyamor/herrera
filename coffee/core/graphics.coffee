@@ -58,6 +58,14 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			@prerender() if @dirty
 			x = point.x - @origin.x - camera.x
 			y = point.y - @origin.y - camera.y
+
+			# Uh, looks like this doesn't even matter at all
+			#return unless util.aabbsIntersect camera,
+			#	left: x
+			#	right: x + @width
+			#	top: y
+			#	bottom: y + @height
+
 			target.context.drawImage @canvas.el, x, y
 
 	return ns

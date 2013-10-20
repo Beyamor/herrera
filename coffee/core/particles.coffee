@@ -38,15 +38,6 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 				@pos.y += @vel.y * app.elapsed
 
 		render: (target, camera) ->
-			left	= @pos.x - @image.width / 2
-			top	= @pos.y - @image.height / 2
-
-			return unless util.aabbsIntersect camera,
-				left: left,
-				right: left + image.width
-				top: top
-				bottom: top + image.height
-
 			@image.render target, @pos, camera
 
 		@define 'isDead',
