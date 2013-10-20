@@ -1,12 +1,13 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
-	'core/org/actions'],
-	(app, entities, gfx, input, particles, util, actions) ->
+	'core/org/actions', 'game/entities/actions'],
+	(app, entities, gfx, input, particles, util, coreActions, actions) ->
 		ns = {}
 
-		Entity	= entities.Entity
-		Image	= gfx.Image
-		random	= util.random
+		Entity		= entities.Entity
+		Image		= gfx.Image
+		ActionList	= coreActions.ActionList
+		random		= util.random
 
 		class ns.Wall extends Entity
 			@WIDTH: 48
@@ -126,13 +127,13 @@ define ['core/app', 'core/entities', 'core/graphics',
 					type: 'enemy'
 
 				@hits		= 3
-				@actions	= new actions.ActionList
+				@actions	= new ActionList
 
 				@collisionHandlers =
 					wall: -> true
 
 				@pauseAction = =>
-					action = new actions.Delay Math.random()
+					action = new coreActions.Delay Math.random()
 					action.onEnd = =>
 						@actions.push @moveAction()
 					return action
