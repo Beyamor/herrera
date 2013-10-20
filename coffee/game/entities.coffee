@@ -91,7 +91,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@speed = 400
 
 				@collisionHandlers =
-					wall: -> return true
+					wall: -> true
 
 			update: ->
 				super()
@@ -128,6 +128,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@hits		= 3
 				@actions	= new actions.ActionList
 
+				@collisionHandlers =
+					wall: -> true
+
 				@pauseAction = =>
 					action = new actions.Delay Math.random()
 					action.onEnd = =>
@@ -139,7 +142,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 						x: @x + random.inRange -50, 50
 						y: @y + random.inRange -50, 50
 
-					action = new actions.MoveTo this, destination, 200, 10
+					action = new actions.MoveTo this, destination,
+						speed: 200
+						threshold: 5
+						timeout: 1
+
 					action.onEnd = =>
 						@actions.push @pauseAction()
 					return action
