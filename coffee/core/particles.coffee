@@ -3,7 +3,8 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 
 	class ns.Particle
 		constructor: ({x: x, y: y, image: image, lifespan: lifespan, \
-				speed: speed, direction: direction, directionWiggle: directionWiggle}) ->
+				speed: speed, direction: direction, directionWiggle: directionWiggle}, \
+				@target, @camera) ->
 
 			@pos = {x: x, y: y}
 
@@ -37,8 +38,8 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 				@pos.x += @vel.x * app.elapsed
 				@pos.y += @vel.y * app.elapsed
 
-		render: (target, camera) ->
-			@image.render target, @pos, camera
+		render: ->
+			@image.render @target, @pos, @camera
 
 		@define 'isDead',
 			get: -> @elapsed >= @lifespan
@@ -89,7 +90,7 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 			return emitter
 
 		addParticle: (particle) ->
-			@particles.push new ns.Particle particle
+			@particles.push new ns.Particle particle, app.canvas, @scene.camera
 
 		update: ->
 			emittersToRemove = []
@@ -105,6 +106,6 @@ define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 			@particles.remove(particle) for particle in particlesToRemove
 
 		render: ->
-			particle.render(app.canvas, @scene.camera) for particle in @particles
+			particle.render() for particle in @particles
 
 	return ns
