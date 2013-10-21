@@ -15,8 +15,7 @@ define ['game/entities', 'core/util'], (entities, util) ->
 				@tiles[0][j] = "wall"
 				@tiles[Room.WIDTH-1][j] = "wall"
 
-			if @xIndex is 0 and @yIndex is 0
-				@tiles[Room.WIDTH/2][Room.HEIGHT/2] = "silverfish"
+			@tiles[Room.WIDTH/2][Room.HEIGHT/2] = "silverfish"
 
 		fill: ->
 			for i in [0...Room.WIDTH]
