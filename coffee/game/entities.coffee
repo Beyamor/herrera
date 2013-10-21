@@ -150,26 +150,24 @@ define ['core/app', 'core/entities', 'core/graphics',
 						@actions.push @pauseAction()
 					return action
 
-				@behaviour = new bt.ForeverRoot(
-						new bt.OrderedSelector([
-							new bt.Concurrent([
-								new behaviours.CloseTo(this, (=> @player), 100),
-								new behaviours.Flee(this, (=> @player),
-									speed: 200
-								)
-							]),
-							new bt.Loop([
-								new bt.RandomDelay(0, 1),
-								new behaviours.WanderNearby(
-									this,
-									radius: 100
-									speed: 200
-									timeout: 1
-									threshold: 20
-								)
-							])
-						])
+				@behaviour = bt.forever(
+					bt.branch(
+						bt.concurrently(
+							new behaviours.CloseTo(this, (=> @player), 100),
+							new behaviours.Flee(this, (=> @player), speed: 200)
+						),
+						bt.loop(
+							bt.randomDelay(0, 1),
+							new behaviours.WanderNearby(
+								this,
+								radius: 100
+								speed: 200
+								timeout: 1
+								threshold: 20
+							)
+						)
 					)
+				)
 
 			update: ->
 				super()

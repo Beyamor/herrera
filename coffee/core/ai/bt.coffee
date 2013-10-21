@@ -23,6 +23,7 @@ define ['core/app', 'core/util'], (app, util) ->
 				return RUNNING
 			else
 				return SUCCESS
+	ns.delay = (duration) -> new ns.Delay duration
 
 	class ns.RandomDelay
 		constructor: (@minDuration, @maxDuration) ->
@@ -33,6 +34,7 @@ define ['core/app', 'core/util'], (app, util) ->
 
 		update: ->
 			return @delay.update()
+	ns.randomDelay = (min, max) -> new ns.RandomDelay min, max
 
 	class ns.Loop
 		constructor: (@children)->
@@ -57,6 +59,7 @@ define ['core/app', 'core/util'], (app, util) ->
 				return RUNNING
 			else
 				return FAILURE
+	ns.loop = (children...) -> new ns.Loop children
 
 	class ns.ForeverRoot
 		constructor: (@child) ->
@@ -70,6 +73,7 @@ define ['core/app', 'core/util'], (app, util) ->
 			result = @child.update()
 			if result is FAILURE
 				@pendingBegin = true
+	ns.forever = (child) -> new ns.ForeverRoot child
 
 	class ns.OrderedSelector
 		constructor: (@children) ->
@@ -95,6 +99,7 @@ define ['core/app', 'core/util'], (app, util) ->
 						++index
 
 			return FAILURE
+	ns.branch = (children...) -> new ns.OrderedSelector children
 
 	class ns.Concurrent
 		constructor: (@children) ->
@@ -113,5 +118,6 @@ define ['core/app', 'core/util'], (app, util) ->
 				return SUCCESS
 			else
 				return RUNNING
+	ns.concurrently = (children...) -> new ns.Concurrent children
 
 	return ns
