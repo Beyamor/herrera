@@ -153,10 +153,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@behaviour = bt.forever(
 					bt.branch(
 						bt.cond(
-							behaviours.closeTo(this, (=> @player), 100),
+							bt.checkOnce(
+								behaviours.closeTo(this, (=> @player), 50)),
 							behaviours.flee(this, (=> @player),
-								speed: 200
-								minDistance: 200
+								speed: 300
+								minDistance: 150
 							)
 						),
 						bt.loop(
@@ -166,7 +167,6 @@ define ['core/app', 'core/entities', 'core/graphics',
 								speed: 200
 								timeout: 1
 								threshold: 20
-
 							)
 						)
 					)

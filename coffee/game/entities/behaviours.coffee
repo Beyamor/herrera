@@ -15,15 +15,22 @@ define ['core/app', 'core/util', 'core/ai/bt'], (app, util, bt) ->
 				return bt.FAILURE
 
 	ns.flee = (entity, target, args) ->
-		target	= util.thunkWrap target
-		speed	= args.sped or 200
+		target		= util.thunkWrap target
+		speed		= args.speed or 200
+		minDistance	= args.minDistance
 
 		begin: ->
 		update: ->
+			if minDistance?
+				distance = util.distanceBetween entity, target()
+				return bt.SUCCESS if distance >= minDistance
+
 			direction = util.directionFrom target(), entity
 
 			entity.vel.x = Math.cos(direction) * speed
 			entity.vel.y = Math.sin(direction) * speed
+
+			return bt.RUNNING
 
 	ns.wanderNearby = (entity, args) ->
 		speed		= args.speed or 200

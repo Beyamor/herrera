@@ -118,4 +118,17 @@ define ['core/app', 'core/util'], (app, util) ->
 			else
 				return RUNNING
 
+	ns.checkOnce = (check) ->
+		begin: ->
+			@hasChecked = false
+			check.begin()
+
+		update: ->
+			if @hasChecked
+				return SUCCESS
+			else
+				result = check.update()
+				@hasChecked = true
+				return result
+
 	return ns
