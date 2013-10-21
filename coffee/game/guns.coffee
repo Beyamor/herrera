@@ -67,8 +67,8 @@ define ['core/util', 'core/app', 'core/canvas'],
 				context.lineWidth = 4
 
 			render: ->
+				return unless @player.gun
 				gun = @player.gun.model
-				return unless gun
 
 				@canvas.clear()
 				context = @canvas.context

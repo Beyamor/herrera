@@ -14,6 +14,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					graphic: new Image("gun-sprite", centered: true)
 					width: 24
 					layer: 150
+					type: 'gun'
 					centered: true
 				}
 				@model = guns.GunModel.createRandom()
@@ -109,18 +110,25 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@vel.x = dx * @speed
 				@vel.y = dy * @speed
 
-				@gun.update()
-				if input.isDown 'shoot'
-						if @gun.tryShooting()
-							dx = input.mouseX - @pos.x + @scene.camera.x
-							dy = input.mouseY - @pos.y + @scene.camera.y
-							shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
-							@scene.add shot
+				if @gun
+					@gun.update()
+					if input.isDown 'shoot'
+							if @gun.tryShooting()
+								dx = input.mouseX - @pos.x + @scene.camera.x
+								dy = input.mouseY - @pos.y + @scene.camera.y
+								shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
+								@scene.add shot
 
 				if input.pressed 'grab'
-					console.log 'pressed grab!'
-				if input.released 'grab'
-					console.log 'released grab!'
+					gun = @scene.entities.collide this, 'gun'
+
+					if gun
+						if @gun
+							@gun.x = @x
+							@gun.y = @y
+							@scene.add @gun
+						@scene.remove gun
+						@gun = gun
 
 		class ns.Silverfish extends Entity
 			constructor: (x, y) ->
