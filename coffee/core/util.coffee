@@ -1,4 +1,4 @@
-define ->
+define ['core/app'], (app) ->
 	Function::accessors = (definitions) ->
 		for prop, desc of definitions
 			Object.defineProperty this.prototype, prop, desc
@@ -20,6 +20,32 @@ define ->
 				for j in [0...a[i].length]
 					f i, j, a[i][j]
 		return a
+
+	class Timer
+		constructor: (args) ->
+			@period		= args.period
+			@callback	= args.callback
+			@loops		= args.loops
+			@elapsed	= 0
+
+		restart: ->
+			@elapsed	= 0
+			@running	= true
+			return this
+
+		update: ->
+			return unless @running
+
+			@elapsed += app.elapsed
+			
+			if @loops
+				while @elapsed >= @period
+					@elapsed -= @period
+					@callback()
+
+			else
+				if @elapsed >= @period
+					@callback()
 
 	return {
 		sign: (x) -> (x > 0) - (x < 0)
@@ -49,4 +75,6 @@ define ->
 
 		thunkWrap: (x) ->
 			if @isFunction(x) then x else -> x
+
+		Timer: Timer
 	}

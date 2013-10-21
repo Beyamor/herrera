@@ -1,7 +1,7 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
-	'core/ai/bt', 'game/entities/behaviours'],
-	(app, entities, gfx, input, particles, util, bt, behaviours) ->
+	'core/ai/bt', 'game/entities/behaviours', 'game/guns'],
+	(app, entities, gfx, input, particles, util, bt, behaviours, guns) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -93,6 +93,13 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@collisionHandlers =
 					wall: -> true
 
+				@gun = new guns.Gun {
+					capacity: 3
+					firingRate: 10
+					rechargeDelay: 0.4
+					rechargeSpeed: 1
+				}
+
 			update: ->
 				super()
 
@@ -109,11 +116,13 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@vel.x = dx * @speed
 				@vel.y = dy * @speed
 
+				@gun.update()
 				if input.isDown 'shoot'
-					dx = input.mouseX - @pos.x + @scene.camera.x
-					dy = input.mouseY - @pos.y + @scene.camera.y
-					shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
-					@scene.add shot
+						if @gun.tryShooting()
+							dx = input.mouseX - @pos.x + @scene.camera.x
+							dy = input.mouseY - @pos.y + @scene.camera.y
+							shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
+							@scene.add shot
 
 		class ns.Silverfish extends Entity
 			constructor: (x, y) ->
