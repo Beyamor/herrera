@@ -18,7 +18,7 @@ define ->
 			@context.clearRect 0, 0, @$el.width(), @$el.height()
 			return this
 
-		setDims: (width, height) ->
+		setDims: (@width, @height) ->
 			@$el.width width
 			@$el.height height
 			@context.canvas.width = width

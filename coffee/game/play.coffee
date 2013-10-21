@@ -1,5 +1,5 @@
-define ['core/app', 'core/scenes', 'game/entities', 'core/cameras', 'game/levels'],
-	(app, scenes, entities, cameras, levels) ->
+define ['core/app', 'core/scenes', 'game/entities', 'core/cameras', 'game/levels', 'game/guns'],
+	(app, scenes, entities, cameras, levels, guns) ->
 		ns = {}
 
 		Player = entities.Player
@@ -15,5 +15,11 @@ define ['core/app', 'core/scenes', 'game/entities', 'core/cameras', 'game/levels
 					@add e
 
 				@camera = new cameras.EntityFollower player, @camera
+
+				@ammoDisplay = new guns.AmmoDisplay player.gun
+
+			render: ->
+				super()
+				@ammoDisplay.render app.canvas
 
 		return ns

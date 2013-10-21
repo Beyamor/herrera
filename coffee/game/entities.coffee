@@ -94,9 +94,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 					wall: -> true
 
 				@gun = new guns.Gun {
-					capacity: 3
+					capacity: 10
 					firingRate: 10
-					rechargeDelay: 0.4
+					rechargeDelay: 0.5
 					rechargeSpeed: 1
 				}
 

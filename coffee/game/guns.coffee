@@ -1,4 +1,4 @@
-define ['core/util', 'core/app'], (util, app) ->
+define ['core/util', 'core/app', 'core/canvas'], (util, app, canvas) ->
 	ns = {}
 
 	class ns.Gun
@@ -28,11 +28,10 @@ define ['core/util', 'core/app'], (util, app) ->
 					@isRecharging = false
 
 			@rechargeTimer.update()
+			@shotTimer.update()
 
 		tryShooting: ->
-			console.log @capacity
-			if @capacity <= 0
-				return false
+			return false if (@capacity < 1) or not @canShoot
 
 			@capacity -= 1
 
@@ -43,5 +42,36 @@ define ['core/util', 'core/app'], (util, app) ->
 			@shotTimer.restart()
 
 			return true
+
+	class ns.AmmoDisplay
+		constructor: (@gun) ->
+			@canvas = new canvas.Canvas {
+				width: 100
+				height: 20
+				clearColor: 'black'
+			}
+
+			context = @canvas.context
+			context.fillStyle = context.strokeStyle = "#FACB0F"
+			context.lineWidth = 4
+
+		render: (target) ->
+			@canvas.clear()
+			context = @canvas.context
+
+			left = (1 - @gun.capacity/@gun.maxCapacity) * 100
+			context.beginPath()
+			context.moveTo left, 0
+			context.lineTo 100, 0
+			context.lineTo 100, 20
+			context.lineTo left - 15, 20
+			context.fill()
+
+			context.beginPath()
+			context.rect 0, 0, 100, 20
+			context.stroke()
+
+			target.context.drawImage @canvas.el, target.width - 100, 0
+
 
 	return ns
