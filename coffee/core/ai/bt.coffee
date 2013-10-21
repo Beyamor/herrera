@@ -87,6 +87,21 @@ define ['core/app', 'core/util'], (app, util) ->
 
 			return FAILURE
 
+	ns.cond = (check, body) ->
+		begin: ->
+			check.begin()
+			@bodyBegun = false
+
+		update: ->
+			result = check.update()
+			return FAILURE if result is FAILURE
+
+			unless @bodyBegun
+				@bodyBegun = true
+				body.begin()
+
+			return body.update()
+
 	ns.concurrently = (children...) ->
 		begin: ->
 			child.begin() for child in children

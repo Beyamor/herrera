@@ -152,7 +152,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 				@behaviour = bt.forever(
 					bt.branch(
-						bt.concurrently(
+						bt.cond(
 							new behaviours.CloseTo(this, (=> @player), 100),
 							new behaviours.Flee(this, (=> @player), speed: 200)
 						),
