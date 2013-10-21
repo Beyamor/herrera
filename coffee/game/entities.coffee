@@ -8,6 +8,23 @@ define ['core/app', 'core/entities', 'core/graphics',
 		Image		= gfx.Image
 		random		= util.random
 
+		class ns.Gun extends Entity
+			constructor: ->
+				super {
+					graphic: new Image("gun-sprite", centered: true)
+					width: 24
+					layer: 150
+					centered: true
+				}
+				@model = guns.GunModel.createRandom()
+
+			update: ->
+				super()
+				@model.update()
+
+			tryShooting: ->
+				@model.tryShooting()
+
 		class ns.Wall extends Entity
 			@WIDTH: 48
 			@LAYER: 200
@@ -93,12 +110,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@collisionHandlers =
 					wall: -> true
 
-				@gun = new guns.Gun {
-					capacity: 10
-					firingRate: 10
-					rechargeDelay: 0.5
-					rechargeSpeed: 1
-				}
+				@gun = new ns.Gun
 
 			update: ->
 				super()
@@ -194,6 +206,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 				--@hits
 
 				if @hits <= 0
+					loot = new ns.Gun
+					loot.x = @x
+					loot.y = @y
+					@scene.add loot
+
 					@scene.remove(this) if @scene
 
 		return ns

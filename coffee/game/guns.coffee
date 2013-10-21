@@ -1,79 +1,90 @@
-define ['core/util', 'core/app', 'core/canvas'], (util, app, canvas) ->
-	ns = {}
+define ['core/util', 'core/app', 'core/canvas'],
+	(util, app, canvas) ->
+		ns = {}
 
-	class ns.Gun
-		constructor: ({capacity: @maxCapacity, firingRate: firingRate,\
-				rechargeDelay: rechargeDelay, rechargeSpeed: @rechargeSpeed}) ->
-					@capacity	= @maxCapacity
-					@isRecharging	= false
-					@canShoot	= true
+		random = util.random
 
-					@rechargeTimer	= new util.Timer {
-						period: rechargeDelay,
-						callback: =>
-							@isRecharging = true
-					}
+		class ns.GunModel
+			constructor: ({capacity: @maxCapacity, firingRate: firingRate,\
+					rechargeDelay: rechargeDelay, rechargeSpeed: @rechargeSpeed}) ->
+						@capacity	= @maxCapacity
+						@isRecharging	= false
+						@canShoot	= true
 
-					@shotTimer = new util.Timer {
-						period: (1 / firingRate)
-						callback: =>
-							@canShoot = true
-					}
+						@rechargeTimer	= new util.Timer {
+							period: rechargeDelay,
+							callback: =>
+								@isRecharging = true
+						}
 
-		update: ->
-			if @isRecharging
-				@capacity += (app.elapsed / @rechargeSpeed) * @maxCapacity
-				if @capacity >= @maxCapacity
-					@capacity = @maxCapacity
-					@isRecharging = false
+						@shotTimer = new util.Timer {
+							period: (1 / firingRate)
+							callback: =>
+								@canShoot = true
+						}
 
-			@rechargeTimer.update()
-			@shotTimer.update()
+			update: ->
+				if @isRecharging
+					@capacity += (app.elapsed / @rechargeSpeed) * @maxCapacity
+					if @capacity >= @maxCapacity
+						@capacity = @maxCapacity
+						@isRecharging = false
 
-		tryShooting: ->
-			return false if (@capacity < 1) or not @canShoot
+				@rechargeTimer.update()
+				@shotTimer.update()
 
-			@capacity -= 1
+			tryShooting: ->
+				return false if (@capacity < 1) or not @canShoot
 
-			@isRecharging = false
-			@rechargeTimer.restart()
+				@capacity -= 1
 
-			@canShoot = false
-			@shotTimer.restart()
+				@isRecharging = false
+				@rechargeTimer.restart()
 
-			return true
+				@canShoot = false
+				@shotTimer.restart()
 
-	class ns.AmmoDisplay
-		constructor: (@hud, @player) ->
-			@canvas = new canvas.Canvas {
-				width: 100
-				height: 20
-				clearColor: 'black'
-			}
+				return true
 
-			context = @canvas.context
-			context.fillStyle = context.strokeStyle = "#FACB0F"
-			context.lineWidth = 4
+			@createRandom: ->
+				new ns.GunModel {
+					capacity: random.intInRange 1, 20
+					firingRate: random.inRange 0.1, 10
+					rechargeDelay: 0.5
+					rechargeSpeed: random.inRange 0.5, 3
+				}
 
-		render: ->
-			gun = @player.gun
-			return unless gun
+		class ns.AmmoDisplay
+			constructor: (@hud, @player) ->
+				@canvas = new canvas.Canvas {
+					width: 100
+					height: 20
+					clearColor: 'black'
+				}
 
-			@canvas.clear()
-			context = @canvas.context
+				context = @canvas.context
+				context.fillStyle = context.strokeStyle = "#FACB0F"
+				context.lineWidth = 4
 
-			left = (1 - gun.capacity / gun.maxCapacity) * 100
-			context.beginPath()
-			context.moveTo left, 0
-			context.lineTo 100, 0
-			context.lineTo 100, 20
-			context.lineTo left - 15, 20
-			context.fill()
+			render: ->
+				gun = @player.gun.model
+				return unless gun
 
-			context.beginPath()
-			context.rect 0, 0, 100, 20
-			context.stroke()
+				@canvas.clear()
+				context = @canvas.context
 
-			@canvas.renderTo @hud, @hud.width - 100, 0
+				left = (1 - gun.capacity / gun.maxCapacity) * 100
+				context.beginPath()
+				context.moveTo left, 0
+				context.lineTo 100, 0
+				context.lineTo 100, 20
+				context.lineTo left - 15, 20
+				context.fill()
 
-	return ns
+				context.beginPath()
+				context.rect 0, 0, 100, 20
+				context.stroke()
+
+				@canvas.renderTo @hud, @hud.width - 100, 0
+
+		return ns

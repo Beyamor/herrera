@@ -68,6 +68,7 @@ define ['core/app'], (app) ->
 
 		random:
 			inRange: (min, max) -> min + Math.random() * (max - min)
+			intInRange: (min, max) -> Math.floor(@inRange min, max)
 			angle: -> @inRange 0, 2 * Math.PI
 
 		isFunction: (x) ->
