@@ -37,4 +37,5 @@ define ->
 
 		random:
 			inRange: (min, max) -> min + Math.random() * (max - min)
+			angle: -> @inRange 0, 2 * Math.PI
 	}

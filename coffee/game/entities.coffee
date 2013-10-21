@@ -1,12 +1,11 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
-	'core/org/actions', 'game/entities/actions'],
-	(app, entities, gfx, input, particles, util, coreActions, actions) ->
+	'core/ai/bt', 'game/entities/behaviours'],
+	(app, entities, gfx, input, particles, util, bt, behaviours) ->
 		ns = {}
 
 		Entity		= entities.Entity
 		Image		= gfx.Image
-		ActionList	= coreActions.ActionList
 		random		= util.random
 
 		class ns.Wall extends Entity
@@ -127,7 +126,6 @@ define ['core/app', 'core/entities', 'core/graphics',
 					type: 'enemy'
 
 				@hits		= 3
-				@actions	= new ActionList
 
 				@collisionHandlers =
 					wall: -> true
@@ -152,12 +150,23 @@ define ['core/app', 'core/entities', 'core/graphics',
 						@actions.push @pauseAction()
 					return action
 
-				@actions.push @pauseAction()
+				@behaviour = new bt.ForeverRoot(
+						new bt.Loop [
+							new bt.RandomDelay(0, 1),
+							new behaviours.WanderNearby(
+								this,
+								radius: 100
+								speed: 200
+								timeout: 1
+								threshold: 20
+							)
+						]
+					)
 
 			update: ->
 				super()
 
-				@actions.update()
+				@behaviour.update()
 				if @vel.x isnt 0 or @vel.y isnt 0
 					@graphic.rotate Math.atan2(@vel.y, @vel.x)
 
