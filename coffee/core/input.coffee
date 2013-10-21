@@ -7,29 +7,53 @@ SPECIAL_BROWSER_KEYS = [
 ]
 
 define {
-	state: {}
+	currentState: {}
+	prevState: {}
+	events: []
 	mappings: {}
 
 	mouseX: 0
 	mouseY: 0
 
-	isDown: (key) ->
+	isDown: (key, state) ->
+		state or= @currentState
 		if @mappings[key]?
-			return @isDown @mappings[key]
+			return @isDown @mappings[key], state
 		else
-			state = @state[key]
+			state = state[key]
 			return state is 'down'
 
-	isUp: (key) ->
+	isUp: (key, state) ->
+		state or= @currentState
 		if @mappings[key]?
-			return @isUp @mappings[key]
+			return @isUp @mappings[key], state
 		else
-			state = @state[key]
+			state = state[key]
 			return (not state) or state is 'up'
+
+	pressed: (key) ->
+		@isDown(key, @currentState) and @isUp(key, @prevState)
+
+	released: (key) ->
+		@isUp(key, @currentState) and @isDown(key, @prevState)
 
 	define: (mappings) ->
 		for from, to of mappings
 			@mappings[from] = to
+
+	update: ->
+		# first, copy the state over
+		@prevState = {}
+		for k, v of @currentState
+			@prevState[k] = v
+
+		# then, update the current state
+		for [k, v] in @events
+			@currentState[k] = v
+
+		# and finally, clear the events
+		@events = []
+
 
 	watch: ($el) ->
 		eventToMouseButton = (e) ->
@@ -40,21 +64,21 @@ define {
 
 		$el.keydown (e) =>
 			e.preventDefault() if SPECIAL_BROWSER_KEYS.indexOf(e.which) isnt -1
-			@state[e.which] = 'down'
+			@events.push [e.which, 'down']
 
 		.keyup (e) =>
 			e.preventDefault() if SPECIAL_BROWSER_KEYS.indexOf(e.which) isnt -1
-			@state[e.which] = 'up'
+			@events.push [e.which, 'up']
 
 		.mousemove (e) =>
 			@mouseX = e.pageX - $el.parent().offset().left
 			@mouseY = e.pageY - $el.parent().offset().top
 
 		.mousedown (e) =>
-			@state[eventToMouseButton(e)] = 'down'
+			@events.push [eventToMouseButton(e), 'down']
 
 		.mouseup (e) =>
-			@state[eventToMouseButton(e)] = 'up'
+			@events.push [eventToMouseButton(e), 'up']
 
 		$el.attr 'oncontextmenu', 'return false;'
 }

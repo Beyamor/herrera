@@ -22,6 +22,7 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		left: 65
 		right: 68
 		shoot: 'mouse-left'
+		grab: 69
 
 	app.launch
 		width: 800

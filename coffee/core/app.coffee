@@ -7,6 +7,8 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			debug.showFPS @elapsed
 
 			if @hasFocus
+				input.update()
+
 				@scene.update() if @scene
 
 				@canvas.clear()

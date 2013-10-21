@@ -117,6 +117,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 							shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
 							@scene.add shot
 
+				if input.pressed 'grab'
+					console.log 'pressed grab!'
+				if input.released 'grab'
+					console.log 'released grab!'
+
 		class ns.Silverfish extends Entity
 			constructor: (x, y) ->
 				super
