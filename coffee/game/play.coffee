@@ -1,5 +1,5 @@
-define ['core/app', 'core/scenes', 'game/entities', 'core/cameras', 'game/levels', 'game/guns'],
-	(app, scenes, entities, cameras, levels, guns) ->
+define ['core/app', 'core/scenes', 'core/canvas', 'game/entities', 'core/cameras', 'game/levels', 'game/guns'],
+	(app, scenes, canvas, entities, cameras, levels, guns) ->
 		ns = {}
 
 		Player = entities.Player
@@ -16,10 +16,18 @@ define ['core/app', 'core/scenes', 'game/entities', 'core/cameras', 'game/levels
 
 				@camera = new cameras.EntityFollower player, @camera
 
-				@ammoDisplay = new guns.AmmoDisplay player.gun
+				@hud = new canvas.Canvas {
+					width: app.width
+					height: app.height
+				}
+
+				@hudElements = []
+				@hudElements.push new guns.AmmoDisplay(@hud, player)
 
 			render: ->
 				super()
-				@ammoDisplay.render app.canvas
+				@hud.clear()
+				hudElement.render() for hudElement in @hudElements
+				@hud.renderTo app.canvas
 
 		return ns

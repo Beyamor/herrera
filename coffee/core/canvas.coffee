@@ -24,6 +24,11 @@ define ->
 			@context.canvas.width = width
 			@context.canvas.height = height
 
+		renderTo: (target, x, y) ->
+			x or= 0
+			y or= 0
+			target.context.drawImage @el, x, y
+
 	return {
 		Canvas: Canvas
 	}

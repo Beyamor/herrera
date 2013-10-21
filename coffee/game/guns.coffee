@@ -44,7 +44,7 @@ define ['core/util', 'core/app', 'core/canvas'], (util, app, canvas) ->
 			return true
 
 	class ns.AmmoDisplay
-		constructor: (@gun) ->
+		constructor: (@hud, @player) ->
 			@canvas = new canvas.Canvas {
 				width: 100
 				height: 20
@@ -55,11 +55,14 @@ define ['core/util', 'core/app', 'core/canvas'], (util, app, canvas) ->
 			context.fillStyle = context.strokeStyle = "#FACB0F"
 			context.lineWidth = 4
 
-		render: (target) ->
+		render: ->
+			gun = @player.gun
+			return unless gun
+
 			@canvas.clear()
 			context = @canvas.context
 
-			left = (1 - @gun.capacity/@gun.maxCapacity) * 100
+			left = (1 - gun.capacity / gun.maxCapacity) * 100
 			context.beginPath()
 			context.moveTo left, 0
 			context.lineTo 100, 0
@@ -71,7 +74,6 @@ define ['core/util', 'core/app', 'core/canvas'], (util, app, canvas) ->
 			context.rect 0, 0, 100, 20
 			context.stroke()
 
-			target.context.drawImage @canvas.el, target.width - 100, 0
-
+			@canvas.renderTo @hud, @hud.width - 100, 0
 
 	return ns
