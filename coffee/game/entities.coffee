@@ -76,25 +76,6 @@ define ['core/app', 'core/entities', 'core/graphics',
 						enemy.hit()
 						return true
 
-			#added: ->
-			#	@smoke = @scene.particles.addEmitter
-			#		type: "continuous"
-			#		amount: 1
-			#		particle:
-			#			image: "shot-smoke-sprite"
-			#			lifespan: [0.3, 0.5]
-			#			direction: Math.atan2(@vel.y, @vel.x) - Math.PI
-			#			speed: [2, 5]
-			#			directionWiggle: 0.5
-
-			#removed: ->
-			#	@smoke.kill()
-
-			#update: ->
-			#	super()
-			#	@smoke.x = @x
-			#	@smoke.y = @y
-
 		class ns.Player extends Entity
 			constructor: (x, y) ->
 				super
