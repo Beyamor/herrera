@@ -3,6 +3,29 @@ define ['core/app', 'core/util', 'core/ai/bt'], (app, util, bt) ->
 
 	random = util.random
 
+	class ns.CloseTo
+		constructor: (@from, @to, @distance) ->
+
+		begin: ->
+
+		update: ->
+			if util.distanceBetween(@from, @to()) <= @distance
+				return bt.SUCCESS
+			else
+				return bt.FAILURE
+
+	class ns.Flee
+		constructor: (@entity, @target, args) ->
+			@speed = args.speed or 200
+
+		begin: ->
+
+		update: ->
+			direction = util.directionFrom @target(), @entity
+
+			@entity.vel.x = Math.cos(direction) * @speed
+			@entity.vel.y = Math.sin(direction) * @speed
+
 	class ns.WanderNearby
 		constructor: (@entity, args) ->
 			@speed		= args.speed or 200

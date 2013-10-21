@@ -35,6 +35,11 @@ define ->
 		directionFrom: (a, b) ->
 			Math.atan2 (b.y-a.y), (b.x-a.x)
 
+		distanceBetween: (a, b) ->
+			dx = b.x - a.x
+			dy = b.y - a.y
+			return Math.sqrt dx*dx + dy*dy
+
 		random:
 			inRange: (min, max) -> min + Math.random() * (max - min)
 			angle: -> @inRange 0, 2 * Math.PI

@@ -71,4 +71,47 @@ define ['core/app', 'core/util'], (app, util) ->
 			if result is FAILURE
 				@pendingBegin = true
 
+	class ns.OrderedSelector
+		constructor: (@children) ->
+
+		begin: ->
+			@running = -1
+
+		update: ->
+			index = 0
+			while index < @children.length
+				child = @children[index]
+				child.begin() if index isnt @running
+
+				result = child.update()
+				switch result
+					when RUNNING
+						@running = index
+						return RUNNING
+					when SUCCESS
+						@running = -1
+						return SUCCESS
+					else
+						++index
+
+			return FAILURE
+
+	class ns.Concurrent
+		constructor: (@children) ->
+
+		begin: ->
+			child.begin() for child in @children
+
+		update: ->
+			allSuccess = true
+			for child in @children
+				result = child.update()
+				return FAILURE if result is FAILURE
+				allSuccess and= (result is SUCCESS)
+
+			if allSuccess
+				return SUCCESS
+			else
+				return RUNNING
+
 	return ns

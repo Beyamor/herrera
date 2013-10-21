@@ -151,20 +151,30 @@ define ['core/app', 'core/entities', 'core/graphics',
 					return action
 
 				@behaviour = new bt.ForeverRoot(
-						new bt.Loop [
-							new bt.RandomDelay(0, 1),
-							new behaviours.WanderNearby(
-								this,
-								radius: 100
-								speed: 200
-								timeout: 1
-								threshold: 20
-							)
-						]
+						new bt.OrderedSelector([
+							new bt.Concurrent([
+								new behaviours.CloseTo(this, (=> @player), 100),
+								new behaviours.Flee(this, (=> @player),
+									speed: 200
+								)
+							]),
+							new bt.Loop([
+								new bt.RandomDelay(0, 1),
+								new behaviours.WanderNearby(
+									this,
+									radius: 100
+									speed: 200
+									timeout: 1
+									threshold: 20
+								)
+							])
+						])
 					)
 
 			update: ->
 				super()
+
+				@player = @scene.entities.first "player"
 
 				@behaviour.update()
 				if @vel.x isnt 0 or @vel.y isnt 0
