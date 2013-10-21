@@ -43,4 +43,10 @@ define ->
 		random:
 			inRange: (min, max) -> min + Math.random() * (max - min)
 			angle: -> @inRange 0, 2 * Math.PI
+
+		isFunction: (x) ->
+			x and typeof(x) is "function"
+
+		thunkWrap: (x) ->
+			if @isFunction(x) then x else -> x
 	}

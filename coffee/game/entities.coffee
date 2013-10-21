@@ -153,17 +153,20 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@behaviour = bt.forever(
 					bt.branch(
 						bt.cond(
-							new behaviours.CloseTo(this, (=> @player), 100),
-							new behaviours.Flee(this, (=> @player), speed: 200)
+							behaviours.closeTo(this, (=> @player), 100),
+							behaviours.flee(this, (=> @player),
+								speed: 200
+								minDistance: 200
+							)
 						),
 						bt.loop(
 							bt.randomDelay(0, 1),
-							new behaviours.WanderNearby(
-								this,
+							behaviours.wanderNearby(this,
 								radius: 100
 								speed: 200
 								timeout: 1
 								threshold: 20
+
 							)
 						)
 					)
