@@ -26,6 +26,32 @@ define ['core/app', 'core/entities', 'core/graphics',
 			tryShooting: ->
 				@model.tryShooting()
 
+		class ns.Barrel extends Entity
+			constructor: (x, y) ->
+				super
+					x: x
+					y: y
+					graphic: new Image('barrel-sprite', centered: true)
+					width: 24
+					layer: 175
+					type: 'hittable'
+					centered: true
+
+			hit: ->
+				@scene.particles.addEmitter
+					type: "burst"
+					x: @x
+					y: @y
+					amount: 10
+					particle:
+						image: "shot-smoke-sprite"
+						lifespan: [0.2, 0.5]
+						speed: [10, 30]
+						direction: [0, Math.PI * 2]
+						layer: ns.Wall.LAYER + 1
+
+				@scene.remove this
+
 		class ns.Wall extends Entity
 			@WIDTH: 48
 			@LAYER: 200
@@ -72,9 +98,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 						@scene.remove this if @scene
 						return true
 
-					enemy: (enemy) =>
+					hittable: (hittable) =>
 						@scene.remove this if @scene
-						enemy.hit()
+						hittable.hit()
 						return true
 
 		class ns.Player extends Entity
@@ -138,7 +164,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					graphic: (new Image 'silverfish-sprite', centered: true)
 					width: 40
 					centered: true
-					type: 'enemy'
+					type: 'hittable'
 
 				@hits		= 3
 

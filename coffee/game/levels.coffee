@@ -2,8 +2,8 @@ define ['game/entities', 'core/util'], (entities, util) ->
 	Wall = entities.Wall
 
 	class Room
-		@WIDTH	= 16
-		@HEIGHT	= 16
+		@WIDTH	= 20
+		@HEIGHT	= 20
 		constructor: (@xIndex, @yIndex) ->
 			@tiles = util.array2d Room.WIDTH, Room.HEIGHT
 
@@ -16,6 +16,7 @@ define ['game/entities', 'core/util'], (entities, util) ->
 				@tiles[Room.WIDTH-1][j] = "wall"
 
 			@tiles[Room.WIDTH/2][Room.HEIGHT/2] = "silverfish"
+			@tiles[Room.WIDTH/2][Math.floor Room.HEIGHT/4] = "barrel"
 
 		fill: ->
 			for i in [0...Room.WIDTH]
@@ -47,6 +48,8 @@ define ['game/entities', 'core/util'], (entities, util) ->
 						es.push new Wall x, y
 					when "silverfish"
 						es.push new entities.Silverfish x, y
+					when "barrel"
+						es.push new entities.Barrel x, y
 
 			return es
 
