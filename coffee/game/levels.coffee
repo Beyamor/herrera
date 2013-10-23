@@ -1,27 +1,12 @@
 define ['game/entities', 'core/util'], (entities, util) ->
 	Wall = entities.Wall
 
+
 	class Room
 		@WIDTH	= 20
 		@HEIGHT	= 20
 		constructor: (@xIndex, @yIndex) ->
 			@tiles = util.array2d Room.WIDTH, Room.HEIGHT
-
-			for i in [0...Room.WIDTH]
-				@tiles[i][0] = "wall"
-				@tiles[i][Room.HEIGHT-1] = "wall"
-
-			for j in [0...Room.HEIGHT]
-				@tiles[0][j] = "wall"
-				@tiles[Room.WIDTH-1][j] = "wall"
-
-			@tiles[Room.WIDTH/2][Room.HEIGHT/2] = "silverfish"
-			@tiles[Room.WIDTH/2][Math.floor Room.HEIGHT/4] = "barrel"
-
-		fill: ->
-			for i in [0...Room.WIDTH]
-				for j in [0...Room.HEIGHT]
-					@tiles[i][j] = "wall"
 
 		open: (direction) ->
 			switch direction
@@ -53,6 +38,23 @@ define ['game/entities', 'core/util'], (entities, util) ->
 
 			return es
 
+	class RegularRoom extends Room
+		constructor: (xIndex, yIndex) ->
+			super xIndex, yIndex
+			@tiles.each (i, j) => @tiles[i][j] = "wall"
+
+	class StartRoom extends Room
+		constructor: (xIndex, yIndex) ->
+			super xIndex, yIndex
+
+			for i in [0...Room.WIDTH]
+				@tiles[i][0] = "wall"
+				@tiles[i][Room.HEIGHT-1] = "wall"
+
+			for j in [0...Room.HEIGHT]
+				@tiles[0][j] = "wall"
+				@tiles[Room.WIDTH-1][j] = "wall"
+
 	class Level
 		@WIDTH	= 4
 		@HEIGHT	= 4
@@ -60,7 +62,11 @@ define ['game/entities', 'core/util'], (entities, util) ->
 		constructor: ->
 			@rooms = util.array2d Level.WIDTH, Level.HEIGHT
 			@rooms.each (i, j) =>
-				@rooms[i][j] = new Room i, j
+				@rooms[i][j] =
+					if i is 0 and j is 0
+						new StartRoom i, j
+					else
+						new RegularRoom i, j
 
 			@construct()
 
@@ -92,9 +98,6 @@ define ['game/entities', 'core/util'], (entities, util) ->
 					else
 						@rooms[i][j].open "up"
 						@rooms[i][j-1].open "down"
-
-				for j in unused
-					@rooms[i][j].fill()
 
 		realize: ->
 			es = []
