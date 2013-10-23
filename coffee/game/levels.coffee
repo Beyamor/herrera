@@ -1,26 +1,15 @@
 define ['game/entities', 'core/util'], (entities, util) ->
 	Wall = entities.Wall
 
+	random = util.random
+
 	class Room
-		@WIDTH	= 20
-		@HEIGHT	= 20
+		@WIDTH	= 16
+		@HEIGHT	= 16
 		constructor: (@xIndex, @yIndex) ->
 			@tiles = util.array2d Room.WIDTH, Room.HEIGHT
 
-		open: (direction) ->
-			switch direction
-				when "left"
-					@tiles[0][Room.HEIGHT/2] = "floor"
-					@tiles[0][Room.HEIGHT/2+1] = "floor"
-				when "right"
-					@tiles[Room.WIDTH-1][Room.HEIGHT/2] = "floor"
-					@tiles[Room.WIDTH-1][Room.HEIGHT/2+1] = "floor"
-				when "up"
-					@tiles[Room.WIDTH/2][0] = "floor"
-					@tiles[Room.WIDTH/2+1][0] = "floor"
-				when "down"
-					@tiles[Room.WIDTH/2][Room.HEIGHT-1] = "floor"
-					@tiles[Room.WIDTH/2+1][Room.HEIGHT-1] = "floor"
+	class EmptyRoom extends Room
 
 	class RegularRoom extends Room
 		constructor: (xIndex, yIndex) ->
@@ -29,6 +18,58 @@ define ['game/entities', 'core/util'], (entities, util) ->
 			@build()
 
 		build: ->
+			pointsInRegion = (minX, minY, maxX, maxY) ->
+				points = []
+				numberOfPoints = random.intInRange(1, 4)
+				for i in [0...numberOfPoints]
+					points.push {
+						x: random.intInRange(minX, maxX)
+						y: random.intInRange(minY, maxY)
+					}
+				return points
+
+			a = pointsInRegion(3, 0, Room.WIDTH-3, 3)
+			a.sort (a, b) -> a.x - b.x
+
+			b = pointsInRegion(Room.WIDTH-3, 3, Room.WIDTH, Room.HEIGHT-3)
+			b.sort (a, b) -> a.y - b.y
+
+			c = pointsInRegion(3, Room.HEIGHT - 3, Room.WIDTH-3, Room.HEIGHT)
+			c.sort (a, b) -> b.x - a.x
+
+			d = pointsInRegion(0, 3, 3, Room.HEIGHT-3)
+			d.sort (a, b) -> b.y - a.y
+
+			points = a.concat(b, c, d)
+			for i in [0...Room.WIDTH]
+				for j in [0...Room.HEIGHT]
+					if util.pointInPoly {x: i, y: j}, points
+						@tiles[i][j] = "floor"
+		open: (direction) ->
+			[openX, openY] = switch direction
+					when "left"
+						[0, Room.HEIGHT/2]
+					when "right"
+						[Room.WIDTH-1, Room.HEIGHT/2]
+					when "up"
+						[Room.WIDTH/2, 0]
+					when "down"
+						[Room.WIDTH/2, Room.HEIGHT-1]
+
+			for {x: x, y: y} in util.bresenham {x: openX, y: openY}, {x: Room.WIDTH/2, y: Room.HEIGHT/2}
+				@tiles[x][y] = "floor"
+
+		finalize: ->
+			@tiles.each (i, j, tile) =>
+				if tile is null
+					neighbouringFloor =
+						(i > 0 and @tiles[i-1][j] is "floor") or
+						(i < Room.WIDTH-1 and @tiles[i+1][j] is "floor") or
+						(j > 0 and @tiles[i][j-1] is "floor") or
+						(j < Room.HEIGHT-1 and @tiles[i][j+1] is "floor")
+
+					if neighbouringFloor
+						@tiles[i][j] = "wall"
 
 	class StartRoom extends Room
 		constructor: (xIndex, yIndex) ->
@@ -45,6 +86,16 @@ define ['game/entities', 'core/util'], (entities, util) ->
 			for i in [1...Room.WIDTH-1]
 				for j in [1...Room.HEIGHT-1]
 					@tiles[i][j] = "floor"
+		open: (direction) ->
+			switch direction
+				when "left"
+					@tiles[0][Room.HEIGHT/2] = "floor"
+				when "right"
+					@tiles[Room.WIDTH-1][Room.HEIGHT/2] = "floor"
+				when "up"
+					@tiles[Room.WIDTH/2][0] = "floor"
+				when "down"
+					@tiles[Room.WIDTH/2][Room.HEIGHT-1] = "floor"
 
 	class Level
 		@WIDTH	= 4
@@ -89,6 +140,12 @@ define ['game/entities', 'core/util'], (entities, util) ->
 					else
 						@rooms[i][j].open "up"
 						@rooms[i][j-1].open "down"
+
+				for j in unused
+					@rooms[i][j] = new EmptyRoom i, j
+
+			@rooms.each (_, _, room) ->
+				room.finalize() if room.finalize?
 
 	class Reifier
 		reifyEntity: (tileX, tileY, tile) ->
