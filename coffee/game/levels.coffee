@@ -10,22 +10,25 @@ define ['game/entities', 'core/util'], (entities, util) ->
 		open: (direction) ->
 			switch direction
 				when "left"
-					@tiles[0][Room.HEIGHT/2] = null
-					@tiles[0][Room.HEIGHT/2+1] = null
+					@tiles[0][Room.HEIGHT/2] = "floor"
+					@tiles[0][Room.HEIGHT/2+1] = "floor"
 				when "right"
-					@tiles[Room.WIDTH-1][Room.HEIGHT/2] = null
-					@tiles[Room.WIDTH-1][Room.HEIGHT/2+1] = null
+					@tiles[Room.WIDTH-1][Room.HEIGHT/2] = "floor"
+					@tiles[Room.WIDTH-1][Room.HEIGHT/2+1] = "floor"
 				when "up"
-					@tiles[Room.WIDTH/2][0] = null
-					@tiles[Room.WIDTH/2+1][0] = null
+					@tiles[Room.WIDTH/2][0] = "floor"
+					@tiles[Room.WIDTH/2+1][0] = "floor"
 				when "down"
-					@tiles[Room.WIDTH/2][Room.HEIGHT-1] = null
-					@tiles[Room.WIDTH/2+1][Room.HEIGHT-1] = null
+					@tiles[Room.WIDTH/2][Room.HEIGHT-1] = "floor"
+					@tiles[Room.WIDTH/2+1][Room.HEIGHT-1] = "floor"
 
 	class RegularRoom extends Room
 		constructor: (xIndex, yIndex) ->
 			super xIndex, yIndex
-			@tiles.each (i, j) => @tiles[i][j] = "wall"
+
+			@build()
+
+		build: ->
 
 	class StartRoom extends Room
 		constructor: (xIndex, yIndex) ->
@@ -38,6 +41,10 @@ define ['game/entities', 'core/util'], (entities, util) ->
 			for j in [0...Room.HEIGHT]
 				@tiles[0][j] = "wall"
 				@tiles[Room.WIDTH-1][j] = "wall"
+
+			for i in [1...Room.WIDTH-1]
+				for j in [1...Room.HEIGHT-1]
+					@tiles[i][j] = "floor"
 
 	class Level
 		@WIDTH	= 4
@@ -91,6 +98,8 @@ define ['game/entities', 'core/util'], (entities, util) ->
 			switch tile
 				when "wall"
 					new Wall x, y
+				when "floor"
+					new entities.Floor x, y
 				when "silverfish"
 					new entities.Silverfish x, y
 				when "barrel"

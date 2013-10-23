@@ -65,6 +65,14 @@ define ['core/app', 'core/entities', 'core/graphics',
 					layer: ns.Wall.LAYER
 					type: 'wall'
 
+		class ns.Floor extends Entity
+			constructor: (x, y) ->
+				super
+					x: x
+					y: y
+					graphic: new Image 'floor-sprite'
+					layer: 300
+
 		class ns.Shot extends Entity
 			constructor: (x, y, speed, direction) ->
 				super

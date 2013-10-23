@@ -15,6 +15,7 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		['silverfish-sprite', 'res/img/silverfish.png']
 		['gun-sprite', 'res/img/gun.png']
 		['barrel-sprite', 'res/img/barrel.png']
+		['floor-sprite', 'res/img/floor.png']
 	]
 
 	input.define
