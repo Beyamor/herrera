@@ -11,7 +11,7 @@ define ['core/app', 'core/scenes', 'core/canvas', 'game/entities', 'core/cameras
 				@add player
 
 				level = new levels.Level
-				for e in level.realize()
+				for e in (new levels.Reifier).reify(level)
 					@add e
 
 				@camera = new cameras.EntityFollower player, @camera

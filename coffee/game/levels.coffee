@@ -1,7 +1,6 @@
 define ['game/entities', 'core/util'], (entities, util) ->
 	Wall = entities.Wall
 
-
 	class Room
 		@WIDTH	= 20
 		@HEIGHT	= 20
@@ -22,21 +21,6 @@ define ['game/entities', 'core/util'], (entities, util) ->
 				when "down"
 					@tiles[Room.WIDTH/2][Room.HEIGHT-1] = null
 					@tiles[Room.WIDTH/2+1][Room.HEIGHT-1] = null
-
-		realize: ->
-			es = []
-			@tiles.each (i, j, tile) =>
-				x = @xIndex * Room.WIDTH * Wall.WIDTH + i * Wall.WIDTH
-				y = @yIndex * Room.HEIGHT * Wall.WIDTH + j * Wall.WIDTH
-				switch tile
-					when "wall"
-						es.push new Wall x, y
-					when "silverfish"
-						es.push new entities.Silverfish x, y
-					when "barrel"
-						es.push new entities.Barrel x, y
-
-			return es
 
 	class RegularRoom extends Room
 		constructor: (xIndex, yIndex) ->
@@ -99,10 +83,32 @@ define ['game/entities', 'core/util'], (entities, util) ->
 						@rooms[i][j].open "up"
 						@rooms[i][j-1].open "down"
 
-		realize: ->
+	class Reifier
+		reifyEntity: (tileX, tileY, tile) ->
+			x = tileX * Wall.WIDTH
+			y = tileY * Wall.WIDTH
+
+			switch tile
+				when "wall"
+					new Wall x, y
+				when "silverfish"
+					new entities.Silverfish x, y
+				when "barrel"
+					new entities.Barrel x, y
+
+		reify: (level) ->
 			es = []
-			@rooms.each (_, _, room) ->
-				es.push e for e in room.realize()
+
+			level.rooms.each (roomX, roomY, room) =>
+				room.tiles.each (tileX, tileY, tile) =>
+					entity = @reifyEntity tileX, tileY, tile
+					if entity
+						entity.x += roomX * Room.WIDTH * Wall.WIDTH
+						entity.y += roomY * Room.HEIGHT * Wall.WIDTH
+						es.push entity
 			return es
 
-	return Level: Level
+	return {
+		Level: Level
+		Reifier: Reifier
+	}
