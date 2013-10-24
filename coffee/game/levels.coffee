@@ -28,16 +28,16 @@ define ['game/entities', 'core/util'], (entities, util) ->
 					}
 				return points
 
-			a = pointsInRegion(3, 0, Room.WIDTH-3, 3)
+			a = pointsInRegion(3, 1, Room.WIDTH-3, 4)
 			a.sort (a, b) -> a.x - b.x
 
-			b = pointsInRegion(Room.WIDTH-3, 3, Room.WIDTH, Room.HEIGHT-3)
+			b = pointsInRegion(Room.WIDTH-4, 3, Room.WIDTH-1, Room.HEIGHT-3)
 			b.sort (a, b) -> a.y - b.y
 
-			c = pointsInRegion(3, Room.HEIGHT - 3, Room.WIDTH-3, Room.HEIGHT)
+			c = pointsInRegion(3, Room.HEIGHT - 4, Room.WIDTH-3, Room.HEIGHT-1)
 			c.sort (a, b) -> b.x - a.x
 
-			d = pointsInRegion(0, 3, 3, Room.HEIGHT-3)
+			d = pointsInRegion(1, 3, 4, Room.HEIGHT-3)
 			d.sort (a, b) -> b.y - a.y
 
 			points = a.concat(b, c, d)
