@@ -117,7 +117,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					x: x
 					y: y
 					graphic: (new Image 'player-sprite', centered: true)
-					width: 40
+					width: 36
 					centered: true
 					type: 'player'
 				
