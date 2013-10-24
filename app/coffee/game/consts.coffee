@@ -1,0 +1,4 @@
+define
+	TILE_WIDTH:	48
+	ROOM_WIDTH:	16
+	LEVEL_WIDTH:	4

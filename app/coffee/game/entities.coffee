@@ -1,7 +1,8 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
-	'core/ai/bt', 'game/entities/behaviours', 'game/guns'],
-	(app, entities, gfx, input, particles, util, bt, behaviours, guns) ->
+	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
+	'game/consts'],
+	(app, entities, gfx, input, particles, util, bt, behaviours, guns, conts) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -53,7 +54,6 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@scene.remove this
 
 		class ns.Wall extends Entity
-			@WIDTH: 48
 			@LAYER: 200
 
 			constructor: (x, y) ->
@@ -61,7 +61,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 					x: x
 					y: y
 					graphic: new Image 'wall-sprite'
-					width: ns.Wall.WIDTH
+					width: consts.TILE_WIDTH
+					height: consts.TILE_HEIGHT
 					layer: ns.Wall.LAYER
 					type: 'wall'
 
