@@ -2,7 +2,8 @@
   (:use seesaw.core
         [seesaw.chooser :only [choose-file]])
   (:require [cheshire.core :as json]
-            [seesaw.bind :as b])
+            [seesaw.bind :as b]
+            [seesaw.color :as color])
   (:import java.awt.FileDialog))
 
 (defn new-model
@@ -30,30 +31,43 @@
     (.add content))
   root)
 
+(def editor-width 600)
+(def editor-height 600)
+
+(defn repaint-editor!
+  [c g model]
+  (.clearRect g 0 0 (.getWidth c) (.getHeight c))
+  (when-let [selected-room (:selected-room model)]
+    (let [tile-width (/ (.getWidth c) 16)
+          tile-height (/ (.getHeight c) 16)]
+      (doseq [i (range 16)
+              j (range 16)
+              :let [idx (+ i (* j 16))
+                    tile (get-in model [:rooms selected-room :definition idx])]]
+        (when (not= tile " ")
+          (let [c (case tile
+                    "W" "grey"
+                    "." "white"
+                    "pink")]
+            (doto g
+              (.setColor (color/color c))
+              (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height))))))))
+
 (defn editor
   [model]
-  (let [e (grid-panel
-            :rows 16
-            :columns 16
-            :items (repeat (* 16 16) " "))]
+  (let [e (canvas
+            :size [editor-width :by editor-height]
+            :paint (fn [c g] (repaint-editor! c g @model)))]
     (b/bind
       model
       (b/b-do
         [m]
-        (when-let [selected-room (get m :selected-room)]
-          (let [definition (get-in m [:rooms selected-room :definition])]
-            (config! e :items definition)))))
+        (repaint! e)))
     e))
 
 (defn room-selection
   [model]
-  (let [rs (listbox)]
-    (b/bind
-      model
-      (b/transform #(if-let [rooms (get % :rooms)]
-                      (-> rooms count range)
-                      []))
-      (b/property rs :model))
+  (let [rs (listbox :id :room-selection)]
     (b/bind
       (b/selection rs)
       (b/b-swap! model #(assoc %1 :selected-room %2)))
@@ -62,22 +76,23 @@
 (defn -main [& args]
   (let [model (new-model)
         root (frame :title "Room Editor")
+        rooms (room-selection model)
         load-action (action
                       :handler (fn [e]
                                  (when-let [file (choose-file)]
-                                   (load-data-file file model)))
+                                   (load-data-file file model)
+                                   (config! rooms :model (-> @model count range))))
                       :name "Load..."
                       :key "menu L")]
   (invoke-later
     (-> root
-      (config! :size [1000 :by 600])
       (config! :content
                (top-bottom-split
                  (toolbar :items [load-action])
                  (left-right-split
                    (vertical-panel
                      :items [(label "Rooms")
-                             (room-selection model)])
+                             rooms])
                    (editor model))))
       pack!
       show!))))
