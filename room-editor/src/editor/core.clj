@@ -1,26 +1,42 @@
 (ns editor.core
-  (:use seesaw.core)
+  (:use seesaw.core
+        [seesaw.chooser :only [choose-file]])
+  (:require [cheshire.core :as json])
   (:import java.awt.FileDialog))
 
 (defn new-model
   []
   (atom {}))
 
-(defn choose-file
-  [frame]
+(defn file->data
+  [file-name]
   (->
-    (doto (FileDialog. frame "Choose a file", FileDialog/LOAD)
-      (.setDirectory "../app/coffee/game")
-      (.setVisible true))
-    .getFile))
+    file-name
+    slurp
+    clojure.string/split-lines
+    rest
+    (->> (apply str))
+    (json/parse-string true)))
+
+(defn load-data-file
+  [file-name model]
+  (swap! model merge (file->data file-name)))
+
+(defn set-content!
+  [root content]
+  (doto (select root [:#content])
+    .removeAll
+    (.add content))
+  root)
 
 (defn -main [& args]
   (let [model (new-model)
         root (frame :title "Room Editor")
         load-action (action
                       :handler (fn [e]
-                                 (when-let [file-name (choose-file root)]
-                                   (config! (select root [:#content]) :text file-name)))
+                                 (when-let [file (choose-file)]
+                                   (load-data-file file model)
+                                   (set-content! root (-> @model str label))))
                       :name "Load..."
                       :key "menu L")]
   (invoke-later
@@ -29,7 +45,7 @@
       (config! :content
                (border-panel
                  :north (toolbar :items [load-action])
-                 :center (label :id :content
-                                :text "Hello")))
+                 :center (vertical-panel :id :content)))
+      (set-content! (label "derp"))
       pack!
       show!))))
