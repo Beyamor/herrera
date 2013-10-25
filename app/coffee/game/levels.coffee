@@ -68,6 +68,16 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						for j in [0...ROOM_HEIGHT]
 							set(i, j, get(ROOM_HEIGHT - 1 - j, i))
 
+				 if transformation.mirror is "vertical"
+					for i in [0...ROOM_WIDTH]
+						for j in [0...ROOM_HEIGHT]
+							set(i, j, get(i, ROOM_HEIGHT - 1 - j))
+				else if transformation.mirror is "horizontal"
+					for i in [0...ROOM_WIDTH]
+						for j in [0...ROOM_HEIGHT]
+							set(i, j, get(ROOM_WIDTH - 1 - i, j))
+
+
 			return result
 
 
