@@ -2,7 +2,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
 	'game/consts'],
-	(app, entities, gfx, input, particles, util, bt, behaviours, guns, conts) ->
+	(app, entities, gfx, input, particles, util, bt, behaviours, guns, consts) ->
 		ns = {}
 
 		Entity		= entities.Entity

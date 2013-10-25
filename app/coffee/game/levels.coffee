@@ -1,4 +1,4 @@
-define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) ->
+define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entities, util, consts, definitions) ->
 	Wall = entities.Wall
 
 	random = util.random
@@ -16,62 +16,39 @@ define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) -
 	class RegularRoom extends Room
 		constructor: (xIndex, yIndex) ->
 			super xIndex, yIndex
+			@exits = []
 
-			@build()
+		addEntrance: (direction) ->
+			@entrance = direction
 
-		build: ->
-			pointsInRegion = (minX, minY, maxX, maxY) ->
-				points = []
-				numberOfPoints = random.intInRange(1, 4)
-				for i in [0...numberOfPoints]
-					points.push {
-						x: random.intInRange(minX, maxX)
-						y: random.intInRange(minY, maxY)
-					}
-				return points
-
-			a = pointsInRegion(3, 1, ROOM_WIDTH-3, 4)
-			a.sort (a, b) -> a.x - b.x
-
-			b = pointsInRegion(ROOM_WIDTH-4, 3, ROOM_WIDTH-1, ROOM_HEIGHT-3)
-			b.sort (a, b) -> a.y - b.y
-
-			c = pointsInRegion(3, ROOM_HEIGHT - 4, ROOM_WIDTH-3, ROOM_HEIGHT-1)
-			c.sort (a, b) -> b.x - a.x
-
-			d = pointsInRegion(1, 3, 4, ROOM_HEIGHT-3)
-			d.sort (a, b) -> b.y - a.y
-
-			points = a.concat(b, c, d)
-			for i in [0...ROOM_WIDTH]
-				for j in [0...ROOM_HEIGHT]
-					if util.pointInPoly {x: i, y: j}, points
-						@tiles[i][j] = "floor"
-		open: (direction) ->
-			[openX, openY] = switch direction
-					when "left"
-						[0, ROOM_HEIGHT/2]
-					when "right"
-						[ROOM_WIDTH-1, ROOM_HEIGHT/2]
-					when "up"
-						[ROOM_WIDTH/2, 0]
-					when "down"
-						[ROOM_WIDTH/2, ROOM_HEIGHT-1]
-
-			for {x: x, y: y} in util.bresenham {x: openX, y: openY}, {x: ROOM_WIDTH/2, y: ROOM_HEIGHT/2}
-				@tiles[x][y] = "floor"
+		addExit: (direction) ->
+			@exits.push direction
 
 		finalize: ->
-			@tiles.each (i, j, tile) =>
-				if tile is null
-					neighbouringFloor =
-						(i > 0 and @tiles[i-1][j] is "floor") or
-						(i < ROOM_WIDTH-1 and @tiles[i+1][j] is "floor") or
-						(j > 0 and @tiles[i][j-1] is "floor") or
-						(j < ROOM_HEIGHT-1 and @tiles[i][j+1] is "floor")
+			possibilities = []
+			for room in definitions.rooms
+				for orientation in room.orientations
+					continue unless orientation.entrance is @entrance
 
-					if neighbouringFloor
-						@tiles[i][j] = "wall"
+					meetsAllExits = true
+					for exit in @exits
+						meetsAllExits and= (orientation.exits.indexOf(exit) isnt -1)
+
+					continue unless meetsAllExits
+					possibilities.push {
+						definition: room.definition
+						transformation: orientation.transformation
+					}
+
+			throw new Error("no room possibilities (entrance is #{@entrance})") unless possibilities.length isnt 0
+			choice = random.any possibilities
+
+			tiles = @applyTransformation choice.definition, choice.transformation
+			@tiles.each (i, j) => @tiles[i][j] = tiles[i][j]
+
+		applyTransformation: (definition, transformation) ->
+			# TODO actually apply transformation
+			return definition
 
 	class StartRoom extends Room
 		constructor: (xIndex, yIndex) ->
@@ -88,15 +65,15 @@ define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) -
 			for i in [1...ROOM_WIDTH-1]
 				for j in [1...ROOM_HEIGHT-1]
 					@tiles[i][j] = "floor"
-		open: (direction) ->
+		addExit: (direction) ->
 			switch direction
-				when "left"
+				when "west"
 					@tiles[0][ROOM_HEIGHT/2] = "floor"
-				when "right"
+				when "east"
 					@tiles[ROOM_WIDTH-1][ROOM_HEIGHT/2] = "floor"
-				when "up"
+				when "north"
 					@tiles[ROOM_WIDTH/2][0] = "floor"
-				when "down"
+				when "south"
 					@tiles[ROOM_WIDTH/2][ROOM_HEIGHT-1] = "floor"
 
 	class Level
@@ -109,8 +86,6 @@ define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) -
 				@rooms[i][j] =
 					if i is 0 and j is 0
 						new StartRoom i, j
-					else
-						new RegularRoom i, j
 
 			@construct()
 
@@ -119,16 +94,20 @@ define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) -
 
 			# assuming the player always starts at (0,0)
 			for j in [0...crossovers[0]]
-				@rooms[0][j].open "down"
-				@rooms[0][j+1].open "up"
-			@rooms[0][crossovers[0]].open "right"
+				@rooms[0][j].addExit "south"
+				@rooms[0][j+1] or= new RegularRoom 0, j+1
+				@rooms[0][j+1].addEntrance "north"
+			@rooms[0][crossovers[0]].addExit "east"
 
 			for i in [1...LEVEL_WIDTH]
 				crossover	= crossovers[i]
 				prevCrossover	= crossovers[i-1]
 
-				@rooms[i][crossover].open "right" if i < LEVEL_WIDTH-1
-				@rooms[i][prevCrossover].open "left"
+				@rooms[i][crossover] or= new RegularRoom i, crossover
+				@rooms[i][crossover].addExit "east" if i < LEVEL_WIDTH-1
+
+				@rooms[i][prevCrossover] or= new RegularRoom i, prevCrossover
+				@rooms[i][prevCrossover].addEntrance "west"
 
 				unused = [0...LEVEL_HEIGHT]
 				unused.remove crossover
@@ -136,18 +115,19 @@ define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) -
 				for j in [prevCrossover...crossover]
 					unused.remove j
 
-					if prevCrossover < crossover
-						@rooms[i][j].open "down"
-						@rooms[i][j+1].open "up"
-					else
-						@rooms[i][j].open "up"
-						@rooms[i][j-1].open "down"
+					@rooms[i][j] or= new RegularRoom i, j
 
-				for j in unused
-					@rooms[i][j] = new EmptyRoom i, j
+					if prevCrossover < crossover
+						@rooms[i][j+1] or= new RegularRoom i, j
+						@rooms[i][j].addExit "south"
+						@rooms[i][j+1].addEntrance "north"
+					else
+						@rooms[i][j-1] or= new RegularRoom i,j
+						@rooms[i][j].addExit "north"
+						@rooms[i][j-1].addEntrance "south"
 
 			@rooms.each (_, _, room) ->
-				room.finalize() if room.finalize?
+				room.finalize() if room and room.finalize?
 
 	class Reifier
 		reifyEntity: (tileX, tileY, tile) ->
@@ -157,7 +137,11 @@ define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) -
 			switch tile
 				when "wall"
 					new Wall x, y
+				when "W"
+					new Wall x, y
 				when "floor"
+					new entities.Floor x, y
+				when "."
 					new entities.Floor x, y
 				when "silverfish"
 					new entities.Silverfish x, y
@@ -168,12 +152,13 @@ define ['game/entities', 'core/util', 'game/consts'], (entities, util, consts) -
 			es = []
 
 			level.rooms.each (roomX, roomY, room) =>
-				room.tiles.each (tileX, tileY, tile) =>
-					entity = @reifyEntity tileX, tileY, tile
-					if entity
-						entity.x += roomX * ROOM_WIDTH * TILE_WIDTH
-						entity.y += roomY * ROOM_HEIGHT * TILE_HEIGHT
-						es.push entity
+				if room
+					room.tiles.each (tileX, tileY, tile) =>
+						entity = @reifyEntity tileX, tileY, tile
+						if entity
+							entity.x += roomX * (ROOM_WIDTH + 1) * TILE_WIDTH
+							entity.y += roomY * (ROOM_HEIGHT + 1) * TILE_HEIGHT
+							es.push entity
 			return es
 
 	return {
