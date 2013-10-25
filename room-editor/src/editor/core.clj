@@ -75,7 +75,9 @@
                (top-bottom-split
                  (toolbar :items [load-action])
                  (left-right-split
-                   (room-selection model)
+                   (vertical-panel
+                     :items [(label "Rooms")
+                             (room-selection model)])
                    (editor model))))
       pack!
       show!))))
