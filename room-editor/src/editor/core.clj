@@ -40,8 +40,9 @@
       model
       (b/b-do
         [m]
-        (when-let [definition (get-in m [:rooms 0 :definition])]
-          (config! e :items definition))))
+        (when-let [selected-room (get m :selected-room)]
+          (let [definition (get-in m [:rooms selected-room :definition])]
+            (config! e :items definition)))))
     e))
 
 (defn room-selection
@@ -53,6 +54,9 @@
                       (-> rooms count range)
                       []))
       (b/property rs :model))
+    (b/bind
+      (b/selection rs)
+      (b/b-swap! model #(assoc %1 :selected-room %2)))
     rs))
 
 (defn -main [& args]
