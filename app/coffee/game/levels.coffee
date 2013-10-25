@@ -44,11 +44,32 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			choice = random.any possibilities
 
 			tiles = @applyTransformation choice.definition, choice.transformation
-			@tiles.each (i, j) => @tiles[i][j] = tiles[i][j]
+			@tiles.each (i, j) => @tiles[i][j] = tiles[i + j * ROOM_WIDTH]
 
 		applyTransformation: (definition, transformation) ->
-			# TODO actually apply transformation
-			return definition
+			result = util.copy definition
+
+			get = (i, j) -> definition[i + j * ROOM_WIDTH]
+			set = (i, j, value) -> result[i + j * ROOM_WIDTH] = value
+
+			if transformation
+				if transformation.rotation is 90
+					for i in [0...ROOM_WIDTH]
+						for j in [0...ROOM_HEIGHT]
+							set(i, j, get(j, ROOM_WIDTH - 1 - i))
+
+				else if transformation.rotation is 180
+					for i in [0...ROOM_WIDTH]
+						for j in [0...ROOM_HEIGHT]
+							set(i, j, get(ROOM_WIDTH - 1 - i, ROOM_HEIGHT - 1 - j))
+
+				else if transformation.rotation is 270
+					for i in [0...ROOM_WIDTH]
+						for j in [0...ROOM_HEIGHT]
+							set(i, j, get(ROOM_HEIGHT - 1 - j, i))
+
+			return result
+
 
 	class StartRoom extends Room
 		constructor: (xIndex, yIndex) ->

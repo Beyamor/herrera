@@ -47,6 +47,28 @@ define ['core/app'], (app) ->
 				if @elapsed >= @period
 					@callback()
 
+	copy = (obj)->
+		if not obj? or typeof obj isnt 'object'
+			return obj
+
+		if obj instanceof Date
+			return new Date(obj.getTime())
+
+		if obj instanceof RegExp
+			flags = ''
+			flags += 'g' if obj.global?
+			flags += 'i' if obj.ignoreCase?
+			flags += 'm' if obj.multiline?
+			flags += 'y' if obj.sticky?
+			return new RegExp(obj.source, flags)
+
+		newInstance = new obj.constructor()
+
+		for key of obj
+			newInstance[key] = copy obj[key]
+
+		return newInstance
+
 	return {
 		sign: (x) -> (x > 0) - (x < 0)
 
@@ -77,6 +99,8 @@ define ['core/app'], (app) ->
 
 		thunkWrap: (x) ->
 			if @isFunction(x) then x else -> x
+
+		copy: copy
 
 		bresenham: ({x: x1, y: y1}, {x: x2, y: y2}) ->
 			points = []
