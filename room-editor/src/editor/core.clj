@@ -44,6 +44,17 @@
           (config! e :items definition))))
     e))
 
+(defn room-selection
+  [model]
+  (let [rs (listbox)]
+    (b/bind
+      model
+      (b/transform #(if-let [rooms (get % :rooms)]
+                      (-> rooms count range)
+                      []))
+      (b/property rs :model))
+    rs))
+
 (defn -main [& args]
   (let [model (new-model)
         root (frame :title "Room Editor")
@@ -55,10 +66,12 @@
                       :key "menu L")]
   (invoke-later
     (-> root
-      (config! :size [600 :by 600])
+      (config! :size [1000 :by 600])
       (config! :content
-               (border-panel
-                 :north (toolbar :items [load-action])
-                 :center (editor model)))
+               (top-bottom-split
+                 (toolbar :items [load-action])
+                 (left-right-split
+                   (room-selection model)
+                   (editor model))))
       pack!
       show!))))
