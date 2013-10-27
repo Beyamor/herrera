@@ -34,12 +34,20 @@
 (def editor-width 600)
 (def editor-height 600)
 
+(defn get-tile-width
+  [c]
+  (/ (.getWidth c) 16))
+
+(defn get-tile-height
+  [c]
+  (/ (.getHeight c) 16))
+
 (defn repaint-editor!
   [c g model]
   (.clearRect g 0 0 (.getWidth c) (.getHeight c))
   (when-let [selected-room (:selected-room model)]
-    (let [tile-width (/ (.getWidth c) 16)
-          tile-height (/ (.getHeight c) 16)]
+    (let [tile-width (get-tile-width c)
+          tile-height (get-tile-height c)]
       (doseq [i (range 16)
               j (range 16)
               :let [idx (+ i (* j 16))
@@ -57,15 +65,26 @@
 
 (defn editor
   [model]
-  (let [e (canvas
+  (let [c (canvas
             :size [editor-width :by editor-height]
             :paint (fn [c g] (repaint-editor! c g @model)))]
     (b/bind
       model
       (b/b-do
         [m]
-        (repaint! e)))
-    e))
+        (repaint! c)))
+    (listen c
+            :mouse-clicked (fn [e]
+                             (when-let [selected-room (:selected-room @model)]
+                               (when-let [tool (:tool @model)]
+                                 (let [tile-width (get-tile-width c)
+                                       tile-height (get-tile-height c)
+                                       tile-x (-> e .getX (/ tile-width) int)
+                                       tile-y (-> e .getY (/ tile-height) int)]
+                                   (swap! model assoc-in
+                                          [:rooms selected-room :definition (+ tile-x (* 16 tile-y))]
+                                          (tool)))))))
+    c))
 
 (defn room-selection
   [model]
@@ -83,6 +102,12 @@
         (when selection
           (swap! model assoc :selected-room selection))))
     rs))
+
+(defn tool-button
+  [model label tool]
+  (button
+    :text label
+    :listen [:action (fn [e] (swap! model assoc :tool tool))]))
 
 (defn -main [& args]
   (let [model (new-model)
@@ -106,6 +131,7 @@
                    (top-bottom-split
                      (editor model)
                      (horizontal-panel
-                       :items [(button :text "button")])))))
+                       :items [(tool-button model "wall" (fn []
+                                                           "W"))])))))
       pack!
       show!))))
