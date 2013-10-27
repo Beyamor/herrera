@@ -142,13 +142,13 @@
                (top-bottom-split
                  (toolbar :items [save-action load-action])
                  (left-right-split
+                   (left-right-split
+                     (vertical-panel
+                       :items [(tool-button model "wall" (fn []
+                                                           "W"))])
+                     (editor model))
                    (vertical-panel
                      :items [(label "Rooms")
-                             rooms])
-                   (top-bottom-split
-                     (editor model)
-                     (horizontal-panel
-                       :items [(tool-button model "wall" (fn []
-                                                           "W"))])))))
+                             rooms]))))
       pack!
       show!))))
