@@ -48,6 +48,8 @@
           (let [c (case tile
                     "W" "grey"
                     "." "white"
+                    "o" "lightblue"
+                    "i" "lightgreen"
                     "pink")]
             (doto g
               (.setColor (color/color c))
