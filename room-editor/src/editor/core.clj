@@ -14,9 +14,7 @@
   (->
     file-name
     slurp
-    clojure.string/split-lines
-    rest
-    (->> (apply str))
+    (subs (count "define "))
     (json/parse-string true)))
 
 (defn load-data-file
