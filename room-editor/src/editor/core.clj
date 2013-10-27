@@ -24,6 +24,15 @@
   [file-name model]
   (swap! model merge (file->data file-name)))
 
+(defn save-data-file
+  [file model]
+  (->
+    @model
+    (select-keys #{:rooms})
+    json/generate-string
+    (->> (str "define\n\t"))
+    (->> (spit file))))
+
 (defn set-content!
   [root content]
   (doto (select root [:#content])
@@ -118,12 +127,20 @@
                                  (when-let [file (choose-file)]
                                    (load-data-file file model)))
                       :name "Load..."
-                      :key "menu L")]
+                      :key "menu L")
+        save-action (action
+                      :handler (fn [e]
+                                 (when-let [file (choose-file
+                                                   :type :save
+                                                   :filters [["Coffee" [".coffee"]]])]
+                                   (save-data-file file model)))
+                      :name "Save..."
+                      :key "menu S")]
   (invoke-later
     (-> root
       (config! :content
                (top-bottom-split
-                 (toolbar :items [load-action])
+                 (toolbar :items [save-action load-action])
                  (left-right-split
                    (vertical-panel
                      :items [(label "Rooms")
