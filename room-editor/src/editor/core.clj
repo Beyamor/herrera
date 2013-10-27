@@ -30,7 +30,7 @@
     @model
     (select-keys #{:rooms})
     json/generate-string
-    (->> (str "define\n\t"))
+    (->> (str "define "))
     (->> (spit file))))
 
 (defn set-content!
