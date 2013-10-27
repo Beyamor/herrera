@@ -6,6 +6,9 @@
             [seesaw.color :as color])
   (:import java.awt.FileDialog))
 
+(def room-width 16)
+(def room-height 16)
+
 (defn new-model
   []
   (atom {}))
@@ -45,11 +48,11 @@
 
 (defn get-tile-width
   [c]
-  (/ (.getWidth c) 16))
+  (/ (.getWidth c) room-width))
 
 (defn get-tile-height
   [c]
-  (/ (.getHeight c) 16))
+  (/ (.getHeight c) room-height))
 
 (defn repaint-editor!
   [c g model]
@@ -57,9 +60,9 @@
   (when-let [selected-room (:selected-room model)]
     (let [tile-width (get-tile-width c)
           tile-height (get-tile-height c)]
-      (doseq [i (range 16)
-              j (range 16)
-              :let [idx (+ i (* j 16))
+      (doseq [i (range room-width)
+              j (range room-height)
+              :let [idx (+ i (* j room-width))
                     tile (get-in model [:rooms selected-room :definition idx])]]
         (when (not= tile " ")
           (let [c (case tile
@@ -91,7 +94,7 @@
                                        tile-x (-> e .getX (/ tile-width) int)
                                        tile-y (-> e .getY (/ tile-height) int)]
                                    (swap! model assoc-in
-                                          [:rooms selected-room :definition (+ tile-x (* 16 tile-y))]
+                                          [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]
                                           (tool)))))))
     c))
 
