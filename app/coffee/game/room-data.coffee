@@ -1,5 +1,4 @@
-define
-	{
+define {
 		"rooms": [{
 			"definition": [
 				"W", "o", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W", "W",
