@@ -103,6 +103,9 @@
                    (vertical-panel
                      :items [(label "Rooms")
                              rooms])
-                   (editor model))))
+                   (top-bottom-split
+                     (editor model)
+                     (horizontal-panel
+                       :items [(button :text "button")])))))
       pack!
       show!))))
