@@ -69,8 +69,17 @@
   [model]
   (let [rs (listbox :id :room-selection)]
     (b/bind
+      model
+      (b/transform #(if-let [rooms (:rooms %)]
+                      (-> rooms count range)
+                      []))
+      (b/property rs :model))
+    (b/bind
       (b/selection rs)
-      (b/b-swap! model #(assoc %1 :selected-room %2)))
+      (b/b-do
+        [selection]
+        (when selection
+          (swap! model assoc :selected-room selection))))
     rs))
 
 (defn -main [& args]
@@ -80,8 +89,7 @@
         load-action (action
                       :handler (fn [e]
                                  (when-let [file (choose-file)]
-                                   (load-data-file file model)
-                                   (config! rooms :model (-> @model count range))))
+                                   (load-data-file file model)))
                       :name "Load..."
                       :key "menu L")]
   (invoke-later
