@@ -73,20 +73,20 @@
   [c model state]
   (fn [e]
     (when-let [selected-room (:selected-room @state)]
-      (when-let [tool (:tool @state)]
-        (let [tile-width (get-tile-width c)
-              tile-height (get-tile-height c)
-              tile-x (-> e .getX (/ tile-width) int)
-              tile-y (-> e .getY (/ tile-height) int)
-              tile-path [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]]
-          (cond
-            (is-left? e)
-            (swap! model assoc-in tile-path (tool))
+      (let [tile-width (get-tile-width c)
+            tile-height (get-tile-height c)
+            tile-x (-> e .getX (/ tile-width) int)
+            tile-y (-> e .getY (/ tile-height) int)
+            tile-path [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]]
+        (cond
+          (is-left? e)
+          (when-let [tool (:tool @state)]
+            (swap! model assoc-in tile-path (tool)))
 
-            (is-right? e)
-            (swap! model assoc-in tile-path " ")
+          (is-right? e)
+          (swap! model assoc-in tile-path " ")
 
-            :else :do-nothing))))))
+          :else :do-nothing)))))
 
 (defn create
   [{:keys [state model]}]
