@@ -58,6 +58,10 @@
   [e]
   (has-modifier? e InputEvent/BUTTON1_MASK))
 
+(defn is-right?
+  [e]
+  (has-modifier? e InputEvent/BUTTON3_MASK))
+
 (defn create-paint-handler
   [c model state]
   (fn [e]
@@ -66,12 +70,14 @@
         (let [tile-width (get-tile-width c)
               tile-height (get-tile-height c)
               tile-x (-> e .getX (/ tile-width) int)
-              tile-y (-> e .getY (/ tile-height) int)]
+              tile-y (-> e .getY (/ tile-height) int)
+              tile-path [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]]
           (cond
             (is-left? e)
-            (swap! model assoc-in
-                   [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]
-                   (tool))
+            (swap! model assoc-in tile-path (tool))
+
+            (is-right? e)
+            (swap! model assoc-in tile-path " ")
 
             :else :do-nothing))))))
 
