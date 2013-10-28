@@ -38,7 +38,14 @@
                   "pink")]
           (doto g
             (.setColor (color/color c))
-            (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height)))))))
+            (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height))))
+      (.setColor g (color/color "lightgray"))
+      (doseq [i (range room-width)
+              :let [x (* i tile-width)]]
+        (.drawLine g x 0 x (.getHeight c)))
+      (doseq [j (range room-height)
+              :let [y (* j tile-height)]]
+        (.drawLine g 0 y (.getWidth c) y)))))
 
 (defn repaint-on-change
   [c m]
