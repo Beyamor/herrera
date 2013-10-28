@@ -32,16 +32,20 @@
                       :key "menu S")]
   (invoke-later
     (-> root
+      (config! :menubar
+               (menubar
+                 :items [(menu
+                           :text "File"
+                           :items [save-action
+                                   load-action])]))
       (config! :content
-               (top-bottom-split
-                 (toolbar :items [save-action load-action])
+               (left-right-split
                  (left-right-split
-                   (left-right-split
-                     (vertical-panel
-                       :items (tools/create-list app))
-                     (editor/create app))
                    (vertical-panel
-                     :items [(label "Rooms")
-                             rooms]))))
+                     :items (tools/create-list app))
+                   (editor/create app))
+                 (vertical-panel
+                   :items [(label "Rooms")
+                           rooms])))
       pack!
       show!))))
