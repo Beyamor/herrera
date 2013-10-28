@@ -39,24 +39,21 @@
               (.setColor (color/color c))
               (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height))))))))
 
+(defn repaint-on-change
+  [c m]
+  (b/bind
+    m
+    (b/b-do
+      [m]
+      (repaint! c))))
+
 (defn create
   [{:keys [state model]}]
   (let [c (canvas
             :size [editor-width :by editor-height]
             :paint (fn [c g] (repaint-editor! c g @state @model)))]
-    (b/bind
-      model
-      (b/b-do
-        [m]
-        (repaint! c)))
-
-    ; kinda don't wanna do this, but whatever
-    (b/bind
-      state
-      (b/b-do
-        [m]
-        (repaint! c)))
-
+    (repaint-on-change c model)
+    (repaint-on-change c state)
     (listen c
             :mouse-clicked (fn [e]
                              (when-let [selected-room (:selected-room @state)]
