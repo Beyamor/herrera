@@ -28,16 +28,16 @@
               j (range room-height)
               :let [idx (+ i (* j room-width))
                     tile (get-in model [:rooms selected-room :definition idx])]]
-        (when (not= tile " ")
-          (let [c (case tile
-                    "W" "grey"
-                    "." "white"
-                    "o" "lightblue"
-                    "i" "lightgreen"
-                    "pink")]
-            (doto g
-              (.setColor (color/color c))
-              (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height))))))))
+        (let [c (case tile
+                  "W" "grey"
+                  "." "white"
+                  "o" "lightblue"
+                  "i" "lightgreen"
+                  " " "black"
+                  "pink")]
+          (doto g
+            (.setColor (color/color c))
+            (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height)))))))
 
 (defn repaint-on-change
   [c m]

@@ -4,4 +4,7 @@
 (def room-height 16)
 
 (def empty-room
-  {:definition (repeat (* room-width room-height) " ")})
+  {:definition
+   (->> " "
+     (repeat (* room-width room-height))
+     vec)})
