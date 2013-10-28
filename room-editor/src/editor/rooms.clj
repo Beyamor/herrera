@@ -82,9 +82,72 @@
   {:entrances (find-entrances definition)
    :exits (find-exits definition)})
 
+(defn swap-directions
+  [base from->to]
+  (let [get (fn [what dir]
+              (get-in base [what (from->to dir)]))]
+    {:entrances (into {}
+                     (for [direction directions]
+                      [direction (get :entrances direction)]))
+    :exits (into {}
+                (for [direction directions]
+                 [direction (get :exits direction)]))})) 
+
+(defn rotate
+  [base rotation]
+  (case rotation
+    0   base
+    90  (swap-directions
+          base
+          {:north :west
+           :east :north
+           :south :east
+           :west :south})
+    180 (swap-directions
+          base
+          {:north :south
+           :east :west
+           :south :north
+           :west :east})
+    270 (swap-directions
+          base
+          {:north :east
+           :east :south
+           :south :west
+           :west :north})))
+
+(defn mirror
+  [base mirroring]
+  (case mirroring
+    nil         base
+    :horizontal (swap-directions
+                  base
+                  {:north :north
+                   :east :west
+                   :south :south
+                   :west :east})
+    :vertical   (swap-directions
+                  base
+                  {:north :south
+                   :east :east
+                   :south :north
+                   :west :west})))
+
+(defn transformation
+  [base rotation mirroring]
+  (-> base
+    (rotate rotation)
+    (mirror mirroring)
+    (merge {:transformation
+            {:rotation (when-not (zero? rotation) rotation)
+             :mirror mirroring}})))
+
 (defn all-transformations
   [base]
-  [base])
+  (for [rotation [0 90 180 270]
+        mirroring [nil :horizontal :vertical]]
+    (transformation
+      base rotation mirroring)))
 
 (defn add-orientations
   [room]
