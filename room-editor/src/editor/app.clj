@@ -7,14 +7,9 @@
             [seesaw.bind :as b]
             [seesaw.color :as color]
             [editor.editor :as editor]
-            [editor.room-management :as rms])
+            [editor.room-management :as rms]
+            [editor.tools :as tools])
   (:import java.awt.FileDialog))
-
-(defn tool-button
-  [state label tool]
-  (button
-    :text label
-    :listen [:action (fn [e] (swap! state assoc :tool tool))]))
 
 (defn -main [& args]
   (let [app {:model (atom {})
@@ -43,9 +38,7 @@
                  (left-right-split
                    (left-right-split
                      (vertical-panel
-                       :items [(tool-button (:state app) "wall"
-                                            (fn []
-                                              "W"))])
+                       :items (tools/create-list app))
                      (editor/create app))
                    (vertical-panel
                      :items [(label "Rooms")
