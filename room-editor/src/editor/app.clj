@@ -8,7 +8,8 @@
             [seesaw.color :as color]
             [editor.editor :as editor]
             [editor.room-management :as rms]
-            [editor.tools :as tools])
+            [editor.tools :as tools]
+            [editor.rooms :as rooms])
   (:import java.awt.FileDialog))
 
 (defn -main [& args]
@@ -27,6 +28,7 @@
                                  (when-let [file (choose-file
                                                    :type :save
                                                    :filters [["Coffee" [".coffee"]]])]
+                                   (swap! (:model app) update-in [:rooms] rooms/augment)
                                    (save-data-file file app)))
                       :name "Save..."
                       :key "menu S")]
