@@ -20,7 +20,7 @@
   (let [app {:model (atom {})
              :state (atom {})}
         root (frame :title "Room Editor")
-        rooms (rms/room-selector app)
+        rooms (rms/create-browser app)
         load-action (action
                       :handler (fn [e]
                                  (when-let [file (choose-file)]
