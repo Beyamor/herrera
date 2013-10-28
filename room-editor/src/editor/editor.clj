@@ -47,22 +47,28 @@
       [m]
       (repaint! c))))
 
+(defn create-paint-handler
+  [c model state]
+  (fn [e]
+    (when-let [selected-room (:selected-room @state)]
+      (when-let [tool (:tool @state)]
+        (let [tile-width (get-tile-width c)
+              tile-height (get-tile-height c)
+              tile-x (-> e .getX (/ tile-width) int)
+              tile-y (-> e .getY (/ tile-height) int)]
+          (swap! model assoc-in
+                 [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]
+                 (tool)))))))
+
 (defn create
   [{:keys [state model]}]
   (let [c (canvas
             :size [editor-width :by editor-height]
-            :paint (fn [c g] (repaint-editor! c g @state @model)))]
+            :paint (fn [c g] (repaint-editor! c g @state @model)))
+        paint-handler (create-paint-handler c model state)]
     (repaint-on-change c model)
     (repaint-on-change c state)
     (listen c
-            :mouse-clicked (fn [e]
-                             (when-let [selected-room (:selected-room @state)]
-                               (when-let [tool (:tool @state)]
-                                 (let [tile-width (get-tile-width c)
-                                       tile-height (get-tile-height c)
-                                       tile-x (-> e .getX (/ tile-width) int)
-                                       tile-y (-> e .getY (/ tile-height) int)]
-                                   (swap! model assoc-in
-                                          [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]
-                                          (tool)))))))
+            :mouse-clicked paint-handler
+            :mouse-dragged paint-handler)
     c))
