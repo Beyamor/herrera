@@ -6,4 +6,4 @@
   :dependencies [[org.clojure/clojure "1.5.1"]
                  [seesaw "1.4.4"]
                  [cheshire "5.2.0"]]
-  :main editor.core)
+  :main editor.app)
