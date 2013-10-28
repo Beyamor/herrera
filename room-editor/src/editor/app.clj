@@ -12,7 +12,7 @@
   (:import java.awt.FileDialog))
 
 (defn -main [& args]
-  (let [app {:model (atom {})
+  (let [app {:model (atom {:rooms []})
              :state (atom {})}
         root (frame :title "Room Editor")
         rooms (rms/create-browser app)
