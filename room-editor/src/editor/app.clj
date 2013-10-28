@@ -1,29 +1,14 @@
 (ns editor.app
   (:use seesaw.core
         editor.core
-        [seesaw.chooser :only [choose-file]])
+        [seesaw.chooser :only [choose-file]]
+        [editor.rooms :only [room-width room-height]])
   (:require [cheshire.core :as json]
             [seesaw.bind :as b]
             [seesaw.color :as color]
-            [editor.editor :as editor])
+            [editor.editor :as editor]
+            [editor.room-management :as rms])
   (:import java.awt.FileDialog))
-
-(defn room-selection
-  [{:keys [state model]}]
-  (let [rs (listbox :id :room-selection)]
-    (b/bind
-      model
-      (b/transform #(if-let [rooms (:rooms %)]
-                      (-> rooms count range)
-                      []))
-      (b/property rs :model))
-    (b/bind
-      (b/selection rs)
-      (b/b-do
-        [selection]
-        (when selection
-          (swap! state assoc :selected-room selection))))
-    rs))
 
 (defn tool-button
   [state label tool]
@@ -35,7 +20,7 @@
   (let [app {:model (atom {})
              :state (atom {})}
         root (frame :title "Room Editor")
-        rooms (room-selection app)
+        rooms (rms/room-selector app)
         load-action (action
                       :handler (fn [e]
                                  (when-let [file (choose-file)]

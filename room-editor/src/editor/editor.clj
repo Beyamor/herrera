@@ -1,7 +1,7 @@
 (ns editor.editor
   (:use seesaw.core
         [seesaw.chooser :only [choose-file]]
-        [editor.core :only [room-width room-height]])
+        [editor.rooms :only [room-width room-height]])
   (:require [cheshire.core :as json]
             [seesaw.bind :as b]
             [seesaw.color :as color])

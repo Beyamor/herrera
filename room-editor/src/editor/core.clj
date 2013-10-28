@@ -6,9 +6,6 @@
             [seesaw.color :as color])
   (:import java.awt.FileDialog))
 
-(def room-width 16)
-(def room-height 16)
-
 (defn file->data
   [file-name]
   (->
