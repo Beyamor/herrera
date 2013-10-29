@@ -186,10 +186,10 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 					@rooms[i][j] or= new RegularRoom i, j
 
 					if prevCrossover < crossover
-						@rooms[i][j+1] or= new RegularRoom i, j
+						@rooms[i][j+1] or= new RegularRoom i, j+1
 						@connections.push {from: @rooms[i][j], to: @rooms[i][j+1], direction: "south"}
 					else
-						@rooms[i][j-1] or= new RegularRoom i,j
+						@rooms[i][j-1] or= new RegularRoom i,j-1
 						@connections.push {from: @rooms[i][j], to: @rooms[i][j-1], direction: "north"}
 
 			for {from: from, to: to, direction: direction} in @connections
@@ -226,8 +226,45 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						for y in [@levelY(to, entrance.y-1)...middleY]
 							path.push [@levelX(to, entrance.x), y]
 
-				#for [tileX, tileY] in path
-				#	@tiles[tileX][tileY] = "."
+					when "north"
+						middleY = @levelY(from, -1)
+
+						for y in [@levelY(from, exit.y-1)...middleY]
+							path.push [@levelX(from, exit.x), y]
+
+						for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
+							path.push [x, middleY]
+
+						for y in [@levelY(to, entrance.y+1)...middleY]
+							path.push [@levelX(to, entrance.x), y]
+
+					when "east"
+						middleX = @levelX(to, -1)
+
+						for x in [@levelX(from, exit.x+1)...middleX]
+							path.push [x, @levelY(from, exit.y)]
+
+						for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
+							path.push [middleX, y]
+
+						for x in [@levelX(to, entrance.x-1)...middleX]
+							path.push [x, @levelY(to, entrance.y)]
+
+					when "west"
+						middleX = @levelX(from, -1)
+
+						for x in [@levelX(from, exit.x-1)...middleX]
+							path.push [x, @levelY(from, exit.y)]
+
+						for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
+							path.push [middleX, y]
+
+						for x in [@levelX(to, entrance.x+1)...middleX]
+							path.push [x, @levelY(to, entrance.y)]
+
+
+				for [tileX, tileY] in path
+					@tiles[tileX][tileY] = "."
 
 		levelX: (room, tileX) ->
 			tileX + room.xIndex * (ROOM_WIDTH + 1)
