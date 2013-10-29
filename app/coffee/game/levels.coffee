@@ -131,16 +131,26 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			for i in [1...ROOM_WIDTH-1]
 				for j in [1...ROOM_HEIGHT-1]
 					@tiles[i][j] = "floor"
+
+			@exits = {}
+
 		addExit: (direction) ->
 			switch direction
 				when "west"
-					@tiles[0][ROOM_HEIGHT/2] = "floor"
+					x = 0
+					y = [ROOM_HEIGHT/2]
 				when "east"
-					@tiles[ROOM_WIDTH-1][ROOM_HEIGHT/2] = "floor"
+					x = [ROOM_WIDTH - 1]
+					y = [ROOM_HEIGHT/2]
 				when "north"
-					@tiles[ROOM_WIDTH/2][0] = "floor"
+					x = ROOM_WIDTH/2
+					y = 0
 				when "south"
-					@tiles[ROOM_WIDTH/2][ROOM_HEIGHT-1] = "floor"
+					x = ROOM_WIDTH/2
+					y = ROOM_HEIGHT-1
+
+			@tiles[x][y] = "."
+			@exits[direction] = {x: x, y: y}
 
 	class Level
 		@WIDTH	= 4
@@ -207,8 +217,6 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						@tiles[levelTileX][levelTileY] = tile
 
 			for {from: from, to: to, direction: direction} in @connections
-				continue if from.xIndex is 0 and from.yIndex is 0 # temp, gotta handle new room's exit
-
 				exit		= from.exits[direction]
 				entrance	= to.entrance
 
