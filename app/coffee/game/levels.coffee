@@ -12,6 +12,27 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 	oppositeDirection = (direction) ->
 		DIRECTIONS[(DIRECTIONS.indexOf(direction) + 2) % DIRECTIONS.length]
 
+
+	transformedXY = (x, y, transformation) ->
+		origX = x
+		origY = y
+		if transformation.rotation is 90
+			[x, y] = [ROOM_HEIGHT - 1- y, x]
+
+		else if transformation.rotation is 180
+			[x, y] = [ROOM_WIDTH - 1 - x, ROOM_HEIGHT - 1 - y]
+
+		else if transformation.rotation is 270
+			[x, y] = [y, ROOM_WIDTH - 1 - x]
+
+		if transformation.mirror is "vertical"
+			[x, y] = [x, ROOM_HEIGHT - 1 - y]
+
+		else if transformation.mirror is "horizontal"
+			[x, y] = [ROOM_WIDTH - 1 - x, y]
+
+		return [x, y]
+
 	class Room
 		constructor: (@xIndex, @yIndex) ->
 			@tiles = util.array2d ROOM_WIDTH, ROOM_HEIGHT
@@ -52,24 +73,29 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			@tiles.each (i, j) => @tiles[i][j] = tiles[i + j * ROOM_WIDTH]
 
 		realizeOrientation: (definition, orientation) ->
+			transformation = orientation.transformation
+
 			previous	= util.copy definition
 			result		= util.copy definition
-			saveState	= -> previous = util.copy result
 
-			get = (i, j) -> previous[i + j * ROOM_WIDTH]
-			set = (i, j, value) -> result[i + j * ROOM_WIDTH] = value
+			saveState	= -> previous = util.copy result
+			get		= (i, j) -> previous[i + j * ROOM_WIDTH]
+			set		= (i, j, value) -> result[i + j * ROOM_WIDTH] = value
 
 			# pick an entrance
 			[x, y] = random.any orientation.entrances[@entranceDirection]
 			set x, y, "."
-			@entrance = {x: x, y: y}
+			[transX, transY] = transformedXY x, y, transformation
+			@entrance = {x: transX, y: transY}
 
 			# pick exits
 			@exits = {}
 			for exitDirection in @exitDirections
 				[x, y] = random.any orientation.exits[exitDirection]
 				set x, y, "."
-				@exits[exitDirection] = {x: x, y: y}
+
+				[transX, transY] = transformedXY x, y, transformation
+				@exits[exitDirection] = {x: transX, y: transY}
 
 			saveState()
 
@@ -82,35 +108,10 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			saveState()
 
 			# and transform
-			transformation = orientation.transformation
-			if transformation
-				if transformation.rotation is 90
-					for i in [0...ROOM_WIDTH]
-						for j in [0...ROOM_HEIGHT]
-							set(i, j, get(j, ROOM_WIDTH - 1 - i))
-
-				else if transformation.rotation is 180
-					for i in [0...ROOM_WIDTH]
-						for j in [0...ROOM_HEIGHT]
-							set(i, j, get(ROOM_WIDTH - 1 - i, ROOM_HEIGHT - 1 - j))
-
-				else if transformation.rotation is 270
-					for i in [0...ROOM_WIDTH]
-						for j in [0...ROOM_HEIGHT]
-							set(i, j, get(ROOM_HEIGHT - 1 - j, i))
-
-				saveState()
-
-				if transformation.mirror is "vertical"
-					for i in [0...ROOM_WIDTH]
-						for j in [0...ROOM_HEIGHT]
-							set(i, j, get(i, ROOM_HEIGHT - 1 - j))
-
-				else if transformation.mirror is "horizontal"
-					for i in [0...ROOM_WIDTH]
-						for j in [0...ROOM_HEIGHT]
-							set(i, j, get(ROOM_WIDTH - 1 - i, j))
-
+			for x in [0...ROOM_WIDTH]
+				for y in [0...ROOM_HEIGHT]
+					[transX, transY] = transformedXY x, y, transformation
+					set(transX, transY, get(x, y))
 
 			return result
 
@@ -225,8 +226,8 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						for y in [@levelY(to, entrance.y-1)...middleY]
 							path.push [@levelX(to, entrance.x), y]
 
-				for [tileX, tileY] in path
-					@tiles[tileX][tileY] = "."
+				#for [tileX, tileY] in path
+				#	@tiles[tileX][tileY] = "."
 
 		levelX: (room, tileX) ->
 			tileX + room.xIndex * (ROOM_WIDTH + 1)
