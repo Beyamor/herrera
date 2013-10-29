@@ -205,6 +205,36 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						levelTileY = roomY * (ROOM_HEIGHT + 1) + tileY
 						@tiles[levelTileX][levelTileY] = tile
 
+			for {from: from, to: to, direction: direction} in @connections
+				continue if from.xIndex is 0 and from.yIndex is 0 # temp, gotta handle new room's exit
+
+				exit		= from.exits[direction]
+				entrance	= to.entrance
+
+				path = []
+				switch direction
+					when "south"
+						middleY = @levelY(to, -1)
+
+						for y in [@levelY(from, exit.y+1)...middleY]
+							path.push [@levelX(from, exit.x), y]
+
+						for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
+							path.push [x, middleY]
+
+						for y in [@levelY(to, entrance.y-1)...middleY]
+							path.push [@levelX(to, entrance.x), y]
+
+				for [tileX, tileY] in path
+					@tiles[tileX][tileY] = "."
+
+		levelX: (room, tileX) ->
+			tileX + room.xIndex * (ROOM_WIDTH + 1)
+
+		levelY: (room, tileY) ->
+			tileY + room.yIndex * (ROOM_HEIGHT + 1)
+
+
 	class Reifier
 		reifyEntity: (tileX, tileY, tile) ->
 			x = tileX * TILE_WIDTH
