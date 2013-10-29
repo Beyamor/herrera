@@ -37,21 +37,44 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 					continue unless meetsAllExits
 					possibilities.push {
 						definition: room.definition
-						transformation: orientation.transformation
+						orientation: orientation
 					}
 
 			throw new Error("no room possibilities (entrance is #{@entranceDirection})") unless possibilities.length isnt 0
 			choice = random.any possibilities
 
-			tiles = @applyTransformation choice.definition, choice.transformation
+			tiles = @realizeOrientation choice.definition, choice.orientation
 			@tiles.each (i, j) => @tiles[i][j] = tiles[i + j * ROOM_WIDTH]
 
-		applyTransformation: (definition, transformation) ->
-			result = util.copy definition
+		realizeOrientation: (definition, orientation) ->
+			previous	= util.copy definition
+			result		= util.copy definition
+			saveState	= -> previous = util.copy result
 
-			get = (i, j) -> definition[i + j * ROOM_WIDTH]
+			get = (i, j) -> previous[i + j * ROOM_WIDTH]
 			set = (i, j, value) -> result[i + j * ROOM_WIDTH] = value
 
+			# pick an entrance
+			[x, y] = random.any orientation.entrances[@entranceDirection]
+			set x, y, "."
+
+			# pick exits
+			for exitDirection in @exitDirections
+				[x, y] = random.any orientation.exits[exitDirection]
+				set x, y, "."
+
+			saveState()
+
+			# close out other entrances/exits
+			for x in [0...ROOM_WIDTH]
+				for y in [0...ROOM_HEIGHT]
+					if get(x, y) is "i" or get(x, y) is "o"
+						set x, y, "W"
+
+			saveState()
+
+			# and transform
+			transformation = orientation.transformation
 			if transformation
 				if transformation.rotation is 90
 					for i in [0...ROOM_WIDTH]
@@ -68,7 +91,7 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						for j in [0...ROOM_HEIGHT]
 							set(i, j, get(ROOM_HEIGHT - 1 - j, i))
 
-				definition = util.copy result
+				saveState()
 
 				if transformation.mirror is "vertical"
 					for i in [0...ROOM_WIDTH]
