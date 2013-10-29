@@ -152,16 +152,20 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 					if i is 0 and j is 0
 						new StartRoom i, j
 
+			tileWidth	= LEVEL_WIDTH * (ROOM_WIDTH + 1)
+			tileHeight	= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
+			@tiles		= util.array2d tileWidth * tileHeight
+
 			@construct()
 
 		construct: ->
 			crossovers	= (Math.floor(Math.random() * LEVEL_HEIGHT) for i in [0...LEVEL_WIDTH])
-			connections	= []
+			@connections	= []
 
 			# assuming the player always starts at (0,0)
 			for j in [0...crossovers[0]]
 				@rooms[0][j+1] or= new RegularRoom 0, j+1
-				connections.push {from: @rooms[0][j], to: @rooms[0][j+1], direction: "south"}
+				@connections.push {from: @rooms[0][j], to: @rooms[0][j+1], direction: "south"}
 
 			for i in [1...LEVEL_WIDTH]
 				crossover	= crossovers[i]
@@ -170,7 +174,7 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 				@rooms[i][crossover] or= new RegularRoom i, crossover
 
 				@rooms[i][prevCrossover] or= new RegularRoom i, prevCrossover
-				connections.push {from: @rooms[i-1][prevCrossover], to: @rooms[i][prevCrossover], direction: "east"}
+				@connections.push {from: @rooms[i-1][prevCrossover], to: @rooms[i][prevCrossover], direction: "east"}
 
 				unused = [0...LEVEL_HEIGHT]
 				unused.remove crossover
@@ -182,17 +186,24 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 
 					if prevCrossover < crossover
 						@rooms[i][j+1] or= new RegularRoom i, j
-						connections.push {from: @rooms[i][j], to: @rooms[i][j+1], direction: "south"}
+						@connections.push {from: @rooms[i][j], to: @rooms[i][j+1], direction: "south"}
 					else
 						@rooms[i][j-1] or= new RegularRoom i,j
-						connections.push {from: @rooms[i][j], to: @rooms[i][j-1], direction: "north"}
+						@connections.push {from: @rooms[i][j], to: @rooms[i][j-1], direction: "north"}
 
-			for {from: from, to: to, direction: direction} in connections
+			for {from: from, to: to, direction: direction} in @connections
 				from.addExit direction
 				to.addEntrance oppositeDirection(direction)
 
 			@rooms.each (_, _, room) ->
 				room.finalize() if room and room.finalize?
+
+			@rooms.each (roomX, roomY, room) =>
+				if room
+					room.tiles.each (tileX, tileY, tile) =>
+						levelTileX = roomX * (ROOM_WIDTH + 1) + tileX
+						levelTileY = roomY * (ROOM_HEIGHT + 1) + tileY
+						@tiles[levelTileX][levelTileY] = tile
 
 	class Reifier
 		reifyEntity: (tileX, tileY, tile) ->
@@ -216,14 +227,11 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 		reify: (level) ->
 			es = []
 
-			level.rooms.each (roomX, roomY, room) =>
-				if room
-					room.tiles.each (tileX, tileY, tile) =>
-						entity = @reifyEntity tileX, tileY, tile
-						if entity
-							entity.x += roomX * (ROOM_WIDTH + 1) * TILE_WIDTH
-							entity.y += roomY * (ROOM_HEIGHT + 1) * TILE_HEIGHT
-							es.push entity
+			level.tiles.each (tileX, tileY, tile) =>
+				entity = @reifyEntity tileX, tileY, tile
+				if entity
+					es.push entity
+
 			return es
 
 	return {
