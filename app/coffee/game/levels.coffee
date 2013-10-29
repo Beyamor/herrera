@@ -7,6 +7,11 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 	ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
 	LEVEL_WIDTH	= LEVEL_HEIGHT	= consts.LEVEL_WIDTH
 
+	DIRECTIONS = ["north", "east", "south", "west"]
+
+	oppositeDirection = (direction) ->
+		DIRECTIONS[(DIRECTIONS.indexOf(direction) + 2) % DIRECTIONS.length]
+
 	class Room
 		constructor: (@xIndex, @yIndex) ->
 			@tiles = util.array2d ROOM_WIDTH, ROOM_HEIGHT
@@ -57,11 +62,14 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			# pick an entrance
 			[x, y] = random.any orientation.entrances[@entranceDirection]
 			set x, y, "."
+			@entrance = {x: x, y: y}
 
 			# pick exits
+			@exits = {}
 			for exitDirection in @exitDirections
 				[x, y] = random.any orientation.exits[exitDirection]
 				set x, y, "."
+				@exits[exitDirection] = {x: x, y: y}
 
 			saveState()
 
@@ -147,24 +155,22 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			@construct()
 
 		construct: ->
-			crossovers = (Math.floor(Math.random() * LEVEL_HEIGHT) for i in [0...LEVEL_WIDTH])
+			crossovers	= (Math.floor(Math.random() * LEVEL_HEIGHT) for i in [0...LEVEL_WIDTH])
+			connections	= []
 
 			# assuming the player always starts at (0,0)
 			for j in [0...crossovers[0]]
-				@rooms[0][j].addExit "south"
 				@rooms[0][j+1] or= new RegularRoom 0, j+1
-				@rooms[0][j+1].addEntrance "north"
-			@rooms[0][crossovers[0]].addExit "east"
+				connections.push {from: @rooms[0][j], to: @rooms[0][j+1], direction: "south"}
 
 			for i in [1...LEVEL_WIDTH]
 				crossover	= crossovers[i]
 				prevCrossover	= crossovers[i-1]
 
 				@rooms[i][crossover] or= new RegularRoom i, crossover
-				@rooms[i][crossover].addExit "east" if i < LEVEL_WIDTH-1
 
 				@rooms[i][prevCrossover] or= new RegularRoom i, prevCrossover
-				@rooms[i][prevCrossover].addEntrance "west"
+				connections.push {from: @rooms[i-1][prevCrossover], to: @rooms[i][prevCrossover], direction: "east"}
 
 				unused = [0...LEVEL_HEIGHT]
 				unused.remove crossover
@@ -176,12 +182,14 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 
 					if prevCrossover < crossover
 						@rooms[i][j+1] or= new RegularRoom i, j
-						@rooms[i][j].addExit "south"
-						@rooms[i][j+1].addEntrance "north"
+						connections.push {from: @rooms[i][j], to: @rooms[i][j+1], direction: "south"}
 					else
 						@rooms[i][j-1] or= new RegularRoom i,j
-						@rooms[i][j].addExit "north"
-						@rooms[i][j-1].addEntrance "south"
+						connections.push {from: @rooms[i][j], to: @rooms[i][j-1], direction: "north"}
+
+			for {from: from, to: to, direction: direction} in connections
+				from.addExit direction
+				to.addEntrance oppositeDirection(direction)
 
 			@rooms.each (_, _, room) ->
 				room.finalize() if room and room.finalize?
