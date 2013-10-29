@@ -266,6 +266,17 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 				for [tileX, tileY] in path
 					@tiles[tileX][tileY] = "."
 
+					for neighbourX in [tileX-1..tileX+1]
+						for neighbourY in [tileY-1..tileY+1]
+							continue if neighbourX < 0 or
+									neighbourX >= LEVEL_WIDTH * (ROOM_WIDTH + 1) or
+									neighbourY < 0 or
+									neighbourY >= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
+
+							existingTile = @tiles[neighbourX][neighbourY]
+							if (not existingTile) or (existingTile is " ")
+								@tiles[neighbourX][neighbourY] = "W"
+
 		levelX: (room, tileX) ->
 			tileX + room.xIndex * (ROOM_WIDTH + 1)
 
