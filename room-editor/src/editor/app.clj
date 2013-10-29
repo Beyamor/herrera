@@ -12,6 +12,8 @@
             [editor.rooms :as rooms])
   (:import java.awt.FileDialog))
 
+(def base-dir "../app/coffee/game")
+
 (defn -main [& args]
   (let [app {:model (atom {:rooms []})
              :state (atom {})}
@@ -19,13 +21,15 @@
         rooms (rms/create-browser app)
         load-action (action
                       :handler (fn [e]
-                                 (when-let [file (choose-file)]
+                                 (when-let [file (choose-file
+                                                   :dir base-dir)]
                                    (load-data-file file app)))
                       :name "Load..."
                       :key "menu L")
         save-action (action
                       :handler (fn [e]
                                  (when-let [file (choose-file
+                                                   :dir base-dir
                                                    :type :save
                                                    :filters [["Coffee" [".coffee"]]])]
                                    (swap! (:model app) update-in [:rooms] rooms/augment)

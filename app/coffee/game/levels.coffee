@@ -16,23 +16,23 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 	class RegularRoom extends Room
 		constructor: (xIndex, yIndex) ->
 			super xIndex, yIndex
-			@exits = []
+			@exitDirections = []
 
 		addEntrance: (direction) ->
-			@entrance = direction
+			@entranceDirection = direction
 
 		addExit: (direction) ->
-			@exits.push direction
+			@exitDirections.push direction
 
 		finalize: ->
 			possibilities = []
 			for room in definitions.rooms
 				for orientation in room.orientations
-					continue unless orientation.entrance is @entrance
+					continue unless orientation.entrances[@entranceDirection].length isnt 0
 
 					meetsAllExits = true
-					for exit in @exits
-						meetsAllExits and= (orientation.exits.indexOf(exit) isnt -1)
+					for exitDirection in @exitDirections
+						meetsAllExits and= (orientation.exits[exitDirection].length isnt 0)
 
 					continue unless meetsAllExits
 					possibilities.push {
@@ -40,7 +40,7 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						transformation: orientation.transformation
 					}
 
-			throw new Error("no room possibilities (entrance is #{@entrance})") unless possibilities.length isnt 0
+			throw new Error("no room possibilities (entrance is #{@entranceDirection})") unless possibilities.length isnt 0
 			choice = random.any possibilities
 
 			tiles = @applyTransformation choice.definition, choice.transformation
@@ -68,10 +68,13 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						for j in [0...ROOM_HEIGHT]
 							set(i, j, get(ROOM_HEIGHT - 1 - j, i))
 
-				 if transformation.mirror is "vertical"
+				definition = util.copy result
+
+				if transformation.mirror is "vertical"
 					for i in [0...ROOM_WIDTH]
 						for j in [0...ROOM_HEIGHT]
 							set(i, j, get(i, ROOM_HEIGHT - 1 - j))
+
 				else if transformation.mirror is "horizontal"
 					for i in [0...ROOM_WIDTH]
 						for j in [0...ROOM_HEIGHT]
