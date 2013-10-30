@@ -70,7 +70,7 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			choice = random.any possibilities
 
 			tiles = @realizeOrientation choice.definition, choice.orientation
-			@tiles.each (i, j) => @tiles[i][j] = tiles[i + j * ROOM_WIDTH]
+			@tiles.each (i, j) => @tiles[i][j] = tiles[i][j]
 
 		realizeOrientation: (definition, orientation) ->
 			transformation = orientation.transformation
@@ -79,8 +79,8 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			result		= util.copy definition
 
 			saveState	= -> previous = util.copy result
-			get		= (i, j) -> previous[i + j * ROOM_WIDTH]
-			set		= (i, j, value) -> result[i + j * ROOM_WIDTH] = value
+			get		= (i, j) -> previous[i][j]
+			set		= (i, j, value) -> result[i][j] = value
 
 			# pick an entrance
 			[x, y] = random.any orientation.entrances[@entranceDirection]

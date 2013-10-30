@@ -7,17 +7,17 @@
 
 (defn get-tile
   [definition i j]
-  (get definition (+ i (* j room-width))))
+  (get-in definition [i j]))
 
 (defn set-tile
   [definition i j value]
-  (assoc definition (+ i (* j room-width)) value))
+  (assoc-in definition [i j] value))
 
 (def empty-room
   {:definition
-   (->> " "
-     (repeat (* room-width room-height))
-     vec)})
+   (vec (for [i (range room-width)]
+          (vec (for [i (range room-height)]
+                 " "))))})
 
 (defn scan-check
   [definition tile i j]

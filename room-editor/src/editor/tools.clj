@@ -4,14 +4,14 @@
 
 (defprotocol Tool
   (options [this])
-  (left-click [this tile-index])
-  (right-click [this tile-index])
+  (left-click [this tile-indices])
+  (right-click [this tile-indices])
   (tool-name [this]))
 
 (defn tile-path
-  [{:keys [state model]} tile-index]
+  [{:keys [state model]} [tile-x tile-y]]
   (when-let [selected-room (:selected-room @state)]
-    [:rooms selected-room :definition tile-index]))
+    [:rooms selected-room :definition tile-x tile-y]))
 
 (defn tiletype-button
   [state label tile-type]
@@ -39,13 +39,13 @@
   (options [_]
     (create-tiletype-list (:state app)))
 
-  (left-click [_ tile-index]
-    (when-let [tile-path (tile-path app tile-index)]
+  (left-click [_ tile-indices]
+    (when-let [tile-path (tile-path app tile-indices)]
       (when-let [tile-type (:tile-type @(:state app))]
         (swap! (:model app) assoc-in tile-path tile-type))))
 
-  (right-click [_ tile-index]
-    (when-let [tile-path (tile-path app tile-index)]
+  (right-click [_ tile-indices]
+    (when-let [tile-path (tile-path app tile-indices)]
       (swap! (:model app) assoc-in tile-path " "))))
 
 (defn tool-button

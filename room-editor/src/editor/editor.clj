@@ -28,8 +28,7 @@
           tile-height (get-tile-height c)]
       (doseq [i (range room-width)
               j (range room-height)
-              :let [idx (+ i (* j room-width))
-                    tile (get-in model [:rooms selected-room :definition idx])]]
+              :let [tile (get-in model [:rooms selected-room :definition i j])]]
         (let [c (case tile
                   "W" "grey"
                   "." "white"
@@ -77,16 +76,15 @@
       (let [tile-width (get-tile-width c)
             tile-height (get-tile-height c)
             tile-x (-> e .getX (/ tile-width) int)
-            tile-y (-> e .getY (/ tile-height) int)
-            tile-index (+ tile-x (* room-width tile-y))]
+            tile-y (-> e .getY (/ tile-height) int)]
         (cond
           (is-left? e)
           (when-let [tool (:tool @state)]
-            (tools/left-click tool tile-index))
+            (tools/left-click tool [tile-x tile-y]))
 
           (is-right? e)
           (when-let [tool (:tool @state)]
-            (tools/right-click tool tile-index))
+            (tools/right-click tool [tile-x tile-y]))
 
           :else :do-nothing)))))
 
