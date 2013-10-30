@@ -62,16 +62,61 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 
 					continue unless meetsAllExits
 					possibilities.push {
-						definition: room.definition
-						orientation: orientation
+						definition: util.copy room.definition
+						orientation: util.copy orientation
+						slices: util.copy room.slices
 					}
 
 			throw new Error("no room possibilities (entrance is #{@entranceDirection})") unless possibilities.length isnt 0
-			choice = random.any possibilities
+			choice = @applySkips random.any possibilities
 
 			tiles = @realizeOrientation choice.definition, choice.orientation
 			@tiles.each (i, j) => @tiles[i][j] = tiles[i][j]
 
+		applySkips: (choice) ->
+			definitionWithSkips = util.array2d ROOM_WIDTH, ROOM_HEIGHT
+
+			skipRows	= (row for row in choice.slices.rows when random.coinFlip())
+			skipColumns	= (column for column in choice.slices.columns when random.coinFlip())
+
+			defI = tileI = 0
+			while defI < ROOM_WIDTH
+
+				unless skipColumns.contains defI
+					defJ = tileJ = 0
+					while defJ < ROOM_HEIGHT
+						unless skipRows.contains defJ
+							definitionWithSkips[tileI][tileJ] = choice.definition[defI][defJ]
+							++tileJ
+						++defJ
+					++tileI
+				++defI
+
+			for property in ["entrances", "exits"]
+				for direction in DIRECTIONS
+					points = choice.orientation[property][direction]
+					for index in [0...points.length]
+						[origX, origY] = points[index]
+						shiftedX = origX
+						shiftedY = origY
+
+						for column in skipColumns
+							if column <= origX
+								shiftedX -= 1
+							else
+								break
+
+						for row in skipRows
+							if row <= origY
+								shiftedY -= 1
+							else
+								break
+
+						points[index] = [shiftedX, shiftedY]
+
+			choice.definition = definitionWithSkips
+			return choice
+			
 		realizeOrientation: (definition, orientation) ->
 			transformation = orientation.transformation
 

@@ -8,6 +8,9 @@ define ['core/app'], (app) ->
 		return unless index > -1
 		@splice index, 1
 
+	Array::contains = (val) ->
+		this.indexOf(val) isnt -1
+
 	array2d = (width, height, constructor) ->
 		a = []
 		for i in [0...width]
@@ -93,6 +96,7 @@ define ['core/app'], (app) ->
 			intInRange: (min, max) -> Math.floor(@inRange min, max)
 			angle: -> @inRange 0, 2 * Math.PI
 			any: (coll) -> coll[Math.floor(Math.random() * coll.length)]
+			coinFlip: -> Math.random() < 0.5
 
 		isFunction: (x) ->
 			x and typeof(x) is "function"
