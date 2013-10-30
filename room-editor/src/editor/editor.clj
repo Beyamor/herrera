@@ -4,7 +4,8 @@
         [editor.rooms :only [room-width room-height]])
   (:require [cheshire.core :as json]
             [seesaw.bind :as b]
-            [seesaw.color :as color])
+            [seesaw.color :as color]
+            [editor.tools :as tools])
   (:import java.awt.FileDialog
            java.awt.event.InputEvent))
 
@@ -77,14 +78,15 @@
             tile-height (get-tile-height c)
             tile-x (-> e .getX (/ tile-width) int)
             tile-y (-> e .getY (/ tile-height) int)
-            tile-path [:rooms selected-room :definition (+ tile-x (* room-width tile-y))]]
+            tile-index (+ tile-x (* room-width tile-y))]
         (cond
           (is-left? e)
           (when-let [tool (:tool @state)]
-            (swap! model assoc-in tile-path (tool)))
+            (tools/left-click tool tile-index))
 
           (is-right? e)
-          (swap! model assoc-in tile-path " ")
+          (when-let [tool (:tool @state)]
+            (tools/right-click tool tile-index))
 
           :else :do-nothing)))))
 

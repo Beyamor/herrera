@@ -47,8 +47,11 @@
       (config! :content
                (left-right-split
                  (left-right-split
-                   (vertical-panel
-                     :items (tools/create-list app))
+                   (top-bottom-split
+                     (vertical-panel
+                       :items (tools/create-list app root))
+                     (vertical-panel
+                       :id :tool-options))
                    (editor/create app))
                  (vertical-panel
                    :items [(label "Rooms")
