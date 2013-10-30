@@ -68,7 +68,7 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 					}
 
 			throw new Error("no room possibilities (entrance is #{@entranceDirection})") unless possibilities.length isnt 0
-			choice = @applySkips random.any possibilities
+			choice = @translate @applySkips random.any possibilities
 
 			tiles = @realizeOrientation choice.definition, choice.orientation
 			@tiles.each (i, j) => @tiles[i][j] = tiles[i][j]
@@ -115,6 +115,82 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 						points[index] = [shiftedX, shiftedY]
 
 			choice.definition = definitionWithSkips
+			return choice
+
+		translate: (choice) ->
+			translatedDefinition = util.array2d ROOM_WIDTH, ROOM_HEIGHT
+
+			xTranslations = [0]
+			yTranslations = [0]
+
+			isFree = (i, j) ->
+				tile = choice.definition[i][j]
+				return (not tile) or (tile is " ")
+
+			free = true
+			for i in [0...ROOM_WIDTH]
+				for j in [0...ROOM_HEIGHT]
+					unless isFree i, j
+						free = false
+						break
+				if free
+					xTranslations.push(-1 - i)
+				else
+					break
+
+			free = true
+			for i in [ROOM_WIDTH-1...0]
+				for j in [0...ROOM_HEIGHT]
+					unless isFree i, j
+						free = false
+						break
+				if free
+					xTranslations.push(ROOM_WIDTH - i)
+				else
+					break
+			free = true
+			for j in [0...ROOM_HEIGHT]
+				for i in [0...ROOM_WIDTH]
+					unless isFree i, j
+						free = false
+						break
+				if free
+					yTranslations.push(-1 - j)
+				else
+					break
+
+			free = true
+			for j in [ROOM_HEIGHT-1...0]
+				for i in [0...ROOM_WIDTH]
+					unless isFree i, j
+						free = false
+						break
+				if free
+					yTranslations.push(ROOM_HEIGHT - j)
+				else
+					break
+
+			xTranslation = random.any xTranslations
+			yTranslation = random.any yTranslations
+
+			for i in [0...ROOM_WIDTH]
+				for j in [0...ROOM_HEIGHT]
+					translatedI = i + xTranslation
+					translatedJ = j + yTranslation
+
+					continue if translatedI < 0 or translatedI >= ROOM_WIDTH or
+							translatedJ < 0 or translatedI >= ROOM_HEIGHT
+
+					translatedDefinition[translatedI][translatedJ] = choice.definition[i][j]
+
+			for property in ["entrances", "exits"]
+				for direction in DIRECTIONS
+					points = choice.orientation[property][direction]
+					for point in choice.orientation[property][direction]
+						point[0] += xTranslation
+						point[1] += yTranslation
+
+			choice.definition = translatedDefinition
 			return choice
 			
 		realizeOrientation: (definition, orientation) ->
