@@ -69,7 +69,17 @@
       
       :else :do-nothing))
 
-  (right-click [_ [tile-x tile-y]]))
+  (right-click [_ [tile-x tile-y]]
+    (cond
+      (= tile-x 0)
+      (update-room! app update-in [:slices :rows]
+                    #(-> % set (disj tile-y)))
+
+      (= tile-y 0)
+      (update-room! app update-in [:slices :columns]
+                    #(-> % set (disj tile-x)))
+
+      :else :do-nothing)))
 
 (defn tool-button
   [state root tool]
