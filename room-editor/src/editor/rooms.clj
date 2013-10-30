@@ -17,7 +17,10 @@
   {:definition
    (vec (for [i (range room-width)]
           (vec (for [i (range room-height)]
-                 " "))))})
+                 " "))))
+   :slices
+   {:rows #{}
+    :columns #{}}})
 
 (defn scan-check
   [definition tile i j]
@@ -161,3 +164,9 @@
 (defn augment
   [room-list]
   (mapv add-orientations room-list))
+
+(defn update-room!
+  [{:keys [model state]} updater & args]
+  (when-let [selected-room (:selected-room @state)]
+    (swap! model update-in [:rooms selected-room]
+           #(apply updater % args))))

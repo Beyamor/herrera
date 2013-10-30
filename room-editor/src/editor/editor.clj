@@ -4,13 +4,20 @@
         [editor.rooms :only [room-width room-height]])
   (:require [cheshire.core :as json]
             [seesaw.bind :as b]
-            [seesaw.color :as color]
+            [seesaw.color :as c]
             [editor.tools :as tools])
   (:import java.awt.FileDialog
-           java.awt.event.InputEvent))
+           java.awt.event.InputEvent
+           java.awt.BasicStroke))
 
 (def editor-width 600)
 (def editor-height 600)
+
+(def slice-color (c/color "red" 40))
+
+(defn set-stroke-width!
+  [g width]
+  (.setStroke g (BasicStroke. width)))
 
 (defn get-tile-width
   [c]
@@ -24,22 +31,41 @@
   [c g {:keys [selected-room]} model]
   (.clearRect g 0 0 (.getWidth c) (.getHeight c))
   (when selected-room
-    (let [tile-width (get-tile-width c)
-          tile-height (get-tile-height c)]
+    (let [room (get-in model [:rooms selected-room])
+          tile-width (get-tile-width c)
+          tile-height (get-tile-height c)
+          draw-tile (fn [color i j]
+                      (doto g
+                        (.setColor color)
+                        (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height)))]
+
+      ; tiles
       (doseq [i (range room-width)
               j (range room-height)
-              :let [tile (get-in model [:rooms selected-room :definition i j])]]
-        (let [c (case tile
-                  "W" "grey"
-                  "." "white"
-                  "o" "lightblue"
-                  "i" "lightgreen"
-                  " " "black"
-                  "pink")]
-          (doto g
-            (.setColor (color/color c))
-            (.fillRect (* i tile-width) (* j tile-height) tile-width tile-height))))
-      (.setColor g (color/color "lightgray"))
+              :let [tile (get-in room [:definition i j])]]
+        (let [color (c/color
+                      (case tile
+                        "W" "grey"
+                        "." "white"
+                        "o" "lightblue"
+                        "i" "lightgreen"
+                        " " "black"
+                        "pink"))]
+          (draw-tile color i j)))
+
+      ; slices
+      (.setColor g slice-color)
+      (set-stroke-width! g 5)
+      (doseq [j (get-in room [:slices :rows])
+              :let [y (+ (* j tile-height) (/ tile-height 2))]]
+        (.drawLine g 0 y (.getWidth c) y))
+      (doseq [i (get-in room [:slices :columns])
+              :let [x (+ (* i tile-width) (/ tile-height 2))]]
+        (.drawLine g x 0 x (.getHeight c)))
+
+      ; grid
+      (.setColor g (c/color "lightgray"))
+      (set-stroke-width! g 1)
       (doseq [i (range room-width)
               :let [x (* i tile-width)]]
         (.drawLine g x 0 x (.getHeight c)))

@@ -1,5 +1,6 @@
 (ns editor.tools
-  (:use seesaw.core)
+  (:use seesaw.core
+        [editor.rooms :only [update-room!]])
   (:require [cheshire.core :as json]))
 
 (defprotocol Tool
@@ -48,6 +49,28 @@
     (when-let [tile-path (tile-path app tile-indices)]
       (swap! (:model app) assoc-in tile-path " "))))
 
+(defrecord Slice [app]
+  Tool
+  (tool-name [_]
+    "Slice")
+
+  (options [_]
+    nil)
+
+  (left-click [_ [tile-x tile-y]]
+    (cond
+      (= tile-x 0)
+      (update-room! app update-in [:slices :rows]
+                    #(-> % set (conj tile-y)))
+
+      (= tile-y 0)
+      (update-room! app update-in [:slices :columns]
+                    #(-> % set (conj tile-x)))
+      
+      :else :do-nothing))
+
+  (right-click [_ [tile-x tile-y]]))
+
 (defn tool-button
   [state root tool]
   (button
@@ -61,5 +84,6 @@
 (defn create-list
   [{:keys [state] :as app} root]
   (->>
-    [(->Paint app)]
+    [(->Paint app)
+     (->Slice app)]
     (map #(tool-button state root %))))
