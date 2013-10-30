@@ -138,10 +138,10 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 			switch direction
 				when "west"
 					x = 0
-					y = [ROOM_HEIGHT/2]
+					y = ROOM_HEIGHT/2
 				when "east"
-					x = [ROOM_WIDTH - 1]
-					y = [ROOM_HEIGHT/2]
+					x = ROOM_WIDTH - 1
+					y = ROOM_HEIGHT/2
 				when "north"
 					x = ROOM_WIDTH/2
 					y = 0
@@ -158,10 +158,7 @@ define ['game/entities', 'core/util', 'game/consts', 'game/room-data'], (entitie
 
 		constructor: ->
 			@rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
-			@rooms.each (i, j) =>
-				@rooms[i][j] =
-					if i is 0 and j is 0
-						new StartRoom i, j
+			@rooms[0][0] = new StartRoom 0, 0
 
 			tileWidth	= LEVEL_WIDTH * (ROOM_WIDTH + 1)
 			tileHeight	= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
