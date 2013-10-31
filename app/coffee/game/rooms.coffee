@@ -1,4 +1,4 @@
-define ['core/util', 'game/consts', 'game/room-data'], (util, consts, definitions) ->
+define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (util, consts, definitions, features) ->
 	ns = {}
 
 	random = util.random
@@ -64,6 +64,7 @@ define ['core/util', 'game/consts', 'game/room-data'], (util, consts, definition
 
 			tiles = @realizeOrientation choice.definition, choice.orientation
 			@tiles.each (i, j) => @tiles[i][j] = tiles[i][j]
+			@addFeatures()
 
 		applySkips: (choice) ->
 			definitionWithSkips = util.array2d ROOM_WIDTH, ROOM_HEIGHT
@@ -228,6 +229,50 @@ define ['core/util', 'game/consts', 'game/room-data'], (util, consts, definition
 
 			return result
 
+		addFeatures: ->
+			areas = []
+			@tiles.each (x, y, tile) =>
+				return unless tile is "."
+
+				# sooo many repeated checks
+				for width in [0...ROOM_HEIGHT] when x + width < ROOM_WIDTH
+					do (width) =>
+						for height in [0...ROOM_WIDTH] when y + height < ROOM_HEIGHT
+							do (height) =>
+								tiles	= []
+
+								clear	= true
+								for i in [x...x+width]
+									for j in [y...y+height]
+										clear and= @tiles[i][j] is "."
+										break unless clear
+										tiles.push [i, j]
+									break unless clear
+								return unless clear
+
+								area = {
+									set: (i, j, value) =>
+										@tiles[x + i][y + j] = value
+									width: width
+									height: height
+									tiles: tiles
+									hasTile: ([checkX, checkY]) ->
+										for [tileX, tileY] in @tiles
+											return true if tileX is checkX and
+													tileY is checkY
+										return false
+								}
+
+								if features.canFill area
+									areas.push area
+
+			while areas.length > 0
+				someArea = random.any areas
+
+				features.fill someArea
+
+				for tile in someArea.tiles
+					areas = (area for area in areas when not area.hasTile tile)
 
 	class ns.StartRoom extends ns.Room
 		constructor: (xIndex, yIndex) ->
