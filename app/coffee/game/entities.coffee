@@ -99,7 +99,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 						color: tileColors[i % tileColors.length]
 					}
 
-				margin = 2
+				margin = 1
 				for x in [margin...consts.TILE_WIDTH - margin]
 					for y in [margin...consts.TILE_WIDTH - margin]
 						closestFeature		= null
