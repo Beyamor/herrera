@@ -34,7 +34,11 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 					@rooms[i][crossover] or= new RegularRoom i, crossover
 
 					@rooms[i][prevCrossover] or= new RegularRoom i, prevCrossover
-					@connections.push {from: @rooms[i-1][prevCrossover], to: @rooms[i][prevCrossover], direction: "east"}
+					@connections.push {
+						from: @rooms[i-1][prevCrossover],
+						to: @rooms[i][prevCrossover],
+						direction: "east"
+					}
 
 					unused = [0...LEVEL_HEIGHT]
 					unused.remove crossover
@@ -57,13 +61,6 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 				@rooms.each (_, _, room) ->
 					room.finalize() if room and room.finalize?
-
-				@rooms.each (roomX, roomY, room) =>
-					if room
-						room.tiles.each (tileX, tileY, tile) =>
-							levelTileX = roomX * (ROOM_WIDTH + 1) + tileX
-							levelTileY = roomY * (ROOM_HEIGHT + 1) + tileY
-							@tiles[levelTileX][levelTileY] = tile
 
 				for {from: from, to: to, direction: direction} in @connections
 					exit		= from.exits[direction]
@@ -130,9 +127,31 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 										neighbourY < 0 or
 										neighbourY >= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
 
-								existingTile = @tiles[neighbourX][neighbourY]
+								existingTile = @existingTile neighbourX, neighbourY
 								if (not existingTile) or (existingTile is " ")
 									@tiles[neighbourX][neighbourY] = "W"
+
+			existingTile: (tileX, tileY) ->
+				tile = null
+
+				roomX = Math.floor(tileX / (ROOM_WIDTH + 1))
+				roomY = Math.floor(tileY / (ROOM_HEIGHT + 1))
+				if @rooms[roomX] and @rooms[roomX][roomY]
+					room		= @rooms[roomX][roomY]
+					roomTileX	= tileX - (roomX * (ROOM_WIDTH + 1))
+					roomTileY	= tileY - (roomY * (ROOM_HEIGHT + 1))
+
+					if room.tiles[roomTileX] and room.tiles[roomTileX][roomTileY]
+						tile = room.tiles[roomTileX][roomTileY]
+
+				if not tile or tile is " "
+					if @tiles[tileX] and @tiles[tileX][tileY]
+						tile = @tiles[tileX][tileY]
+
+				return tile
+
+				return till
+
 
 			levelX: (room, tileX) ->
 				tileX + room.xIndex * (ROOM_WIDTH + 1)
@@ -162,6 +181,15 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 			reify: (level) ->
 				es = []
+
+				level.rooms.each (roomX, roomY, room) =>
+					return unless room
+					room.tiles.each (tileX, tileY, tile) =>
+						entity = @reifyEntity tileX, tileY, tile
+						if entity
+							entity.x += roomX * (ROOM_WIDTH + 1) * TILE_WIDTH
+							entity.y += roomY * (ROOM_HEIGHT + 1) * TILE_HEIGHT
+							es.push entity
 
 				level.tiles.each (tileX, tileY, tile) =>
 					entity = @reifyEntity tileX, tileY, tile
