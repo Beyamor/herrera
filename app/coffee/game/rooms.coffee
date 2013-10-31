@@ -31,6 +31,9 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		constructor: (@xIndex, @yIndex) ->
 			@tiles = util.array2d ROOM_WIDTH, ROOM_HEIGHT
 
+		enemies: (desiredAmount) ->
+			[]
+
 	class ns.RegularRoom extends ns.Room
 		constructor: (xIndex, yIndex) ->
 			super xIndex, yIndex
@@ -273,6 +276,21 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 				for tile in someArea.tiles
 					areas = (area for area in areas when not area.hasTile tile)
+
+		enemies: (desiredAmount) ->
+			candidates = []
+			@tiles.each (tileX, tileY, tile) =>
+				if tile is "."
+					candidates.push {x: tileX, y: tileY}
+
+			positions = []
+			while positions.length < desiredAmount and candidates.length > 0
+				candidate = random.any candidates
+				candidates.remove candidate
+
+				positions.push candidate
+
+			return positions
 
 	class ns.StartRoom extends ns.Room
 		constructor: (xIndex, yIndex) ->

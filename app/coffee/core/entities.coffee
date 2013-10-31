@@ -244,5 +244,7 @@ define ['core/app', 'core/util'], (app, util) ->
 				return e2 if util.aabbsIntersect e1, e2
 			return null
 
-	
+		first: (type) ->
+			@statics.first(type) or @dynamics.first(type)
+
 	return ns

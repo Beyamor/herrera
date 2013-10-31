@@ -7,6 +7,8 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
 		LEVEL_WIDTH	= LEVEL_HEIGHT	= consts.LEVEL_WIDTH
 
+		random = util.random
+
 		class Level
 			constructor: ->
 				@rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
@@ -179,17 +181,31 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 					when "barrel"
 						new entities.Barrel x, y
 
+			addRoomOffset: (room, pos) ->
+				pos.x += room.xIndex * (ROOM_WIDTH + 1) * TILE_WIDTH
+				pos.y += room.yIndex * (ROOM_HEIGHT + 1) * TILE_HEIGHT
+				return pos
+
 			reify: (level) ->
 				es = []
 
 				level.rooms.each (roomX, roomY, room) =>
 					return unless room
+
 					room.tiles.each (tileX, tileY, tile) =>
 						entity = @reifyEntity tileX, tileY, tile
 						if entity
-							entity.x += roomX * (ROOM_WIDTH + 1) * TILE_WIDTH
-							entity.y += roomY * (ROOM_HEIGHT + 1) * TILE_HEIGHT
+							@addRoomOffset room, entity
 							es.push entity
+
+					numberOfEnemies = random.intInRange(2, 5)
+					for {x: tileX, y: tileY} in room.enemies numberOfEnemies
+						enemy = new entities.Silverfish(
+							(tileX + 0.5) * TILE_WIDTH,
+							(tileY + 0.5) * TILE_HEIGHT
+						)
+						@addRoomOffset room, enemy
+						es.push enemy
 
 				level.tiles.each (tileX, tileY, tile) =>
 					entity = @reifyEntity tileX, tileY, tile
