@@ -1,0 +1,2 @@
+define ->
+	alert "hello world"
