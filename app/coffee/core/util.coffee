@@ -163,4 +163,10 @@ define ['core/app'], (app) ->
 			return isIn
 
 		Timer: Timer
+
+		DIRECTIONS: ["north", "east", "south", "west"]
+
+		oppositeDirection: (direction) ->
+			@DIRECTIONS[(@DIRECTIONS.indexOf(direction) + 2) % @DIRECTIONS.length]
+
 	}
