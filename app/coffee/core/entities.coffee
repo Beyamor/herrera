@@ -14,6 +14,7 @@ define ['core/app', 'core/util'], (app, util) ->
 			@offset			= {x: 0, y: 0}
 			@collisionHandlers	= {}
 			@type			= args.type
+			@static			= args.static
 
 			@center() if args.centered?
 
@@ -102,11 +103,12 @@ define ['core/app', 'core/util'], (app, util) ->
 				get: -> @pos.y
 				set: (y) -> @pos.y = y
 
-	class ns.EntityList
+	class BaseEntityList
 		constructor: ->
-			@list	= []
+			@list		= []
 			@toAdd	 	= []
 			@toRemove	= []
+			@entityCells	= {}
 
 		add: (e) ->
 			return unless e?
@@ -141,30 +143,6 @@ define ['core/app', 'core/util'], (app, util) ->
 					@entityCells[x][y].remove e
 
 		update: ->
-			@entityCells = {}
-			@addToCells(entity) for entity in @list
-
-			for entity in @list
-				# so, this isn't perfect
-				# cause, like, what if this entity moves some other one?
-				# but whatever, probably good enough to just handle this case
-				prevX = entity.x
-				prevY = entity.y
-
-				entity.update()
-
-				if entity.x isnt prevX or entity.y isnt prevY
-					newX = entity.x
-					newY = entity.y
-
-					entity.x = prevX
-					entity.y = prevY
-					@removeFromCells(entity)
-
-					entity.x = newX
-					entity.y = newY
-					@addToCells(entity)
-
 			if @toAdd.length isnt 0
 				for entity in @toAdd
 					@list.push entity
@@ -194,13 +172,77 @@ define ['core/app', 'core/util'], (app, util) ->
 			return es
 
 
+		first: (type) ->
+			(return e) for e in @list when e.hasType type
+			return null
+
+		rebuildCells: ->
+			@entityCells = {}
+			@addToCells(entity) for entity in @list
+
+	class StaticEntityList extends BaseEntityList
+		add: (e) ->
+			@addToCells e
+			super e
+
+		remove: (e) ->
+			@removeFromCells e
+			super e
+
+		update: ->
+			entity.update() for entity in @list
+			super()
+
+	class DynamicEntityList extends BaseEntityList
+		update: ->
+			@rebuildCells()
+			for entity in @list
+				# so, this isn't perfect
+				# cause, like, what if this entity moves some other one?
+				# but whatever, probably good enough to just handle this case
+				prevX = entity.x
+				prevY = entity.y
+
+				entity.update()
+
+				if entity.x isnt prevX or entity.y isnt prevY
+					newX = entity.x
+					newY = entity.y
+
+					entity.x = prevX
+					entity.y = prevY
+					@removeFromCells(entity)
+
+					entity.x = newX
+					entity.y = newY
+					@addToCells(entity)
+
+			super()
+
+	class ns.EntityList
+		constructor: ->
+			@statics	= new StaticEntityList
+			@dynamics	= new DynamicEntityList
+
+		add: (e) ->
+			return unless e
+			if e.static then @statics.add e else @dynamics.add e
+
+		remove: (e) ->
+			return unless e
+			if e.static then @statics.remove e else @dynamics.remove e
+
+		update: ->
+			@statics.update()
+			@dynamics.update()
+
+		inBounds: (rect) ->
+			@statics.inBounds(rect).concat @dynamics.inBounds(rect)
+
 		collide: (e1, type) ->
 			for e2 in @inBounds(e1) when e2 isnt e1 and e2.hasType type
 				return e2 if util.aabbsIntersect e1, e2
 			return null
 
-		first: (type) ->
-			(return e) for e in @list when e.hasType type
-			return null
-
+	
 	return ns

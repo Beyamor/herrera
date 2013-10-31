@@ -19,6 +19,7 @@ define ['core/app', 'core/entities',
 					width: consts.TILE_WIDTH
 					layer: ns.Wall.LAYER
 					type: 'wall'
+					static: true
 
 		class FloorSprite
 			constructor: ->
@@ -103,5 +104,6 @@ define ['core/app', 'core/entities',
 					y: y
 					graphic: random.any floorSprites
 					layer: 300
+					static: true
 
 		return ns
