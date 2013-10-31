@@ -29,6 +29,17 @@ define ->
 			y or= 0
 			target.context.drawImage @el, x, y
 
+		drawPixel: (x, y, [r, g, b, a]) ->
+			@pixel or= @context.createImageData 1, 1
+
+			data = @pixel.data
+			data[0] = r
+			data[1] = g
+			data[2] = b
+			data[3] = a or 255
+
+			@context.putImageData @pixel, x, y
+
 	return {
 		Canvas: Canvas
 	}
