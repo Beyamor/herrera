@@ -185,7 +185,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 							bt.checkOnce(
 								behaviours.closeTo(this, (=> @player), 50)),
 							behaviours.flee(this, (=> @player),
-								speed: 300
+								speed: 425
 								minDistance: 150
 							)
 						),
