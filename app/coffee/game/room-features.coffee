@@ -4,21 +4,9 @@ define ['core/util'], (util) ->
 	features = [{
 		# hole
 		canFill: (area) ->
-			area.width >= 6 and area.height >= 6
+			area.width >= 7 and area.height >= 7
 
 		fill: (area) ->
-			for i in [0...area.width]
-				area.set i, 0, "."
-				area.set i, 1, "."
-				area.set i, area.height-1, "."
-				area.set i, area.height-2, "."
-
-			for j in [0...area.height]
-				area.set 0, j, "."
-				area.set 1, j, "."
-				area.set area.width-1, j, "."
-				area.set area.width-2, j, "."
-
 			minX = 2
 			maxX = area.width - 3
 			minY = 2
@@ -29,6 +17,22 @@ define ['core/util'], (util) ->
 						area.set i, j, " "
 					else
 						area.set i, j, "W"
+	}, {
+		# horizontal wall segment
+		canFill: (area) ->
+			area.height is 5 and area.width >= 5 and area.width <= 7
+
+		fill: (area) ->
+			for i in [1...area.width-1]
+				area.set i, 2, "W"
+	}, {
+		# vertical wall segment
+		canFill: (area) ->
+			area.width is 5 and area.height >= 5 and area.height <= 7
+
+		fill: (area) ->
+			for j in [1...area.height-1]
+				area.set 2, j, "W"
 	}]
 
 	return {
@@ -40,7 +44,7 @@ define ['core/util'], (util) ->
 		fill: (area) ->
 			applicableFeatures = []
 			for feature in features
-				applicableFeatures.push(feature) is feature.canFill area
+				applicableFeatures.push(feature) if feature.canFill area
 
 			throw new Error("no applicable feature") if applicableFeatures.length is 0
 			random.any(applicableFeatures).fill area
