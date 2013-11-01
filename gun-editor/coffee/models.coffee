@@ -44,8 +44,9 @@ define ['core/util'], (util) ->
 
 		removeVertex: (vertex) ->
 			@get('vertices').remove vertex
-			@set 'edges',
-				(edge for edge in @get('edges') when edge.from isnt vertex and edge.to isnt vertex)
+
+			edgesToRemove = (edge for edge in @get 'edges' when edge.from is vertex or edge.to is vertex)
+			@removeEdge edge for edge in edgesToRemove
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
