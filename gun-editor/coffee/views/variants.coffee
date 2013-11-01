@@ -14,15 +14,19 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 		mouseDown: (e) ->
 			if e.which is 1
-				for shape in @view.model.get 'pieces'
-					if util.pointInPoly @view.realMousePos, shape.vertices
-						@view.state = new DraggingShape @view, shape
+				thingOfInterest = @view.thingOfInterest
+
+				if thingOfInterest?
+					if thingOfInterest.shape?
+						@view.state = new DraggingShape @view, thingOfInterest.shape
 						return
 
 		render: ->
-			for shape in @view.model.get 'pieces'
-				if util.pointInPoly @view.realMousePos, shape.vertices
-					@view.highlightShape shape
+			thingOfInterest = @view.thingOfInterest
+
+			if thingOfInterest?
+				if thingOfInterest.shape?
+					@view.highlightShape thingOfInterest.shape
 
 	class DraggingShape
 		constructor: (@view, @shape) ->
@@ -90,15 +94,10 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 			Object.defineProperty this, "realMousePos",
 				get: => @realPos @mousePos
 
+			Object.defineProperty this, "thingOfInterest",
+				get: => @getThingOfInterest()
+
 			@mousePos = {x: 0, y: 0}
-
-		getVertexOfInterest: ->
-			return null unless @mousePos
-
-			for vertex in @vertices
-				return vertex if @vertexInDraggingRange vertex
-
-			return null
 
 		vertexInDraggingRange: (vertex) ->
 			return unless @mousePos
@@ -139,32 +138,14 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 			context.fillStyle = "red"
 			context.fill()
 
-		highlightVertexOfInterest: ->
-			vertexOfInterest = @vertexOfInterest
-			if vertexOfInterest
-				pixelPos = @pixelPos vertexOfInterest.pos
+		getThingOfInterest: ->
+			mousePos = @realMousePos
 
-				context = @canvas.context
-				context.beginPath()
-				context.arc pixelPos.x, pixelPos.y, 7, 0, 2 * Math.PI, false
-				context.strokeStyle = "black"
-				context.lineWidth = 2
-				context.stroke()
+			for shape in @model.get 'pieces'
+				if util.pointInPoly mousePos, shape.vertices
+					return {shape: shape}
 
-		highlightEdgeOfInterest: ->
-			edgeOfInterest = @edgeOfInterest
-			if edgeOfInterest
-
-				{x: fromX, y: fromY}	= @pixelPos edgeOfInterest.from.pos
-				{x: toX, y: toY}	= @pixelPos edgeOfInterest.to.pos
-
-				context = @canvas.context
-				context.beginPath()
-				context.moveTo fromX, fromY
-				context.lineTo toX, toY
-				context.strokeStyle = "black"
-				context.lineWidth = 2
-				context.stroke()
+			return null
 
 		highlightShape: (shape) ->
 			@renderShape shape, color: "blue", lineWidth: 3
