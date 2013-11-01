@@ -36,7 +36,7 @@ define ['core/canvas'], (canvas) ->
 
 			@vertices = @model.get 'vertices'
 
-			@$el
+			@canvas.$el
 				.mousedown (e) =>
 					@draggedVertex = null
 					mousePos = relativePos e, @$el
