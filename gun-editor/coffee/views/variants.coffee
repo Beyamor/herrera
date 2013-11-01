@@ -13,18 +13,21 @@ define ['core/canvas'], (canvas) ->
 		constructor: (@view) ->
 
 		mouseDown: (e) ->
-			vertexOfInterest = @view.vertexOfInterest()
-			if vertexOfInterest
-				if e.which is 1
-					@view.state = new DraggingVertexState @view, vertexOfInterest
-				else if e.which is 2
-					@view.model.removeVertex vertexOfInterest
-				else if e.which is 3
-					@view.state = new AddingEdgeState @view, vertexOfInterest
+			vertexOfInterest	= @view.vertexOfInterest()
 
-			else
-				if e.which is 2
+			if e.which is 1
+				if vertexOfInterest
+					@view.state = new DraggingVertexState @view, vertexOfInterest
+
+			else if e.which is 2
+				if vertexOfInterest
+					@view.model.removeVertex vertexOfInterest
+				else
 					@view.model.addVertex(@view.realPos @view.mousePos)
+
+			else if e.which is 3
+				if vertexOfInterest
+					@view.state = new AddingEdgeState @view, vertexOfInterest
 
 		render: ->
 			@view.highlightVertexOfInterest()
