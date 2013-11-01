@@ -1,0 +1,21 @@
+body {
+	font-family: Verdana, Geneva, sans-serif
+}
+
+li {
+	list-style-type: none;
+}
+
+#parts-browser {
+	float: left;
+	margin-right: 100px;
+}
+
+#variant-viewer {
+	float: left;
+
+	canvas {
+		border-style: solid;
+		border-width: 1px;
+	}
+}

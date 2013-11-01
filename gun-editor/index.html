@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>Herrera - Gun Editor</title>
-		<!--<link rel="stylesheet" type="text/css" href="css/style.css">-->
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 		<script src="http://code.createjs.com/preloadjs-0.4.0.min.js"></script>
 		<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
@@ -27,7 +27,7 @@
 				<% for (var partIndex in parts) { %>
 					<% var part = parts[partIndex]; %>
 					<li>
-						<div><%- part.name %></div>
+						<div class="part-name"><%- part.name %></div>
 						<ul>
 							<% for (var variantIndex in part.variants) { %>
 								<% var variant = part.variants[variantIndex]; %>
