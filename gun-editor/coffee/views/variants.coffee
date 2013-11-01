@@ -43,7 +43,7 @@ define ['core/canvas'], (canvas) ->
 				vertexOfInterest = @view.vertexOfInterest()
 				return unless vertexOfInterest
 
-				@view.edges.push
+				@view.model.addEdge
 					from: @from
 					to: vertexOfInterest
 

@@ -22,7 +22,19 @@ define ->
 
 		return response
 
-	ns.Variant = Backbone.Model.extend()
+	ns.Variant = Backbone.Model.extend
+		addEdge: ({from: from, to: to}) ->
+			edges = @get 'edges'
+			for edge in edges
+				return if (edge.from is from and edge.to is to) or
+						(edge.to is from and edge.from is to)
+
+			edges.push {
+				from: from
+				to: to
+			}
+
+			console.log "added edge"
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
