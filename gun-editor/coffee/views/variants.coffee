@@ -25,7 +25,10 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 			thingOfInterest = @view.thingOfInterest
 
 			if thingOfInterest?
-				if thingOfInterest.shape?
+				if thingOfInterest.vertex?
+					@view.highlightVertex thingOfInterest.vertex
+
+				else if thingOfInterest.shape?
 					@view.highlightShape thingOfInterest.shape
 
 	class DraggingShape
@@ -103,14 +106,25 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 			@mousePos = {x: 0, y: 0}
 
 		vertexInDraggingRange: (vertex) ->
-			return unless @mousePos
-
-			{x: x, y: y} = @pixelPos vertex.pos
+			{x: x, y: y} = @pixelPos vertex
 
 			dx = @mousePos.x - x
 			dy = @mousePos.y - y
 
 			return dx*dx + dy*dy < 25
+
+		getThingOfInterest: ->
+			mousePos = @realMousePos
+
+			for shape in @model.get 'pieces'
+				for vertex in shape.vertices
+					if @vertexInDraggingRange vertex
+						return {vertex: vertex}
+
+				if util.pointInPoly mousePos, shape.vertices
+					return {shape: shape}
+
+			return null
 
 		pixelPos: (pos) ->
 			x: @canvas.width/2 + pos.x * @scale.x
@@ -120,35 +134,17 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 			x: (pos.x - @canvas.width/2) / @scale.x
 			y: (pos.y - @canvas.height/2) / @scale.y
 
-		drawEdge: (from, to) ->
-				{x: fromX, y: fromY}	= from
-				{x: toX, y: toY}	= to
-
-				context = @canvas.context
-				context.beginPath()
-				context.moveTo fromX, fromY
-				context.lineTo toX, toY
-				context.strokeStyle = "blue"
-				context.lineWidth = 1
-				context.stroke()
-
-		drawVertex: (vertex) ->
-			{x: pixelX, y: pixelY} = @pixelPos vertex.pos
+		highlightVertex: (vertex) ->
+			{x: pixelX, y: pixelY} = @pixelPos vertex
 			
 			context = @canvas.context
 			context.beginPath()
 			context.arc pixelX, pixelY, 4, 0, 2 * Math.PI, false
-			context.fillStyle = "red"
+			context.fillStyle = "blue"
 			context.fill()
-
-		getThingOfInterest: ->
-			mousePos = @realMousePos
-
-			for shape in @model.get 'pieces'
-				if util.pointInPoly mousePos, shape.vertices
-					return {shape: shape}
-
-			return null
+			context.strokeStyle = "blac"
+			context.lineWidth = 3
+			context.stroke()
 
 		highlightShape: (shape) ->
 			@renderShape shape, color: "blue", lineWidth: 3
