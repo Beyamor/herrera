@@ -34,7 +34,10 @@ define ->
 				to: to
 			}
 
-			console.log "added edge"
+		addVertex: (pos) ->
+			@get('vertices').push
+				pos: pos
+				name: "Dude, give this guy a name"
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant

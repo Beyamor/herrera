@@ -20,6 +20,10 @@ define ['core/canvas'], (canvas) ->
 				else if e.which is 3
 					@view.state = new AddingEdgeState @view, vertexOfInterest
 
+			else
+				if e.which is 1
+					@view.model.addVertex(@view.realPos @view.mousePos)
+
 		render: ->
 			@view.highlightVertexOfInterest()
 
