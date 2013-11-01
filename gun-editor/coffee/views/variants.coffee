@@ -23,7 +23,7 @@ define ['core/canvas'], (canvas) ->
 					@view.state = new AddingEdgeState @view, vertexOfInterest
 
 			else
-				if e.which is 1
+				if e.which is 2
 					@view.model.addVertex(@view.realPos @view.mousePos)
 
 		render: ->
