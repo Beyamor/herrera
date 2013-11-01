@@ -37,7 +37,9 @@ define ['core/canvas'], (canvas) ->
 			@vertices = @model.get 'vertices'
 
 			@canvas.$el
+				.attr('oncontextmenu', 'return false;')
 				.mousedown (e) =>
+					e.preventDefault()
 					@draggedVertex = null
 					mousePos = relativePos e, @$el
 
@@ -52,9 +54,11 @@ define ['core/canvas'], (canvas) ->
 							return
 
 				.mouseup (e) =>
+					e.preventDefault()
 					@draggedVertex = null
 
 				.mousemove (e) =>
+					e.preventDefault()
 					return unless @draggedVertex
 
 					mousePos	= relativePos e, @$el
