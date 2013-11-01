@@ -21,5 +21,10 @@ define ['editor/models', 'editor/views'], (models, views) ->
 		}]
 	}, parse: true
 
-	partsBroswer = new views.PartsBrowser model: gun
-	partsBroswer.render()
+	partsBrowser = new views.PartsBrowser model: gun
+	partsBrowser.render()
+
+	variantViewer = new views.VariantViewer model: gun
+	variantViewer.render()
+
+	gun.set 'selectedVariant', gun.get('parts').at(0).get('variants').at(0)
