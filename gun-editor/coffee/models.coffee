@@ -29,10 +29,11 @@ define ['core/util'], (util) ->
 				return if (edge.from is from and edge.to is to) or
 						(edge.to is from and edge.from is to)
 
-			edges.push {
+			edge = {
 				from: from
 				to: to
 			}
+			edges.push edge
 
 		removeEdge: (edge) ->
 			@get('edges').remove edge
