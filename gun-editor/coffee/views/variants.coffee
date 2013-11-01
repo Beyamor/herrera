@@ -12,14 +12,39 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 	class DefaultState
 		constructor: (@view) ->
 
-		onMouseMove: (e) ->
+		mouseDown: (e) ->
+			if e.which is 1
+				for shape in @view.model.get 'pieces'
+					if util.pointInPoly @view.realMousePos, shape.vertices
+						@view.state = new DraggingShape @view, shape
+						return
 
 		render: ->
-			realMousePos = @view.realPos @view.mousePos
-
 			for shape in @view.model.get 'pieces'
-				if util.pointInPoly realMousePos, shape.vertices
+				if util.pointInPoly @view.realMousePos, shape.vertices
 					@view.highlightShape shape
+
+	class DraggingShape
+		constructor: (@view, @shape) ->
+			mousePos = @view.realMousePos
+			@offsets = []
+			for vertex in @shape.vertices
+				@offsets.push
+					x: mousePos.x - vertex.x,
+					y: mousePos.y - vertex.y
+
+		mouseMove: ->
+			mousePos = @view.realMousePos
+
+			for index in [0...@shape.vertices.length]
+				vertex		= @shape.vertices[index]
+				offset		= @offsets[index]
+
+				vertex.x	= mousePos.x - offset.x
+				vertex.y	= mousePos.y - offset.y
+
+		mouseUp: ->
+			@view.state = new DefaultState @view
 
 	ns.VariantViewer = Backbone.View.extend
 		events:
@@ -61,6 +86,9 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 			Object.defineProperty this, "edgeOfInterest",
 				get: => @getEdgeOfInterest()
+
+			Object.defineProperty this, "realMousePos",
+				get: => @realPos @mousePos
 
 			@mousePos = {x: 0, y: 0}
 
