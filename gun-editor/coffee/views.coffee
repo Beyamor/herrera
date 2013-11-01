@@ -20,6 +20,9 @@ define ['core/canvas'], (canvas) ->
 		}
 
 	ns.VariantViewer = Backbone.View.extend
+		events:
+			'mousemove': 'render'
+
 		initialize: ->
 			Backbone.View.prototype.initialize.apply this, arguments
 
@@ -40,33 +43,38 @@ define ['core/canvas'], (canvas) ->
 				.attr('oncontextmenu', 'return false;')
 				.mousedown (e) =>
 					e.preventDefault()
-					@draggedVertex = null
-					mousePos = relativePos e, @$el
+
+					@draggedVertex	= null
+					@lastMousePos	= relativePos e, @$el
 
 					if e.which is 1
 						for vertex in @vertices
-							{x: x, y: y} = @pixelPos vertex.pos
-
-							dx = mousePos.x - x
-							dy = mousePos.y - y
-
-							if dx*dx + dy*dy < 25
+							if @vertexInDraggingRange vertex
 								@draggedVertex = vertex
 								return
 
 				.mouseup (e) =>
 					e.preventDefault()
+
 					@draggedVertex = null
 
 				.mousemove (e) =>
-					mousePos	= relativePos e, @$el
-					realPos		= @realPos mousePos
+					@lastMousePos	= relativePos e, @$el
+					realPos		= @realPos @lastMousePos
 
 					if @draggedVertex
 						@draggedVertex.pos.x = realPos.x
 						@draggedVertex.pos.y = realPos.y
 
-						@render()
+		vertexInDraggingRange: (vertex) ->
+			return unless @lastMousePos
+
+			{x: x, y: y} = @pixelPos vertex.pos
+
+			dx = @lastMousePos.x - x
+			dy = @lastMousePos.y - y
+
+			return dx*dx + dy*dy < 25
 
 		pixelPos: (pos) ->
 			x: @canvas.width/2 + pos.x * @scale.x
@@ -79,12 +87,18 @@ define ['core/canvas'], (canvas) ->
 		render: ->
 			@canvas.clear()
 
-			for {pos: pos} in @vertices
-				{x: pixelX, y: pixelY} = @pixelPos pos
+			for vertex in @vertices
+				{x: pixelX, y: pixelY} = @pixelPos vertex.pos
 				
 				context = @canvas.context
 				context.beginPath()
 				context.arc pixelX, pixelY, 4, 0, 2 * Math.PI, false
 				context.fillStyle = "red"
 				context.fill()
+
+				if @lastMousePos and not @draggedVertex and @vertexInDraggingRange vertex, @lastMousePos
+					context.moveTo pixelX + 7, pixelY
+					context.arc pixelX, pixelY, 7, 0, 2 * Math.PI, false
+					context.strokeStyle = "black"
+					context.stroke()
 	return ns
