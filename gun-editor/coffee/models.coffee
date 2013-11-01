@@ -34,6 +34,9 @@ define ['core/util'], (util) ->
 				to: to
 			}
 
+		removeEdge: (edge) ->
+			@get('edges').remove edge
+
 		addVertex: (pos) ->
 			@get('vertices').push
 				pos: pos

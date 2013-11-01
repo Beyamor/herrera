@@ -14,6 +14,7 @@ define ['core/canvas'], (canvas) ->
 
 		mouseDown: (e) ->
 			vertexOfInterest	= @view.vertexOfInterest
+			edgeOfInterest		= @view.edgeOfInterest
 
 			if e.which is 1
 				if vertexOfInterest
@@ -22,6 +23,8 @@ define ['core/canvas'], (canvas) ->
 			else if e.which is 2
 				if vertexOfInterest
 					@view.model.removeVertex vertexOfInterest
+				else if edgeOfInterest
+					@view.model.removeEdge edgeOfInterest
 				else
 					@view.model.addVertex(@view.realPos @view.mousePos)
 
@@ -30,7 +33,10 @@ define ['core/canvas'], (canvas) ->
 					@view.state = new AddingEdgeState @view, vertexOfInterest
 
 		render: ->
-			@view.highlightVertexOfInterest()
+			if @view.vertexOfInterest
+				@view.highlightVertexOfInterest()
+			else if @view.edgeOfInterest
+				@view.highlightEdgeOfInterest()
 
 	class DraggingVertexState
 		constructor: (@view, @vertex) ->
@@ -68,6 +74,8 @@ define ['core/canvas'], (canvas) ->
 	ns.VariantViewer = Backbone.View.extend
 		events:
 			'mousemove': 'render'
+			'mousedown': 'render'
+			'mouseup': 'render'
 
 		initialize: ->
 			Backbone.View.prototype.initialize.apply this, arguments
@@ -110,11 +118,50 @@ define ['core/canvas'], (canvas) ->
 			Object.defineProperty this, "vertexOfInterest",
 				get: => @getVertexOfInterest()
 
+			Object.defineProperty this, "edgeOfInterest",
+				get: => @getEdgeOfInterest()
+
 		getVertexOfInterest: ->
 			return null unless @mousePos
 
 			for vertex in @vertices
 				return vertex if @vertexInDraggingRange vertex
+
+			return null
+
+		getEdgeOfInterest: ->
+			return null unless @mousePos
+
+			for edge in @edges
+				from	= @pixelPos edge.from.pos
+				to	= @pixelPos edge.to.pos
+				dx	= to.x - from.x
+				dy	= to.y - from.y
+				length	= Math.sqrt(dx * dx + dy * dy)
+
+				# first dot product
+				toX	= (to.x - from.x) / length
+				toY	= (to.y - from.y) / length
+				mouseX	= @mousePos.x - from.x
+				mouseY	= @mousePos.y - from.y
+				dot	= toX * mouseX + toY * mouseY
+
+				continue unless dot >= 0
+
+				# second dot product
+				fromX	= (from.x - to.x) / length
+				fromY	= (from.y - to.y) / length
+				mouseX	= @mousePos.x - to.x
+				mouseY	= @mousePos.y - to.y
+				dot	= fromX * mouseX + fromY * mouseY
+
+				continue unless dot >= 0
+
+				# proximity, yo
+				distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY) - dot
+				continue unless distance <= 0.5 # whoa that's way to big, something's prolly wrong
+
+				return edge
 
 			return null
 
@@ -145,6 +192,7 @@ define ['core/canvas'], (canvas) ->
 				context.moveTo fromX, fromY
 				context.lineTo toX, toY
 				context.strokeStyle = "blue"
+				context.lineWidth = 1
 				context.stroke()
 
 		highlightVertexOfInterest: ->
@@ -156,8 +204,23 @@ define ['core/canvas'], (canvas) ->
 				context.beginPath()
 				context.arc pixelPos.x, pixelPos.y, 7, 0, 2 * Math.PI, false
 				context.strokeStyle = "black"
+				context.lineWidth = 2
 				context.stroke()
-		
+
+		highlightEdgeOfInterest: ->
+			edgeOfInterest = @edgeOfInterest
+			if edgeOfInterest
+
+				{x: fromX, y: fromY}	= @pixelPos edgeOfInterest.from.pos
+				{x: toX, y: toY}	= @pixelPos edgeOfInterest.to.pos
+
+				context = @canvas.context
+				context.beginPath()
+				context.moveTo fromX, fromY
+				context.lineTo toX, toY
+				context.strokeStyle = "black"
+				context.lineWidth = 2
+				context.stroke()
 
 		render: ->
 			@canvas.clear()
