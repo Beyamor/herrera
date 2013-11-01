@@ -50,6 +50,9 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 		mouseUp: ->
 			@view.state = new DefaultState @view
 
+		render: ->
+			@view.highlightShape @shape
+
 	ns.VariantViewer = Backbone.View.extend
 		events:
 			'mousemove': 'render'
