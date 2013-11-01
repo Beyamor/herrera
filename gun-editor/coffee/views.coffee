@@ -37,7 +37,8 @@ define ['core/canvas'], (canvas) ->
 			@canvas = new canvas.Canvas width: width, height: height
 			@$el.append @canvas.$el
 
-			@vertices = @model.get 'vertices'
+			@vertices	= @model.get 'vertices'
+			@edges		= @model.get 'edges'
 
 			@canvas.$el
 				.attr('oncontextmenu', 'return false;')
@@ -47,11 +48,27 @@ define ['core/canvas'], (canvas) ->
 					@draggedVertex	= null
 					@lastMousePos	= relativePos e, @$el
 
-					if e.which is 1
-						for vertex in @vertices
-							if @vertexInDraggingRange vertex
-								@draggedVertex = vertex
-								return
+					if @edgeBeingPlaced
+						if e.which is 1
+							vertexOfInterest = @vertexOfInterest()
+							if vertexOfInterest
+								@edgeBeingPlaced.to = vertexOfInterest
+								@edges.push @edgeBeingPlaced
+								@edgeBeingPlaced = null
+
+						else if e.which is 3
+							@edgeBeingPlaced = null
+
+					else
+						vertexOfInterest = @vertexOfInterest()
+						if vertexOfInterest
+							if e.which is 1
+								@draggedVertex = vertexOfInterest
+
+							else if e.which is 3
+								@edgeBeingPlaced = {
+									from: vertexOfInterest
+								}
 
 				.mouseup (e) =>
 					e.preventDefault()
@@ -65,6 +82,14 @@ define ['core/canvas'], (canvas) ->
 					if @draggedVertex
 						@draggedVertex.pos.x = realPos.x
 						@draggedVertex.pos.y = realPos.y
+
+		vertexOfInterest: ->
+			return null unless @lastMousePos
+
+			for vertex in @vertices
+				return vertex if @vertexInDraggingRange vertex
+
+			return null
 
 		vertexInDraggingRange: (vertex) ->
 			return unless @lastMousePos
@@ -87,6 +112,17 @@ define ['core/canvas'], (canvas) ->
 		render: ->
 			@canvas.clear()
 
+			for {from: from, to: to} in @edges
+				{x: fromX, y: fromY}	= @pixelPos from.pos
+				{x: toX, y: toY}	= @pixelPos to.pos
+
+				context = @canvas.context
+				context.beginPath()
+				context.moveTo fromX, fromY
+				context.lineTo toX, toY
+				context.strokeStyle = "blue"
+				context.stroke()
+
 			for vertex in @vertices
 				{x: pixelX, y: pixelY} = @pixelPos vertex.pos
 				
@@ -101,4 +137,17 @@ define ['core/canvas'], (canvas) ->
 					context.arc pixelX, pixelY, 7, 0, 2 * Math.PI, false
 					context.strokeStyle = "black"
 					context.stroke()
+
+			if @edgeBeingPlaced and @lastMousePos
+				from			= @edgeBeingPlaced.from
+				{x: fromX, y: fromY}	= @pixelPos from.pos
+				{x: toX, y: toY}	= @lastMousePos
+
+				context = @canvas.context
+				context.beginPath()
+				context.moveTo fromX, fromY
+				context.lineTo toX, toY
+				context.strokeStyle = "blue"
+				context.stroke()
+
 	return ns

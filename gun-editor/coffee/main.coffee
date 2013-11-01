@@ -16,7 +16,9 @@ define ['editor/models', 'editor/views'], (models, views) ->
 						"x": 5,
 						"y": 0
 					}
-				}]
+				}],
+				edges: [
+				]
 			]
 		}]
 	}, parse: true
