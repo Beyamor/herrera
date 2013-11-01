@@ -9,6 +9,52 @@ define ['core/canvas'], (canvas) ->
 			y: e.pageY - parentOffset.top
 		}
 
+	class DefaultState
+		constructor: (@view) ->
+
+		mouseDown: (e) ->
+			vertexOfInterest = @view.vertexOfInterest()
+			if vertexOfInterest
+				if e.which is 1
+					@view.state = new DraggingVertexState @view, vertexOfInterest
+				else if e.which is 3
+					@view.state = new AddingEdgeState @view, vertexOfInterest
+
+		render: ->
+			@view.highlightVertexOfInterest()
+
+	class DraggingVertexState
+		constructor: (@view, @vertex) ->
+
+		mouseUp: (e) ->
+			@view.state = new DefaultState @view
+
+		mouseMove: (e) ->
+			realPos = @view.realPos @view.mousePos
+
+			@vertex.pos.x = realPos.x
+			@vertex.pos.y = realPos.y
+
+	class AddingEdgeState
+		constructor: (@view, @from) ->
+
+		mouseDown: (e) ->
+			if e.which is 1
+				vertexOfInterest = @view.vertexOfInterest()
+				return unless vertexOfInterest
+
+				@view.edges.push
+					from: @from
+					to: vertexOfInterest
+
+				@view.state = new DefaultState @view
+
+			else if e.which is 3
+				@view.state = new DefaultState @view
+
+		render: ->
+			@view.highlightVertexOfInterest()
+			@view.drawEdge @view.pixelPos(@from.pos), @view.mousePos
 
 	ns.VariantViewer = Backbone.View.extend
 		events:
@@ -31,51 +77,27 @@ define ['core/canvas'], (canvas) ->
 			@vertices	= @model.get 'vertices'
 			@edges		= @model.get 'edges'
 
+
 			@canvas.$el
 				.attr('oncontextmenu', 'return false;')
 				.mousedown (e) =>
 					e.preventDefault()
 
-					@draggedVertex	= null
-					@lastMousePos	= relativePos e, @$el
-
-					if @edgeBeingPlaced
-						if e.which is 1
-							vertexOfInterest = @vertexOfInterest()
-							if vertexOfInterest
-								@edgeBeingPlaced.to = vertexOfInterest
-								@edges.push @edgeBeingPlaced
-								@edgeBeingPlaced = null
-
-						else if e.which is 3
-							@edgeBeingPlaced = null
-
-					else
-						vertexOfInterest = @vertexOfInterest()
-						if vertexOfInterest
-							if e.which is 1
-								@draggedVertex = vertexOfInterest
-
-							else if e.which is 3
-								@edgeBeingPlaced = {
-									from: vertexOfInterest
-								}
+					@mousePos = relativePos e, @$el
+					@state.mouseDown e if @state.mouseDown
 
 				.mouseup (e) =>
 					e.preventDefault()
-
-					@draggedVertex = null
+					@state.mouseUp e if @state.mouseUp
 
 				.mousemove (e) =>
-					@lastMousePos	= relativePos e, @$el
-					realPos		= @realPos @lastMousePos
+					@mousePos = relativePos e, @$el
+					@state.mouseMove e if @state.mouseMove
 
-					if @draggedVertex
-						@draggedVertex.pos.x = realPos.x
-						@draggedVertex.pos.y = realPos.y
+			@state = new DefaultState this
 
 		vertexOfInterest: ->
-			return null unless @lastMousePos
+			return null unless @mousePos
 
 			for vertex in @vertices
 				return vertex if @vertexInDraggingRange vertex
@@ -83,12 +105,12 @@ define ['core/canvas'], (canvas) ->
 			return null
 
 		vertexInDraggingRange: (vertex) ->
-			return unless @lastMousePos
+			return unless @mousePos
 
 			{x: x, y: y} = @pixelPos vertex.pos
 
-			dx = @lastMousePos.x - x
-			dy = @lastMousePos.y - y
+			dx = @mousePos.x - x
+			dy = @mousePos.y - y
 
 			return dx*dx + dy*dy < 25
 
@@ -100,12 +122,9 @@ define ['core/canvas'], (canvas) ->
 			x: (pos.x - @canvas.width/2) / @scale.x
 			y: (pos.y - @canvas.height/2) / @scale.y
 
-		render: ->
-			@canvas.clear()
-
-			for {from: from, to: to} in @edges
-				{x: fromX, y: fromY}	= @pixelPos from.pos
-				{x: toX, y: toY}	= @pixelPos to.pos
+		drawEdge: (from, to) ->
+				{x: fromX, y: fromY}	= from
+				{x: toX, y: toY}	= to
 
 				context = @canvas.context
 				context.beginPath()
@@ -113,6 +132,24 @@ define ['core/canvas'], (canvas) ->
 				context.lineTo toX, toY
 				context.strokeStyle = "blue"
 				context.stroke()
+
+		highlightVertexOfInterest: ->
+			vertexOfInterest = @vertexOfInterest()
+			if vertexOfInterest
+				pixelPos = @pixelPos vertexOfInterest.pos
+
+				context = @canvas.context
+				context.beginPath()
+				context.arc pixelPos.x, pixelPos.y, 7, 0, 2 * Math.PI, false
+				context.strokeStyle = "black"
+				context.stroke()
+		
+
+		render: ->
+			@canvas.clear()
+
+			for {from: from, to: to} in @edges
+				@drawEdge @pixelPos(from.pos), @pixelPos(to.pos)
 
 			for vertex in @vertices
 				{x: pixelX, y: pixelY} = @pixelPos vertex.pos
@@ -123,22 +160,6 @@ define ['core/canvas'], (canvas) ->
 				context.fillStyle = "red"
 				context.fill()
 
-				if @lastMousePos and not @draggedVertex and @vertexInDraggingRange vertex, @lastMousePos
-					context.moveTo pixelX + 7, pixelY
-					context.arc pixelX, pixelY, 7, 0, 2 * Math.PI, false
-					context.strokeStyle = "black"
-					context.stroke()
-
-			if @edgeBeingPlaced and @lastMousePos
-				from			= @edgeBeingPlaced.from
-				{x: fromX, y: fromY}	= @pixelPos from.pos
-				{x: toX, y: toY}	= @lastMousePos
-
-				context = @canvas.context
-				context.beginPath()
-				context.moveTo fromX, fromY
-				context.lineTo toX, toY
-				context.strokeStyle = "blue"
-				context.stroke()
+			@state.render @canvas if @state.render
 
 	return ns
