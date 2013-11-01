@@ -17,7 +17,11 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 				thingOfInterest = @view.thingOfInterest
 
 				if thingOfInterest?
-					if thingOfInterest.shape?
+					if thingOfInterest.vertex?
+						@view.state = new DraggingVertex @view, thingOfInterest.vertex
+						return
+
+					else if thingOfInterest.shape?
 						@view.state = new DraggingShape @view, thingOfInterest.shape
 						return
 
@@ -30,6 +34,20 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 				else if thingOfInterest.shape?
 					@view.highlightShape thingOfInterest.shape
+
+	class DraggingVertex
+		constructor: (@view, @vertex) ->
+
+		mouseMove: ->
+			mousePos	= @view.realMousePos
+			@vertex.x	= mousePos.x
+			@vertex.y	= mousePos.y
+
+		mouseUp: ->
+			@view.state = new DefaultState @view
+
+		render: ->
+			@view.highlightVertex @vertex
 
 	class DraggingShape
 		constructor: (@view, @shape) ->
