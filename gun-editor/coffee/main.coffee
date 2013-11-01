@@ -4,20 +4,7 @@ define ['editor/models', 'editor/views', 'editor/views/variants'], (models, view
 			name: "body",
 			variants: [
 				name: "v0",
-				vertices: [{
-					name: "a",
-					pos: {
-						"x": -5,
-						"y": 0
-					}
-				}, {
-					name: "b",
-					pos: {
-						"x": 5,
-						"y": 0
-					}
-				}],
-				edges: [
+				pieces: [
 				]
 			]
 		}]

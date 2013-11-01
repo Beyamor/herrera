@@ -22,32 +22,7 @@ define ['core/util'], (util) ->
 
 		return response
 
-	ns.Variant = Backbone.Model.extend
-		addEdge: ({from: from, to: to}) ->
-			edges = @get 'edges'
-			for edge in edges
-				return if (edge.from is from and edge.to is to) or
-						(edge.to is from and edge.from is to)
-
-			edge = {
-				from: from
-				to: to
-			}
-			edges.push edge
-
-		removeEdge: (edge) ->
-			@get('edges').remove edge
-
-		addVertex: (pos) ->
-			@get('vertices').push
-				pos: pos
-				name: "Dude, give this guy a name"
-
-		removeVertex: (vertex) ->
-			@get('vertices').remove vertex
-
-			edgesToRemove = (edge for edge in @get 'edges' when edge.from is vertex or edge.to is vertex)
-			@removeEdge edge for edge in edgesToRemove
+	ns.Variant = Backbone.Model.extend()
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
