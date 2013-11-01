@@ -17,6 +17,8 @@ define ['core/canvas'], (canvas) ->
 			if vertexOfInterest
 				if e.which is 1
 					@view.state = new DraggingVertexState @view, vertexOfInterest
+				else if e.which is 2
+					@view.model.removeVertex vertexOfInterest
 				else if e.which is 3
 					@view.state = new AddingEdgeState @view, vertexOfInterest
 
@@ -78,10 +80,6 @@ define ['core/canvas'], (canvas) ->
 			@canvas = new canvas.Canvas width: width, height: height
 			@$el.append @canvas.$el
 
-			@vertices	= @model.get 'vertices'
-			@edges		= @model.get 'edges'
-
-
 			@canvas.$el
 				.attr('oncontextmenu', 'return false;')
 				.mousedown (e) =>
@@ -99,6 +97,12 @@ define ['core/canvas'], (canvas) ->
 					@state.mouseMove e if @state.mouseMove
 
 			@state = new DefaultState this
+
+			Object.defineProperty this, "vertices",
+				get: => @model.get "vertices"
+
+			Object.defineProperty this, "edges",
+				get: => @model.get "edges"
 
 		vertexOfInterest: ->
 			return null unless @mousePos
@@ -165,5 +169,4 @@ define ['core/canvas'], (canvas) ->
 				context.fill()
 
 			@state.render @canvas if @state.render
-
 	return ns

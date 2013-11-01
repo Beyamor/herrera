@@ -1,4 +1,4 @@
-define ->
+define ['core/util'], (util) ->
 	ns = {}
 
 	# shout out to http://www.shesek.info/web-development/recursive-backbone-models-tojson
@@ -38,6 +38,11 @@ define ->
 			@get('vertices').push
 				pos: pos
 				name: "Dude, give this guy a name"
+
+		removeVertex: (vertex) ->
+			@get('vertices').remove vertex
+			@set 'edges',
+				(edge for edge in @get('edges') when edge.from isnt vertex and edge.to isnt vertex)
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
