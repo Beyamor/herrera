@@ -13,7 +13,7 @@ define ['core/canvas'], (canvas) ->
 		constructor: (@view) ->
 
 		mouseDown: (e) ->
-			vertexOfInterest	= @view.vertexOfInterest()
+			vertexOfInterest	= @view.vertexOfInterest
 
 			if e.which is 1
 				if vertexOfInterest
@@ -49,7 +49,7 @@ define ['core/canvas'], (canvas) ->
 
 		mouseDown: (e) ->
 			if e.which is 1
-				vertexOfInterest = @view.vertexOfInterest()
+				vertexOfInterest = @view.vertexOfInterest
 				return unless vertexOfInterest
 
 				@view.model.addEdge
@@ -107,7 +107,10 @@ define ['core/canvas'], (canvas) ->
 			Object.defineProperty this, "edges",
 				get: => @model.get "edges"
 
-		vertexOfInterest: ->
+			Object.defineProperty this, "vertexOfInterest",
+				get: => @getVertexOfInterest()
+
+		getVertexOfInterest: ->
 			return null unless @mousePos
 
 			for vertex in @vertices
@@ -145,7 +148,7 @@ define ['core/canvas'], (canvas) ->
 				context.stroke()
 
 		highlightVertexOfInterest: ->
-			vertexOfInterest = @vertexOfInterest()
+			vertexOfInterest = @vertexOfInterest
 			if vertexOfInterest
 				pixelPos = @pixelPos vertexOfInterest.pos
 
