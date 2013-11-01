@@ -1,4 +1,4 @@
-define ['editor/models', 'editor/views'], (models, views) ->
+define ['editor/models', 'editor/views', 'editor/views/variants'], (models, views, vv) ->
 	gun = new models.Gun {
 		parts: [{
 			name: "body",
@@ -33,7 +33,7 @@ define ['editor/models', 'editor/views'], (models, views) ->
 		selectedVariant = gun.get 'selectedVariant'
 		return unless selectedVariant
 
-		variantViewer = new views.VariantViewer model: selectedVariant
+		variantViewer = new vv.VariantViewer model: selectedVariant
 		variantViewer.render()
 
 		$variantViewerContainer.append variantViewer.$el
