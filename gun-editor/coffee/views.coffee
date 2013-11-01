@@ -7,7 +7,7 @@ define ->
 		template: _.template($('#parts-browser-template').html())
 
 		render: ->
-			@$el.html @template parts: @model
+			@$el.html @template @model.toJSON()
 
 			return this
 
