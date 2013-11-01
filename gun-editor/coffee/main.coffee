@@ -13,6 +13,9 @@ define ['editor/models', 'editor/views', 'editor/views/variants'], (models, view
 	partsBrowser = new views.PartsBrowser model: gun
 	partsBrowser.render()
 
+	piecesToolbar = new views.PiecesToolbar model: gun
+	piecesToolbar.render()
+
 	gun.on 'change:selectedVariant', ->
 		$variantViewerContainer = $ '#variant-viewer'
 		$variantViewerContainer.empty()

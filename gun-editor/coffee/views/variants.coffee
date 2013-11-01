@@ -124,8 +124,29 @@ define ['core/canvas'], (canvas) ->
 				context.lineWidth = 2
 				context.stroke()
 
+		renderShape: (shape) ->
+			return unless shape.vertices.length > 0
+
+			context = @canvas.context
+			context.beginPath()
+
+			lastVertex	= shape.vertices[shape.vertices.length - 1]
+			pixelPos	= @pixelPos lastVertex
+			context.moveTo pixelPos.x, pixelPos.y
+
+			for vertex in shape.vertices
+				pixelPos = @pixelPos vertex
+				context.lineTo pixelPos.x, pixelPos.y
+
+			context.fillStyle	= shape.color or "red"
+			context.strokeStyle	= "black"
+			context.fill()
+			context.stroke()
+
 		render: ->
 			@canvas.clear()
+
+			@renderShape shape for shape in @model.get 'pieces'
 
 			@state.render @canvas if @state.render
 	return ns

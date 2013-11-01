@@ -22,7 +22,9 @@ define ['core/util'], (util) ->
 
 		return response
 
-	ns.Variant = Backbone.Model.extend()
+	ns.Variant = Backbone.Model.extend
+		addPiece: (piece) ->
+			@get('pieces').push piece
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
