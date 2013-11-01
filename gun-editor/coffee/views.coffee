@@ -43,31 +43,30 @@ define ['core/canvas'], (canvas) ->
 					@draggedVertex = null
 					mousePos = relativePos e, @$el
 
-					for vertex in @vertices
-						{x: x, y: y} = @pixelPos vertex.pos
+					if e.which is 1
+						for vertex in @vertices
+							{x: x, y: y} = @pixelPos vertex.pos
 
-						dx = mousePos.x - x
-						dy = mousePos.y - y
+							dx = mousePos.x - x
+							dy = mousePos.y - y
 
-						if dx*dx + dy*dy < 25
-							@draggedVertex = vertex
-							return
+							if dx*dx + dy*dy < 25
+								@draggedVertex = vertex
+								return
 
 				.mouseup (e) =>
 					e.preventDefault()
 					@draggedVertex = null
 
 				.mousemove (e) =>
-					e.preventDefault()
-					return unless @draggedVertex
-
 					mousePos	= relativePos e, @$el
 					realPos		= @realPos mousePos
 
-					@draggedVertex.pos.x = realPos.x
-					@draggedVertex.pos.y = realPos.y
+					if @draggedVertex
+						@draggedVertex.pos.x = realPos.x
+						@draggedVertex.pos.y = realPos.y
 
-					@render()
+						@render()
 
 		pixelPos: (pos) ->
 			x: @canvas.width/2 + pos.x * @scale.x
