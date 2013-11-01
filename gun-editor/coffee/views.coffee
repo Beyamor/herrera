@@ -12,12 +12,8 @@ define ['core/canvas'], (canvas) ->
 			return this
 
 	ns.VariantViewer = Backbone.View.extend
-		el: $ '#variant-viewer'
-
 		initialize: ->
 			Backbone.View.prototype.initialize.apply this, arguments
-
-			@model.on 'change:selectedVariant', => @render()
 
 			width = 600
 			height = 600
@@ -33,14 +29,9 @@ define ['core/canvas'], (canvas) ->
 		render: ->
 			@canvas.clear()
 
-			selectedVariant = @model.get 'selectedVariant'
-			return unless selectedVariant
-
-			for {pos: pos} in selectedVariant.get 'vertices'
+			for {pos: pos} in @model.get 'vertices'
 				pixelX = @canvas.width/2 + pos.x * @scale.x
 				pixelY = @canvas.height/2 + pos.y * @scale.y
-
-				console.log pixelX, pixelY
 
 				context = @canvas.context
 				context.beginPath()
