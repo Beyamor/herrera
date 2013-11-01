@@ -40,8 +40,8 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 		mouseMove: ->
 			mousePos	= @view.realMousePos
-			@vertex.x	= mousePos.x
-			@vertex.y	= mousePos.y
+
+			@vertex.moveTo mousePos.x, mousePos.y
 
 		mouseUp: ->
 			@view.state = new DefaultState @view
@@ -65,8 +65,7 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 				vertex		= @shape.vertices[index]
 				offset		= @offsets[index]
 
-				vertex.x	= mousePos.x - offset.x
-				vertex.y	= mousePos.y - offset.y
+				vertex.moveTo mousePos.x - offset.x, mousePos.y - offset.y
 
 		mouseUp: ->
 			@view.state = new DefaultState @view

@@ -4,6 +4,8 @@ define ['core/util'], (util) ->
 	class Vertex
 		constructor: (@x, @y) ->
 
+		moveTo: (@x, @y) ->
+
 	class Shape
 		constructor: (@vertices...) ->
 
