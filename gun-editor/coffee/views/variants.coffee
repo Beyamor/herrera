@@ -1,4 +1,4 @@
-define ['core/canvas'], (canvas) ->
+define ['core/canvas', 'core/util'], (canvas, util) ->
 	ns = {}
 
 	relativePos = (e, $el) ->
@@ -8,6 +8,18 @@ define ['core/canvas'], (canvas) ->
 			x: e.pageX - parentOffset.left
 			y: e.pageY - parentOffset.top
 		}
+
+	class DefaultState
+		constructor: (@view) ->
+
+		onMouseMove: (e) ->
+
+		render: ->
+			realMousePos = @view.realPos @view.mousePos
+
+			for shape in @view.model.get 'pieces'
+				if util.pointInPoly realMousePos, shape.vertices
+					@view.highlightShape shape
 
 	ns.VariantViewer = Backbone.View.extend
 		events:
@@ -45,10 +57,12 @@ define ['core/canvas'], (canvas) ->
 					@mousePos = relativePos e, @$el
 					@state.mouseMove e if @state.mouseMove
 
-			@state = {}
+			@state = new DefaultState this
 
 			Object.defineProperty this, "edgeOfInterest",
 				get: => @getEdgeOfInterest()
+
+			@mousePos = {x: 0, y: 0}
 
 		getVertexOfInterest: ->
 			return null unless @mousePos
@@ -124,8 +138,13 @@ define ['core/canvas'], (canvas) ->
 				context.lineWidth = 2
 				context.stroke()
 
-		renderShape: (shape) ->
+		highlightShape: (shape) ->
+			@renderShape shape, color: "blue", lineWidth: 3
+
+		renderShape: (shape, opts) ->
 			return unless shape.vertices.length > 0
+
+			opts or= {}
 
 			context = @canvas.context
 			context.beginPath()
@@ -138,8 +157,9 @@ define ['core/canvas'], (canvas) ->
 				pixelPos = @pixelPos vertex
 				context.lineTo pixelPos.x, pixelPos.y
 
-			context.fillStyle	= shape.color or "red"
+			context.fillStyle	= opts.color or shape.color or "red"
 			context.strokeStyle	= "black"
+			context.lineWidth	= opts.lineWidth or 1
 			context.fill()
 			context.stroke()
 
