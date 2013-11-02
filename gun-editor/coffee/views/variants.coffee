@@ -67,7 +67,6 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 				@offsets.push
 					x: mousePos.x - vertex.x,
 					y: mousePos.y - vertex.y
-				vertex.unpin()
 
 		mouseMove: ->
 			mousePos = @view.realMousePos
