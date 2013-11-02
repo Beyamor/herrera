@@ -33,6 +33,10 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 						thingOfInterest.vertex.unpin()
 						return
 
+					else if thingOfInterest.shape?
+						@view.model.removePiece thingOfInterest.shape
+						return
+
 		render: ->
 			thingOfInterest = @view.thingOfInterest
 
