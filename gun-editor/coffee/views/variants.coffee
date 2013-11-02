@@ -25,6 +25,14 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 						@view.state = new DraggingShape @view, thingOfInterest.shape
 						return
 
+			else if e.which is 3
+				thingOfInterest = @view.thingOfInterest
+
+				if thingOfInterest?
+					if thingOfInterest.vertex?
+						thingOfInterest.vertex.unpin()
+						return
+
 		render: ->
 			thingOfInterest = @view.thingOfInterest
 
@@ -37,7 +45,6 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 	class DraggingVertex
 		constructor: (@view, @vertex) ->
-			@vertex.unpin()
 
 		mouseMove: ->
 			mousePos = @view.realMousePos

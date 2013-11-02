@@ -32,7 +32,6 @@ define ['core/util'], (util) ->
 				@shape.pins.remove this
 
 		contains: (vertex) ->
-			console.log "contains vertex? #{@verices.contains vertex}"
 			@vertices.contains vertex
 
 	class Vertex
