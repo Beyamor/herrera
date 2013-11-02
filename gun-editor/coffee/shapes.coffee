@@ -32,6 +32,7 @@ define ['core/util'], (util) ->
 				@shape.pins.remove this
 
 		contains: (vertex) ->
+			console.log "contains vertex? #{@verices.contains vertex}"
 			@vertices.contains vertex
 
 	class Vertex
@@ -47,7 +48,12 @@ define ['core/util'], (util) ->
 		pinTo: (other) ->
 			return if other is this or other.shape is @shape
 
-			@shape.addPin other, this
+			if @pin
+				@pin.add other
+			else if other.pin
+				other.pin.add this
+			else
+				@shape.createPin other, this
 
 		unpin: ->
 			@pin.remove this if @pin
@@ -67,16 +73,7 @@ define ['core/util'], (util) ->
 
 			@pins = []
 
-		addPin: (v1, v2) ->
-			for pin in @pins
-				if pin.contains v1
-					pin.add v2
-					return
-
-				else if pin.contains v2
-					pin.add v1
-					return
-
+		createPin: (v1, v2) ->
 			pin = new Pin this
 			pin.add v1
 			pin.add v2
