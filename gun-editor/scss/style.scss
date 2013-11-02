@@ -9,6 +9,15 @@ li {
 #parts-browser {
 	float: left;
 	margin-right: 100px;
+
+	.part-name {
+		margin-top: 20px;
+		margin-bottom: 5px;
+	}
+
+	.variant {
+		cursor: pointer;
+	}
 }
 
 #center-stuff {

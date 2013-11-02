@@ -7,10 +7,11 @@ define ['core/util'], (util) ->
 
 		moveTo: (x, y) ->
 			for vertex in @vertices
-				vertex.isBeingMoved = true
-				vertex.moveTo x, y
-				vertex.applyVertexConstraints()
-				vertex.isBeingMoved = false
+				unless vertex.isBeingMoved
+					vertex.isBeingMoved = true
+					vertex.moveTo x, y
+					vertex.applyVertexConstraints()
+					vertex.isBeingMoved = false
 
 
 		add: (vertex) ->
@@ -41,9 +42,6 @@ define ['core/util'], (util) ->
 			if @pin and not @isBeingMoved
 				@pin.moveTo @x, @y
 
-			if @onMove and not @isBeingMoved
-				@onMove()
-
 		pinTo: (other) ->
 			return if other is this or other.shape is @shape
 
@@ -58,13 +56,17 @@ define ['core/util'], (util) ->
 			@pin.remove this if @pin
 
 		applyVertexConstraints: ->
+			return if @isBeingConstrained
 			return unless @vertexConstraints
 
 			for constraint in @vertexConstraints()
-				x = constraint.x or constraint.vertex.x
-				y = constraint.y or constraint.vertex.y
+				x	= constraint.x or constraint.vertex.x
+				y	= constraint.y or constraint.vertex.y
+				vertex	= constraint.vertex
 
-				constraint.vertex.moveTo x, y
+				vertex.isBeingConstrained = true
+				vertex.moveTo x, y
+				vertex.isBeingConstrained = false
 
 	class Shape
 		constructor: (model, @vertices...) ->
