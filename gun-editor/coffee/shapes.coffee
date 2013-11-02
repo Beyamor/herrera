@@ -12,6 +12,9 @@ define ['core/util'], (util) ->
 				vertex.isBeingMoved = false
 
 		add: (vertex) ->
+			if @vertices.length > 0
+				vertex.moveTo @vertices[0].x, @vertices[0].y
+
 			@vertices.push vertex
 			vertex.pin = this
 
@@ -39,7 +42,7 @@ define ['core/util'], (util) ->
 		pinTo: (other) ->
 			return if other is this or other.shape is @shape
 
-			@shape.addPin this, other
+			@shape.addPin other, this
 
 		unpin: ->
 			@pin.remove this if @pin
