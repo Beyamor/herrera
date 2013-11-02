@@ -1,4 +1,4 @@
-define ['editor/shapes'], (shapes) ->
+define ['editor/shapes', 'editor/ui'], (shapes, ui) ->
 	ns = {}
 
 	ns.PartsBrowser = Backbone.View.extend
@@ -23,11 +23,6 @@ define ['editor/shapes'], (shapes) ->
 
 			return this
 
-	button = (label, onClick) ->
-		$('<button type="button">')
-			.text(label)
-			.click(onClick)
-
 	ns.PiecesToolbar = Backbone.View.extend
 		el: "#pieces-toolbar"
 
@@ -40,9 +35,9 @@ define ['editor/shapes'], (shapes) ->
 					selectedVariant.addPiece new piece selectedVariant
 
 			@$el.append(
-					button "Triangle", addPiece shapes.Triangle
-					button "Quad", addPiece shapes.Quad
-					button "Rectangle", addPiece shapes.Rectangle
+					ui.button "Triangle", addPiece shapes.Triangle
+					ui.button "Quad", addPiece shapes.Quad
+					ui.button "Rectangle", addPiece shapes.Rectangle
 			)
 
 	return ns

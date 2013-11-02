@@ -1,4 +1,4 @@
-define ['editor/models', 'editor/views', 'editor/views/variants'], (models, views, vv) ->
+define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/renders'], (models, views, vv, renders) ->
 	gun = new models.Gun {
 		parts: [{
 			name: "body",
@@ -26,6 +26,8 @@ define ['editor/models', 'editor/views', 'editor/views/variants'], (models, view
 
 	piecesToolbar = new views.PiecesToolbar model: gun
 	piecesToolbar.render()
+
+	renderer = new renders.Renderer model: gun
 
 	gun.on 'change:selectedVariant', ->
 		$variantViewerContainer = $ '#variant-viewer'

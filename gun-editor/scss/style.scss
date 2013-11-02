@@ -24,9 +24,12 @@ li {
 	float: left;
 }
 
-#variant-viewer {
-	canvas {
-		border-style: solid;
-		border-width: 1px;
-	}
+canvas {
+	border-style: solid;
+	border-width: 1px;
+}
+
+#renders {
+	margin-top: 20px;
+	margin-bottom: 30px;
 }
