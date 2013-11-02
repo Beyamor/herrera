@@ -55,7 +55,7 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 		mouseUp: ->
 			thingOfInterest = @view.getThingOfInterest exclude: @vertex.shape
 
-			if thingOfInterest and thingOfInterest.vertex
+			if thingOfInterest and thingOfInterest.vertex and not @vertex.pin?
 				@vertex.pinTo thingOfInterest.vertex
 
 			@view.state = new DefaultState @view

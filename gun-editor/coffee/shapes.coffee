@@ -1,8 +1,8 @@
 define ['core/util'], (util) ->
 	ns = {}
 
-	class Pin
-		constructor: (@shape) ->
+	class ns.Pin
+		constructor: (@model) ->
 			@vertices = []
 
 		moveTo: (x, y) ->
@@ -29,7 +29,7 @@ define ['core/util'], (util) ->
 					vertex.pin = null
 
 				@vertices = []
-				@shape.pins.remove this
+				@model.get('pins').remove this
 
 		contains: (vertex) ->
 			@vertices.contains vertex
@@ -52,7 +52,7 @@ define ['core/util'], (util) ->
 			else if other.pin
 				other.pin.add this
 			else
-				@shape.createPin other, this
+				@model.createPin other, this
 
 		unpin: ->
 			@pin.remove this if @pin
@@ -67,20 +67,15 @@ define ['core/util'], (util) ->
 				constraint.vertex.moveTo x, y
 
 	class Shape
-		constructor: (@vertices...) ->
-			vertex.shape = this for vertex in @vertices
-
-			@pins = []
-
-		createPin: (v1, v2) ->
-			pin = new Pin this
-			pin.add v1
-			pin.add v2
-			@pins.push pin
+		constructor: (model, @vertices...) ->
+			for vertex in @vertices
+				vertex.model	= model
+				vertex.shape	= this
 
 	class ns.Triangle extends Shape
-		constructor: ->
+		constructor: (model) ->
 			super(
+				model,
 				new Vertex(0, -5),
 				new Vertex(4.33, 2.5),
 				new Vertex(-4.33, 2.5)
@@ -88,8 +83,9 @@ define ['core/util'], (util) ->
 
 
 	class ns.Quad extends Shape
-		constructor: ->
+		constructor: (model) ->
 			super(
+				model,
 				new Vertex(-5, -5),
 				new Vertex(5, -5),
 				new Vertex(5, 5),
@@ -97,7 +93,7 @@ define ['core/util'], (util) ->
 			)
 
 	class ns.Rectangle extends Shape
-		constructor: ->
+		constructor: (model) ->
 			topLeft		= new Vertex(-5, -5)
 			topRight	= new Vertex(5, -5)
 			bottomRight	= new Vertex(5, 5)
@@ -123,6 +119,6 @@ define ['core/util'], (util) ->
 				{vertex: topLeft, x: @x}
 			]
 
-			super topLeft, topRight, bottomRight, bottomLeft
+			super model, topLeft, topRight, bottomRight, bottomLeft
 
 	return ns

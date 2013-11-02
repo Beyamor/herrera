@@ -25,7 +25,7 @@ define ['editor/shapes'], (shapes) ->
 					selectedVariant = @model.get 'selectedVariant'
 					return unless selectedVariant
 
-					selectedVariant.addPiece new piece
+					selectedVariant.addPiece new piece selectedVariant
 
 			@$el.append(
 					button "Triangle", addPiece shapes.Triangle

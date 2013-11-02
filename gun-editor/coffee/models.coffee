@@ -1,4 +1,4 @@
-define ['core/util'], (util) ->
+define ['core/util', 'editor/shapes'], (util, shapes) ->
 	ns = {}
 
 	# shout out to http://www.shesek.info/web-development/recursive-backbone-models-tojson
@@ -23,8 +23,17 @@ define ['core/util'], (util) ->
 		return response
 
 	ns.Variant = Backbone.Model.extend
+		defaults: ->
+			pins: []
+
 		addPiece: (piece) ->
 			@get('pieces').push piece
+
+		createPin: (v1, v2) ->
+			pin = new shapes.Pin this
+			pin.add v1
+			pin.add v2
+			@get('pins').push pin
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
