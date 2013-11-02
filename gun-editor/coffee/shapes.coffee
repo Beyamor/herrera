@@ -9,7 +9,9 @@ define ['core/util'], (util) ->
 			for vertex in @vertices
 				vertex.isBeingMoved = true
 				vertex.moveTo x, y
+				vertex.applyVertexConstraints()
 				vertex.isBeingMoved = false
+
 
 		add: (vertex) ->
 			if @vertices.length > 0
@@ -39,6 +41,9 @@ define ['core/util'], (util) ->
 			if @pin and not @isBeingMoved
 				@pin.moveTo @x, @y
 
+			if @onMove and not @isBeingMoved
+				@onMove()
+
 		pinTo: (other) ->
 			return if other is this or other.shape is @shape
 
@@ -46,6 +51,15 @@ define ['core/util'], (util) ->
 
 		unpin: ->
 			@pin.remove this if @pin
+
+		applyVertexConstraints: ->
+			return unless @vertexConstraints
+
+			for constraint in @vertexConstraints()
+				x = constraint.x or constraint.vertex.x
+				y = constraint.y or constraint.vertex.y
+
+				constraint.vertex.moveTo x, y
 
 	class Shape
 		constructor: (@vertices...) ->
@@ -69,7 +83,7 @@ define ['core/util'], (util) ->
 			@pins.push pin
 
 
-	class ns.Rectangle extends Shape
+	class ns.Quad extends Shape
 		constructor: ->
 			super(
 				new Vertex(-5, -5),
@@ -77,5 +91,34 @@ define ['core/util'], (util) ->
 				new Vertex(5, 5),
 				new Vertex(-5, 5)
 			)
+
+	class ns.Rectangle extends Shape
+		constructor: ->
+			topLeft		= new Vertex(-5, -5)
+			topRight	= new Vertex(5, -5)
+			bottomRight	= new Vertex(5, 5)
+			bottomLeft	= new Vertex(-5, 5)
+
+			topLeft.vertexConstraints = -> [
+				{vertex: topRight, y: @y}
+				{vertex: bottomLeft, x: @x}
+			]
+
+			topRight.vertexConstraints = -> [
+				{vertex: topLeft, y: @y}
+				{vertex: bottomRight, x: @x}
+			]
+
+			bottomRight.vertexConstraints = -> [
+				{vertex: topRight, x: @x}
+				{vertex: bottomLeft, y: @y}
+			]
+
+			bottomLeft.vertexConstraints = -> [
+				{vertex: bottomRight, y: @y}
+				{vertex: topLeft, x: @x}
+			]
+
+			super topLeft, topRight, bottomRight, bottomLeft
 
 	return ns

@@ -43,6 +43,7 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 			mousePos = @view.realMousePos
 
 			@vertex.moveTo mousePos.x, mousePos.y
+			@vertex.applyVertexConstraints()
 
 		mouseUp: ->
 			thingOfInterest = @view.getThingOfInterest exclude: @vertex.shape
