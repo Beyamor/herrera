@@ -20,7 +20,23 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 			@canvas = new canvas.Canvas width: CANVAS_WIDTH, height: CANVAS_HEIGHT
 			@$el.append @canvas.$el
 
+		renderVariantRealization: (x, y, variant) ->
+			context = @canvas.context
+			context.beginPath()
+
+			for piece in variant.get 'pieces'
+				# aw yeah, let's just copy-paste this in
+				lastVertex = piece.vertices[piece.vertices.length - 1]
+				context.moveTo lastVertex.x + x + SPRITE_WIDTH / 2, lastVertex.y + y + SPRITE_HEIGHT / 2
+
+				for vertex in piece.vertices
+					context.lineTo vertex.x + x + SPRITE_WIDTH / 2, vertex.y + y + SPRITE_HEIGHT / 2
+
+				context.fillStyle = "black"
+				context.fill()
+
 		renderSelectedVariant: ->
+			@canvas.clear()
 			selectedVariant = @model.get 'selectedVariant'
 			return unless selectedVariant
 
@@ -28,9 +44,9 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 
 			for i in [0...THINGS_PER_ROW]
 				for j in [0..THINGS_PER_COLUMN]
-					context.beginPath()
-					context.rect i * (SPRITE_WIDTH + X_MARGIN), j * (SPRITE_HEIGHT + Y_MARGIN), 32, 32
-					context.fillStyle = "black"
-					context.fill()
+					x = i * (SPRITE_WIDTH + X_MARGIN)
+					y = j * (SPRITE_HEIGHT + Y_MARGIN)
+					@renderVariantRealization x, y, selectedVariant
+
 
 	return ns
