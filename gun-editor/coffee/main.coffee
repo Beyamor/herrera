@@ -2,11 +2,22 @@ define ['editor/models', 'editor/views', 'editor/views/variants'], (models, view
 	gun = new models.Gun {
 		parts: [{
 			name: "body",
-			variants: [
+			variants: [{
 				name: "v0",
 				pieces: [
 				]
-			]
+			}, {
+				name: "v1",
+				pieces: [
+				]
+			}]
+		}, {
+			name: "barrel",
+			variants: [{
+				name: "v0",
+				pieces: [
+				]
+			}]
 		}]
 	}, parse: true
 

@@ -31,7 +31,11 @@
 						<ul>
 							<% for (var variantIndex in part.variants) { %>
 								<% var variant = part.variants[variantIndex]; %>
-								<li><%- variant.name %></li>
+								<li class ="variant"
+									data-part="<%- partIndex %>"
+									data-variant="<%- variantIndex %>">
+										<%- variant.name %>
+								</li>
 							<% } %>
 						</ul>
 					</li>
