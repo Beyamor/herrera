@@ -82,6 +82,14 @@ define ['core/util'], (util) ->
 			pin.add v2
 			@pins.push pin
 
+	class ns.Triangle extends Shape
+		constructor: ->
+			super(
+				new Vertex(0, -5),
+				new Vertex(4.33, 2.5),
+				new Vertex(-4.33, 2.5)
+			)
+
 
 	class ns.Quad extends Shape
 		constructor: ->

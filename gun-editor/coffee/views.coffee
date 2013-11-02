@@ -28,6 +28,7 @@ define ['editor/shapes'], (shapes) ->
 					selectedVariant.addPiece new piece
 
 			@$el.append(
+					button "Triangle", addPiece shapes.Triangle
 					button "Quad", addPiece shapes.Quad
 					button "Rectangle", addPiece shapes.Rectangle
 			)
