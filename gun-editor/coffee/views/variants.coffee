@@ -37,17 +37,27 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 	class DraggingVertex
 		constructor: (@view, @vertex) ->
+			@vertex.unpin()
 
 		mouseMove: ->
-			mousePos	= @view.realMousePos
+			mousePos = @view.realMousePos
 
 			@vertex.moveTo mousePos.x, mousePos.y
 
 		mouseUp: ->
+			thingOfInterest = @view.getThingOfInterest exclude: @vertex.shape
+
+			if thingOfInterest and thingOfInterest.vertex
+				@vertex.pinTo thingOfInterest.vertex
+
 			@view.state = new DefaultState @view
 
 		render: ->
 			@view.highlightVertex @vertex
+
+			thingOfInterest = @view.getThingOfInterest exclude: @vertex.shape
+			if thingOfInterest? and thingOfInterest.vertex?
+				@view.highlightVertex thingOfInterest.vertex
 
 	class DraggingShape
 		constructor: (@view, @shape) ->
@@ -57,6 +67,7 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 				@offsets.push
 					x: mousePos.x - vertex.x,
 					y: mousePos.y - vertex.y
+				vertex.unpin()
 
 		mouseMove: ->
 			mousePos = @view.realMousePos
@@ -130,10 +141,12 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 			return dx*dx + dy*dy < 25
 
-		getThingOfInterest: ->
+		getThingOfInterest: (opts) ->
+			opts or= {}
+
 			mousePos = @realMousePos
 
-			for shape in @model.get 'pieces'
+			for shape in @model.get 'pieces' when shape isnt opts.exclude
 				for vertex in shape.vertices
 					if @vertexInDraggingRange vertex
 						return {vertex: vertex}
