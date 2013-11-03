@@ -39,7 +39,12 @@ define ['core/util'], (util) ->
 
 	class Vertex
 		constructor: (@x, @y) ->
-			@eastWiggle = @westWiggle = @southWiggle = @northWiggle = 0
+			@wiggle = {
+				north:	0
+				east:	0
+				south:	0
+				west:	0
+			}
 
 		moveTo: (@x, @y) ->
 			if @pin and not @isBeingMoved
@@ -101,8 +106,8 @@ define ['core/util'], (util) ->
 
 		wiggle: ->
 			for vertex in @vertices
-				dx = random.inRange -vertex.westWiggle, vertex.eastWiggle
-				dy = random.inRange -vertex.northWiggle, vertex.southWiggle
+				dx = random.inRange -vertex.wiggle.west, vertex.wiggle.east
+				dy = random.inRange -vertex.wiggle.north, vertex.wiggle.south
 
 				vertex.moveTo vertex.x + dx, vertex.y + dy
 				vertex.applyVertexConstraints()

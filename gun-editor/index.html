@@ -52,6 +52,19 @@
 						<% for (var vertexIndex = 0; vertexIndex < piece.vertices.length; ++vertexIndex) { %>
 							<% var vertex = piece.vertices[vertexIndex]; %>
 							<%- vertexIndex %>
+							<ul>
+							<% for (var wiggleIndex = 0; wiggleIndex < 4; ++wiggleIndex) { %>
+								<% direction = ["north", "east", "south", "west"][wiggleIndex]; %>
+								<li>
+									<%- direction %>: 
+									<input type="text" class="wiggle"
+										value="<%- vertex.wiggle[direction] %>"
+										data-piece="<%- pieceIndex %>"
+										data-vertex="<%- vertexIndex %>"
+										data-direction="<%- direction %>" />
+								</li>
+							<% } %>
+							</ul>
 						<% } %>
 						</ul>
 					</li>
