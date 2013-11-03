@@ -1,6 +1,8 @@
 define ['core/util'], (util) ->
 	ns = {}
 
+	random = util.random
+
 	class ns.Pin
 		constructor: (@model) ->
 			@vertices = []
@@ -68,11 +70,41 @@ define ['core/util'], (util) ->
 				vertex.moveTo x, y
 				vertex.isBeingConstrained = false
 
+		savePosition: ->
+			@savedX = @x
+			@savedY = @y
+
+		restorePosition: ->
+			@x = @savedX
+			@y = @savedY
+
 	class Shape
 		constructor: (model, @vertices...) ->
 			for vertex in @vertices
 				vertex.model	= model
 				vertex.shape	= this
+
+		saveVertices: ->
+			for vertex in @vertices
+				vertex.savePosition()
+
+		restoreVertices: ->
+			for vertex in @vertices
+				vertex.restorePosition()
+
+		toJSON: ->
+			vertices = []
+			for vertex in @vertices
+				vertices.push {x: vertex.x, y: vertex.y}
+			return {vertices: vertices}
+
+		wiggle: ->
+			for vertex in @vertices
+				dx = random.inRange -0.5, 0.5
+				dy = random.inRange -0.5, 0.5
+
+				vertex.moveTo vertex.x + dx, vertex.y + dy
+				vertex.applyVertexConstraints()
 
 	class ns.Triangle extends Shape
 		constructor: (model) ->

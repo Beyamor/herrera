@@ -21,10 +21,11 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 			@$el.append @canvas.$el
 
 		renderVariantRealization: (x, y, variant) ->
-			context = @canvas.context
+			realization	= variant.realize()
+			context		= @canvas.context
 			context.beginPath()
 
-			for piece in variant.get 'pieces'
+			for piece in realization.pieces
 				# aw yeah, let's just copy-paste this in
 				lastVertex = piece.vertices[piece.vertices.length - 1]
 				context.moveTo lastVertex.x + x + SPRITE_WIDTH / 2, lastVertex.y + y + SPRITE_HEIGHT / 2

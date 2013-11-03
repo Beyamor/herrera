@@ -39,6 +39,23 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 			pin.add v2
 			@get('pins').push pin
 
+		realize: ->
+			realizedPieces = []
+
+			for piece in @get 'pieces'
+				piece.saveVertices()
+
+			for piece in @get 'pieces'
+				piece.wiggle()
+
+			for piece in @get 'pieces'
+				realizedPieces.push piece.toJSON()
+
+			for piece in @get 'pieces'
+				piece.restoreVertices()
+
+			return {pieces: realizedPieces}
+
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
 
