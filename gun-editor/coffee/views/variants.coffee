@@ -43,7 +43,6 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 
 						# whatever
 						$('#vertex-browser').empty()
-s
 						return
 
 		render: ->
@@ -200,6 +199,16 @@ s
 
 		highlightShape: (shape) ->
 			@renderShape shape, color: "blue", lineWidth: 3
+
+			context = @canvas.context
+
+			for index in [0...shape.vertices.length]
+				vertex		= shape.vertices[index]
+				pixelPos	= @pixelPos vertex
+
+				context.fillStyle	= "grey"
+				context.font		= "20px Arial"
+				context.fillText index, pixelPos.x, pixelPos.y
 
 		renderShape: (shape, opts) ->
 			return unless shape.vertices.length > 0
