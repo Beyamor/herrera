@@ -20,6 +20,16 @@ li {
 	}
 }
 
+#vertex-browser {
+	float: left;
+	margin-left: 10px;
+
+	.shape-name {
+		margin-top: 20px;
+		margin-bottom: 5px;
+	}
+}
+
 #center-stuff {
 	float: left;
 }

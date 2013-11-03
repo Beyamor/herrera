@@ -42,6 +42,22 @@
 				<% } %>
 			</ul>
 		</script>
+		<script id="vertex-browser-template" type="text/template">
+			<ul>
+				<% for (var pieceIndex = 0; pieceIndex < pieces.length; ++pieceIndex) { %>
+					<% var piece = pieces[pieceIndex]; %>
+					<li>
+						<div class="shape-name"><%- pieceIndex %></div>
+						<ul>
+						<% for (var vertexIndex = 0; vertexIndex < piece.vertices.length; ++vertexIndex) { %>
+							<% var vertex = piece.vertices[vertexIndex]; %>
+							<%- vertexIndex %>
+						<% } %>
+						</ul>
+					</li>
+				<% } %>
+			</ul>
+		</script>
 
 		<!-- The actual page -->
 		<div id="parts-browser"></div>
@@ -50,5 +66,6 @@
 			<div id="variant-viewer"></div>
 			<div id="renders">Render</div>
 		</div>
+		<div id="vertex-browser"></div>
 	</body>
 </html>

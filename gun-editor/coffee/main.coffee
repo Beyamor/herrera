@@ -1,44 +1,48 @@
-define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/renders'], (models, views, vv, renders) ->
-	gun = new models.Gun {
-		parts: [{
-			name: "body",
-			variants: [{
-				name: "v0",
-				pieces: [
-				]
+define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/renders', 'editor/views/vertices'],
+	(models, views, vv, renders, vb) ->
+		gun = new models.Gun {
+			parts: [{
+				name: "body",
+				variants: [{
+					name: "v0",
+					pieces: [
+					]
+				}, {
+					name: "v1",
+					pieces: [
+					]
+				}]
 			}, {
-				name: "v1",
-				pieces: [
-				]
+				name: "barrel",
+				variants: [{
+					name: "v0",
+					pieces: [
+					]
+				}]
 			}]
-		}, {
-			name: "barrel",
-			variants: [{
-				name: "v0",
-				pieces: [
-				]
-			}]
-		}]
-	}, parse: true
+		}, parse: true
 
-	partsBrowser = new views.PartsBrowser model: gun
-	partsBrowser.render()
+		partsBrowser = new views.PartsBrowser model: gun
+		partsBrowser.render()
 
-	piecesToolbar = new views.PiecesToolbar model: gun
-	piecesToolbar.render()
+		piecesToolbar = new views.PiecesToolbar model: gun
+		piecesToolbar.render()
 
-	renderer = new renders.Renderer model: gun
+		renderer = new renders.Renderer model: gun
 
-	gun.on 'change:selectedVariant', ->
-		$variantViewerContainer = $ '#variant-viewer'
-		$variantViewerContainer.empty()
+		gun.on 'change:selectedVariant', ->
+			$variantViewerContainer = $ '#variant-viewer'
+			$variantViewerContainer.empty()
 
-		selectedVariant = gun.get 'selectedVariant'
-		return unless selectedVariant
+			selectedVariant = gun.get 'selectedVariant'
+			return unless selectedVariant
 
-		variantViewer = new vv.VariantViewer model: selectedVariant
-		variantViewer.render()
+			variantViewer = new vv.VariantViewer model: selectedVariant
+			variantViewer.render()
+			$variantViewerContainer.append variantViewer.$el
 
-		$variantViewerContainer.append variantViewer.$el
+			vertexBrowser = new vb.VertexBrowser model: selectedVariant
+			vertexBrowser.render()
+			$('#vertex-browser').empty().append vertexBrowser.$el
 
-	gun.set 'selectedVariant', gun.get('parts').at(0).get('variants').at(0)
+		gun.set 'selectedVariant', gun.get('parts').at(0).get('variants').at(0)
