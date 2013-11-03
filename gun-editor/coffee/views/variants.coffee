@@ -40,6 +40,10 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 
 					else if thingOfInterest.shape?
 						@view.model.removePiece thingOfInterest.shape
+
+						# whatever
+						$('#vertex-browser').empty()
+s
 						return
 
 		render: ->
