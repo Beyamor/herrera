@@ -28,10 +28,12 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 
 		addPiece: (piece) ->
 			@get('pieces').push piece
+			@trigger "piece-added"
 
 		removePiece: (piece) ->
 			vertex.unpin() for vertex in piece.vertices
 			@get('pieces').remove piece
+			@trigger "piece-removed"
 
 		createPin: (v1, v2) ->
 			pin = new shapes.Pin this
