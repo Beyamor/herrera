@@ -115,6 +115,8 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 			@canvas = new canvas.Canvas width: width, height: height
 			@$el.append @canvas.$el
 
+			@model.on 'piece-added', => @render()
+
 			@canvas.$el
 				.attr('oncontextmenu', 'return false;')
 				.mousedown (e) =>
