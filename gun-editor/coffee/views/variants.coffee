@@ -1,4 +1,4 @@
-define ['core/canvas', 'core/util'], (canvas, util) ->
+define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) ->
 	ns = {}
 
 	relativePos = (e, $el) ->
@@ -23,6 +23,11 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 
 					else if thingOfInterest.shape?
 						@view.state = new DraggingShape @view, thingOfInterest.shape
+
+						vertexBrowser = new pb.PiecesBrowser model: thingOfInterest.shape
+						vertexBrowser.render()
+						$('#vertex-browser').empty().append vertexBrowser.$el
+
 						return
 
 			else if e.which is 3

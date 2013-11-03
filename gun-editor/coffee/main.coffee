@@ -1,5 +1,5 @@
-define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/renders', 'editor/views/vertices'],
-	(models, views, vv, renders, vb) ->
+define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/renders'],
+	(models, views, vv, renders) ->
 		gun = new models.Gun {
 			parts: [{
 				name: "body",
@@ -40,9 +40,4 @@ define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/
 			variantViewer = new vv.VariantViewer model: selectedVariant
 			variantViewer.render()
 			$variantViewerContainer.append variantViewer.$el
-
-			vertexBrowser = new vb.VertexBrowser model: selectedVariant
-			vertexBrowser.render()
-			$('#vertex-browser').empty().append vertexBrowser.$el
-
 		gun.set 'selectedVariant', gun.get('parts').at(0).get('variants').at(0)
