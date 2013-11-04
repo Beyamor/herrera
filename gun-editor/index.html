@@ -47,6 +47,9 @@
 			<% for (var vertexIndex = 0; vertexIndex < vertices.length; ++vertexIndex) { %>
 				<% var vertex = vertices[vertexIndex]; %>
 				<%- vertexIndex %><br/>
+				name: <input type="text" class="name"
+					value="<%- vertex.name %>"
+					data-vertex="<%- vertexIndex %>"></br>
 				wiggle:
 				<div>
 					<ul>
