@@ -15,7 +15,8 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 
 		initialize: ->
 			@$el.append $('<div>')
-					.append ui.button "Selected variant", => @renderSelectedVariant()
+					.append(ui.button "Gun", => @renderGun())
+					.append(ui.button "Selected variant", => @renderSelectedVariant())
 
 			@canvas = new canvas.Canvas width: CANVAS_WIDTH, height: CANVAS_HEIGHT
 			@$el.append @canvas.$el
@@ -48,6 +49,10 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 					x = i * (SPRITE_WIDTH + X_MARGIN)
 					y = j * (SPRITE_HEIGHT + Y_MARGIN)
 					@renderVariantRealization x, y, selectedVariant
+
+		renderGun: ->
+			@canvas.clear()
+			console.log @model.get('selectedVariant').getNamedVertex 'vertex'
 
 
 	return ns

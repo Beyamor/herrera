@@ -58,6 +58,14 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 
 			return {pieces: realizedPieces}
 
+		getNamedVertex: (name) ->
+			for piece in @get 'pieces'
+				for vertex in piece.vertices
+					if vertex.name is name
+						return vertex
+
+			throw new Error "Unknown vertex #{name}"
+
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
 

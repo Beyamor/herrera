@@ -101,7 +101,7 @@ define ['core/util'], (util) ->
 		toJSON: ->
 			vertices = []
 			for vertex in @vertices
-				vertices.push {x: vertex.x, y: vertex.y}
+				vertices.push {x: vertex.x, y: vertex.y, name: vertex.name}
 			return {vertices: vertices}
 
 		wiggle: ->
