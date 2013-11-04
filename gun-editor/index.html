@@ -24,20 +24,21 @@
 		<!-- View templates -->
 		<script id="parts-browser-template" type="text/template">
 			<ul>
-				<% for (var partIndex in parts) { %>
+				<% for (var partIndex=0; partIndex<parts.length; ++partIndex) { %>
 					<% var part = parts[partIndex]; %>
 					<li>
 						<div class="part-name"><%- part.name %></div>
 						<ul>
-							<% for (var variantIndex in part.variants) { %>
+							<% for (var variantIndex=0; variantIndex<part.variants.length; ++variantIndex) { %>
 								<% var variant = part.variants[variantIndex]; %>
 								<li class ="variant"
 									data-part="<%- partIndex %>"
 									data-variant="<%- variantIndex %>">
-										<%- variant.name %>
+										<%- variantIndex %>
 								</li>
 							<% } %>
 						</ul>
+						<button class="new-part" data-part="<%- partIndex %>">New</button>
 					</li>
 				<% } %>
 			</ul>

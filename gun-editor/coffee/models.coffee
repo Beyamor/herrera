@@ -25,6 +25,7 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 	ns.Variant = Backbone.Model.extend
 		defaults: ->
 			pins: []
+			pieces: []
 
 		addPiece: (piece) ->
 			@get('pieces').push piece

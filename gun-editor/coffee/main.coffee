@@ -3,22 +3,10 @@ define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/
 		gun = new models.Gun {
 			parts: [{
 				name: "body",
-				variants: [{
-					name: "v0",
-					pieces: [
-					]
-				}, {
-					name: "v1",
-					pieces: [
-					]
-				}]
+				variants: []
 			}, {
 				name: "barrel",
-				variants: [{
-					name: "v0",
-					pieces: [
-					]
-				}]
+				variants: []
 			}]
 		}, parse: true
 
@@ -40,4 +28,3 @@ define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/
 			variantViewer = new vv.VariantViewer model: selectedVariant
 			variantViewer.render()
 			$variantViewerContainer.append variantViewer.$el
-		gun.set 'selectedVariant', gun.get('parts').at(0).get('variants').at(0)

@@ -1,4 +1,4 @@
-define ['editor/shapes', 'editor/ui'], (shapes, ui) ->
+define ['editor/shapes', 'editor/ui', 'editor/models'], (shapes, ui, models) ->
 	ns = {}
 
 	ns.PartsBrowser = Backbone.View.extend
@@ -6,6 +6,7 @@ define ['editor/shapes', 'editor/ui'], (shapes, ui) ->
 
 		events:
 			"click .variant": "selectVariant"
+			"click .new-part": "newVariant"
 
 		selectVariant: (e) ->
 			data	= e.toElement.dataset
@@ -15,6 +16,16 @@ define ['editor/shapes', 'editor/ui'], (shapes, ui) ->
 			selectedVariant = @model.get("parts").at(part).get("variants").at(variant)
 
 			@model.set "selectedVariant", selectedVariant
+
+		newVariant: (e) ->
+			data		= e.target.dataset
+			part		= @model.get("parts").at(data.part)
+			newVariant	= new models.Variant
+
+			part.get('variants').add(newVariant)
+			@model.set 'selectedVariant', newVariant
+
+			@render()
 
 		template: _.template($('#parts-browser-template').html())
 

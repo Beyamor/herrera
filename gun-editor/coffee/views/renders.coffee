@@ -54,5 +54,4 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 			@canvas.clear()
 			console.log @model.get('selectedVariant').getNamedVertex 'vertex'
 
-
 	return ns
