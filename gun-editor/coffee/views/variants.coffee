@@ -239,6 +239,7 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 			context.beginPath()
 			context.moveTo p1.x, p1.y
 			context.lineTo p2.x, p2.y
+			context.strokeStyle = "black"
 			context.lineWidth = 5
 			context.stroke()
 

@@ -33,10 +33,16 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 				for vertex in piece.vertices
 					context.lineTo vertex.x + x + SPRITE_WIDTH / 2, vertex.y + y + SPRITE_HEIGHT / 2
 
-				context.fillStyle = "grey"
+				context.fillStyle = "red"
 				context.fill()
-				context.strokeStyle = "black"
-				context.stroke()
+
+				for [v1, v2] in piece.visibleEdges
+					context.beginPath()
+					context.moveTo v1.x + x + SPRITE_WIDTH / 2, v1.y + y + SPRITE_HEIGHT / 2
+					context.lineTo v2.x + x + SPRITE_WIDTH / 2, v2.y + y + SPRITE_HEIGHT / 2
+
+					context.strokeStyle = "black"
+					context.stroke()
 
 		renderSelectedVariant: ->
 			@canvas.clear()

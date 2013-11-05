@@ -121,7 +121,19 @@ define ['core/util'], (util) ->
 			vertices = []
 			for vertex in @vertices
 				vertices.push {x: vertex.x, y: vertex.y, name: vertex.name}
-			return {vertices: vertices}
+
+			visibleEdges = []
+			for vertexIndex in [0...@vertices.length]
+				v1 = @vertices[vertexIndex]
+				v2 = @vertices[(vertexIndex + 1) % @vertices.length]
+
+				unless @edgeIsInvisible v1, v2
+					visibleEdges.push [v1, v2]
+
+			return {
+				vertices: vertices
+				visibleEdges: visibleEdges
+			}
 
 		wiggle: ->
 			for vertex in @vertices
