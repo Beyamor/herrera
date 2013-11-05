@@ -52,6 +52,10 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 				if thingOfInterest.vertex?
 					@view.highlightVertex thingOfInterest.vertex
 
+				else if thingOfInterest.edge?
+					[v1, v2] = thingOfInterest.edge
+					@view.highlightEdge v1, v2
+
 				else if thingOfInterest.shape?
 					@view.highlightShape thingOfInterest.shape
 
@@ -162,6 +166,28 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 
 			return dx*dx + dy*dy < 25
 
+		edgeInInterestRange: (v1, v2) ->
+			p1	= @pixelPos v1
+			p2	= @pixelPos v2
+
+			dx	= p2.x - p1.x
+			dy	= p2.y - p1.y
+			length	= Math.sqrt(dx*dx + dy*dy)
+			dx	/= length
+			dy	/= length
+
+			mx	= @mousePos.x - p1.x
+			my	= @mousePos.y - p1.y
+
+			dot	= mx*dx + my*dy
+
+			return false if dot < 0 or dot > length
+
+			perpX	= mx - dx * dot
+			perpY	= my - dy * dot
+
+			return Math.sqrt(perpX*perpX + perpY*perpY) < 5
+
 		getThingOfInterest: (opts) ->
 			opts or= {}
 
@@ -171,6 +197,13 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 				for vertex in shape.vertices
 					if @vertexInDraggingRange vertex
 						return {vertex: vertex}
+
+				for vertexIndex in [0...shape.vertices.length]
+					v1 = shape.vertices[vertexIndex]
+					v2 = shape.vertices[(vertexIndex+1) % shape.vertices.length]
+
+					if @edgeInInterestRange v1, v2
+						return {edge: [v1, v2]}
 
 				if util.pointInPoly mousePos, shape.vertices
 					return {shape: shape}
@@ -193,8 +226,19 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 			context.arc pixelX, pixelY, 4, 0, 2 * Math.PI, false
 			context.fillStyle = "blue"
 			context.fill()
-			context.strokeStyle = "blac"
+			context.strokeStyle = "black"
 			context.lineWidth = 3
+			context.stroke()
+
+		highlightEdge: (v1, v2) ->
+			p1 = @pixelPos v1
+			p2 = @pixelPos v2
+
+			context = @canvas.context
+			context.beginPath()
+			context.moveTo p1.x, p1.y
+			context.lineTo p2.x, p2.y
+			context.lineWidth = 5
 			context.stroke()
 
 		highlightShape: (shape) ->
