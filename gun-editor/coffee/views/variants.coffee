@@ -13,37 +13,38 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 		constructor: (@view) ->
 
 		mouseDown: (e) ->
+			thingOfInterest = @view.thingOfInterest
+			return unless thingOfInterest?
+
 			if e.which is 1
-				thingOfInterest = @view.thingOfInterest
+				if thingOfInterest.vertex?
+					@view.state = new DraggingVertex @view, thingOfInterest.vertex
+					return
 
-				if thingOfInterest?
-					if thingOfInterest.vertex?
-						@view.state = new DraggingVertex @view, thingOfInterest.vertex
-						return
+				else if thingOfInterest.shape?
+					@view.state = new DraggingShape @view, thingOfInterest.shape
 
-					else if thingOfInterest.shape?
-						@view.state = new DraggingShape @view, thingOfInterest.shape
+					vertexBrowser = new pb.PiecesBrowser model: thingOfInterest.shape
+					vertexBrowser.render()
+					$('#vertex-browser').empty().append vertexBrowser.$el
 
-						vertexBrowser = new pb.PiecesBrowser model: thingOfInterest.shape
-						vertexBrowser.render()
-						$('#vertex-browser').empty().append vertexBrowser.$el
+					return
 
-						return
+			else if e.which is 2
+				if thingOfInterest.edge?
+					thingOfInterest.shape.toggleEdgeVisibility thingOfInterest.edge
 
 			else if e.which is 3
-				thingOfInterest = @view.thingOfInterest
+				if thingOfInterest.vertex?
+					thingOfInterest.vertex.unpin()
+					return
 
-				if thingOfInterest?
-					if thingOfInterest.vertex?
-						thingOfInterest.vertex.unpin()
-						return
+				else if thingOfInterest.shape?
+					@view.model.removePiece thingOfInterest.shape
 
-					else if thingOfInterest.shape?
-						@view.model.removePiece thingOfInterest.shape
-
-						# whatever
-						$('#vertex-browser').empty()
-						return
+					# whatever
+					$('#vertex-browser').empty()
+					return
 
 		render: ->
 			thingOfInterest = @view.thingOfInterest
@@ -203,7 +204,7 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 					v2 = shape.vertices[(vertexIndex+1) % shape.vertices.length]
 
 					if @edgeInInterestRange v1, v2
-						return {edge: [v1, v2]}
+						return {edge: [v1, v2], shape: shape}
 
 				if util.pointInPoly mousePos, shape.vertices
 					return {shape: shape}
@@ -270,11 +271,27 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 				pixelPos = @pixelPos vertex
 				context.lineTo pixelPos.x, pixelPos.y
 
-			context.fillStyle	= opts.color or shape.color or "red"
-			context.strokeStyle	= "black"
-			context.lineWidth	= opts.lineWidth or 1
+			context.fillStyle = opts.color or shape.color or "red"
 			context.fill()
-			context.stroke()
+
+
+			for vertexIndex in [0...shape.vertices.length]
+				v1	= shape.vertices[vertexIndex]
+				v2	= shape.vertices[(vertexIndex+1) % shape.vertices.length]
+
+				p1	= @pixelPos v1
+				p2	= @pixelPos v2
+
+				context.beginPath()
+				context.moveTo p1.x, p1.y
+				context.lineTo p2.x, p2.y
+				context.lineWidth = opts.lineWidth or 1
+				context.strokeStyle =
+					if shape.edgeIsInvisible v1, v2
+						"grey"
+					else
+						"black"
+				context.stroke()
 
 		render: ->
 			@canvas.clear()

@@ -90,6 +90,25 @@ define ['core/util'], (util) ->
 				vertex.model	= model
 				vertex.shape	= this
 
+			@invisibleEdges = []
+
+		edgeIsInvisible: (v1, v2) ->
+			for edge in @invisibleEdges
+				if (edge[0] is v1 and edge[1] is v2) or (edge[1] is v1 and edge[0] is v2)
+					return true
+			return false
+
+		toggleEdgeVisibility: ([v1, v2]) ->
+			for edge in @invisibleEdges
+				if (edge[0] is v1 and edge[1] is v2) or (edge[1] is v1 and edge[0] is v2)
+					invisibleEdge = edge
+					break
+
+			if invisibleEdge?
+				@invisibleEdges.remove invisibleEdge
+			else
+				@invisibleEdges.push [v1, v2]
+
 		saveVertices: ->
 			for vertex in @vertices
 				vertex.savePosition()
