@@ -21,8 +21,7 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 			@canvas = new canvas.Canvas width: CANVAS_WIDTH, height: CANVAS_HEIGHT
 			@$el.append @canvas.$el
 
-		renderVariantRealization: (x, y, variant) ->
-			realization	= variant.realize()
+		renderVariantRealization: (x, y, realization) ->
 			context		= @canvas.context
 			context.beginPath()
 
@@ -48,10 +47,15 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 				for j in [0..THINGS_PER_COLUMN]
 					x = i * (SPRITE_WIDTH + X_MARGIN)
 					y = j * (SPRITE_HEIGHT + Y_MARGIN)
-					@renderVariantRealization x, y, selectedVariant
+					@renderVariantRealization x, y, selectedVariant.realize()
 
 		renderGun: ->
 			@canvas.clear()
-			console.log @model.get('selectedVariant').getNamedVertex 'vertex'
 
+			for i in [0...THINGS_PER_ROW]
+				for j in [0...THINGS_PER_COLUMN]
+					x = i * (SPRITE_WIDTH + X_MARGIN)
+					y = j * (SPRITE_HEIGHT + Y_MARGIN)
+					for realization in @model.realize()
+						@renderVariantRealization x, y, realization
 	return ns

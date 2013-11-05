@@ -1,6 +1,8 @@
 define ['core/util', 'editor/shapes'], (util, shapes) ->
 	ns = {}
 
+	random = util.random
+
 	# shout out to http://www.shesek.info/web-development/recursive-backbone-models-tojson
 	Backbone.Model.prototype.toJSON = ->
 		if (@_isSerializing)
@@ -57,15 +59,14 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 			for piece in @get 'pieces'
 				piece.restoreVertices()
 
-			return {pieces: realizedPieces}
-
-		getNamedVertex: (name) ->
-			for piece in @get 'pieces'
-				for vertex in piece.vertices
-					if vertex.name is name
-						return vertex
-
-			throw new Error "Unknown vertex #{name}"
+			return {
+				pieces: realizedPieces
+				getNamedVertex: (name) ->
+					for piece in @pieces
+						for vertex in piece.vertices
+							return vertex if vertex.name is name
+					throw new Error "Unknown vertex #{name}"
+			}
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
@@ -76,6 +77,13 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 
 		parse: parseForNesteds
 
+		getAny: ->
+			variants = @get('variants')
+			throw new Error "No variants for #{@get 'name'}" if variants.length is 0
+
+			index = random.intInRange 0, variants.length
+			return variants.at index
+
 	ns.Parts = Backbone.Collection.extend
 		model: ns.Part
 
@@ -84,5 +92,28 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 			parts: ns.Parts
 
 		parse: parseForNesteds
+
+		getPart: (name) ->
+			@get('parts').where({name: name})[0]
+
+		realize: ->
+			body	= @getPart('body').getAny().realize()
+			barrel	= @getPart('barrel').getAny().realize()
+
+			barrelVertex	= body.getNamedVertex "barrel"
+			bodyVertex	= barrel.getNamedVertex "body"
+
+			dx = barrelVertex.x - bodyVertex.x
+			dy = barrelVertex.y - bodyVertex.y
+
+			for piece in barrel.pieces
+				for vertex in piece.vertices
+					vertex.x += dx
+					vertex.y += dy
+
+			return [
+				barrel,
+				body
+			]
 
 	return ns
