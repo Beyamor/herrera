@@ -21,28 +21,33 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 			@canvas = new canvas.Canvas width: CANVAS_WIDTH, height: CANVAS_HEIGHT
 			@$el.append @canvas.$el
 
-		renderVariantRealization: (x, y, realization) ->
-			context		= @canvas.context
-			context.beginPath()
+		realizationSprite: (realization) ->
+			sprite		= new canvas.Canvas width: SPRITE_WIDTH, height: SPRITE_HEIGHT
+			context		= sprite.context
+			context.save()
+			context.translate SPRITE_WIDTH/2, SPRITE_HEIGHT/2
 
+			context.beginPath()
 			for piece in realization.pieces
-				# aw yeah, let's just copy-paste this in
 				lastVertex = piece.vertices[piece.vertices.length - 1]
-				context.moveTo lastVertex.x + x + SPRITE_WIDTH / 2, lastVertex.y + y + SPRITE_HEIGHT / 2
+				context.moveTo lastVertex.x, lastVertex.y
 
 				for vertex in piece.vertices
-					context.lineTo vertex.x + x + SPRITE_WIDTH / 2, vertex.y + y + SPRITE_HEIGHT / 2
+					context.lineTo vertex.x, vertex.y
 
 				context.fillStyle = "red"
 				context.fill()
 
 				for [v1, v2] in piece.visibleEdges
 					context.beginPath()
-					context.moveTo v1.x + x + SPRITE_WIDTH / 2, v1.y + y + SPRITE_HEIGHT / 2
-					context.lineTo v2.x + x + SPRITE_WIDTH / 2, v2.y + y + SPRITE_HEIGHT / 2
+					context.moveTo v1.x, v1.y
+					context.lineTo v2.x, v2.y
 
 					context.strokeStyle = "black"
 					context.stroke()
+
+			context.restore()
+			return sprite
 
 		renderSelectedVariant: ->
 			@canvas.clear()
@@ -55,7 +60,8 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 				for j in [0..THINGS_PER_COLUMN]
 					x = i * (SPRITE_WIDTH + X_MARGIN)
 					y = j * (SPRITE_HEIGHT + Y_MARGIN)
-					@renderVariantRealization x, y, selectedVariant.realize()
+					sprite = @realizationSprite selectedVariant.realize()
+					sprite.renderTo @canvas, x, y
 
 		renderGun: ->
 			@canvas.clear()
@@ -65,5 +71,6 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 					x = i * (SPRITE_WIDTH + X_MARGIN)
 					y = j * (SPRITE_HEIGHT + Y_MARGIN)
 					for realization in @model.realize()
-						@renderVariantRealization x, y, realization
+						sprite = @realizationSprite realization
+						sprite.renderTo @canvas, x, y
 	return ns
