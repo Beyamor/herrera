@@ -34,6 +34,9 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 				if thingOfInterest.edge?
 					thingOfInterest.shape.toggleEdgeVisibility thingOfInterest.edge
 
+				else if thingOfInterest.shape?
+					thingOfInterest.shape.painted = !thingOfInterest.shape.painted
+
 			else if e.which is 3
 				if thingOfInterest.vertex?
 					thingOfInterest.vertex.unpin()
@@ -272,7 +275,7 @@ define ['core/canvas', 'core/util', 'editor/views/pieces'], (canvas, util, pb) -
 				pixelPos = @pixelPos vertex
 				context.lineTo pixelPos.x, pixelPos.y
 
-			context.fillStyle = opts.color or shape.color or "red"
+			context.fillStyle = opts.color or (if shape.painted then "red" else "grey")
 			context.fill()
 
 

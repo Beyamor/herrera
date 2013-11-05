@@ -90,7 +90,8 @@ define ['core/util'], (util) ->
 				vertex.model	= model
 				vertex.shape	= this
 
-			@invisibleEdges = []
+			@invisibleEdges	= []
+			@painted	= true
 
 		edgeIsInvisible: (v1, v2) ->
 			for edge in @invisibleEdges
@@ -137,8 +138,9 @@ define ['core/util'], (util) ->
 					}]
 
 			return {
-				vertices: vertices
-				visibleEdges: visibleEdges
+				vertices:	vertices
+				visibleEdges:	visibleEdges
+				painted:	@painted
 			}
 
 		wiggle: ->

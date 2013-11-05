@@ -10,6 +10,8 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 	X_MARGIN		= (CANVAS_WIDTH - SPRITE_WIDTH * THINGS_PER_ROW) / (THINGS_PER_ROW - 1)
 	Y_MARGIN		= (CANVAS_HEIGHT - SPRITE_HEIGHT * THINGS_PER_COLUMN) / (THINGS_PER_COLUMN - 1)
 
+	random  = util.random
+
 	ns.Renderer = Backbone.View.extend
 		el: "#renders"
 
@@ -27,6 +29,22 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 			context.save()
 			context.translate SPRITE_WIDTH/2, SPRITE_HEIGHT/2
 
+			paintColor = random.any [
+				"#5A5F6E",
+				"#BA2525",
+				"#BA8B25",
+				"#49853E",
+				"#B89AA6",
+				"#7A442F",
+				"#0A010D",
+				"#D5DBF5"
+			]
+
+			metalColor = random.any [
+				"#848687",
+				"#B8BDBF"
+			]
+
 			for piece in realization.pieces
 				lastVertex = piece.vertices[piece.vertices.length - 1]
 
@@ -36,7 +54,7 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 				for vertex in piece.vertices
 					context.lineTo vertex.x, vertex.y
 
-				context.fillStyle = "red"
+				context.fillStyle = (if piece.painted then paintColor else metalColor)
 				context.fill()
 
 				for [v1, v2] in piece.visibleEdges

@@ -68,6 +68,13 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 					throw new Error "Unknown vertex #{name}"
 			}
 
+		toJSON: ->
+			pieces = (piece.toJSON() for piece in @get 'pieces')
+
+			return {
+				pieces: pieces
+			}
+
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant
 
