@@ -28,3 +28,14 @@ define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/
 			variantViewer = new vv.VariantViewer model: selectedVariant
 			variantViewer.render()
 			$variantViewerContainer.append variantViewer.$el
+
+		$('#save').click ->
+			data = gun.toJSON()
+
+			$.ajax
+				url: "http://localhost:9000"
+				type: "POST"
+				data:
+					data: JSON.stringify(data)
+				success: ->
+					console.log "saved"
