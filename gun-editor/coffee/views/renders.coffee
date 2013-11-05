@@ -27,9 +27,10 @@ define ['core/canvas', 'core/util', 'editor/ui'], (canvas, util, ui) ->
 			context.save()
 			context.translate SPRITE_WIDTH/2, SPRITE_HEIGHT/2
 
-			context.beginPath()
 			for piece in realization.pieces
 				lastVertex = piece.vertices[piece.vertices.length - 1]
+
+				context.beginPath()
 				context.moveTo lastVertex.x, lastVertex.y
 
 				for vertex in piece.vertices

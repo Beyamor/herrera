@@ -128,7 +128,13 @@ define ['core/util'], (util) ->
 				v2 = @vertices[(vertexIndex + 1) % @vertices.length]
 
 				unless @edgeIsInvisible v1, v2
-					visibleEdges.push [v1, v2]
+					visibleEdges.push [{
+						x: v1.x
+						y: v1.y
+					}, {
+						x: v2.x
+						y: v2.y
+					}]
 
 			return {
 				vertices: vertices

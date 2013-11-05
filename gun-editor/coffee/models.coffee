@@ -111,6 +111,12 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 					vertex.x += dx
 					vertex.y += dy
 
+				for [v1, v2] in piece.visibleEdges
+					v1.x += dx
+					v1.y += dy
+					v2.x += dx
+					v2.y += dy
+
 			return [
 				barrel,
 				body
