@@ -95,10 +95,15 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 		model: ns.Part
 
 	ns.Gun = Backbone.Model.extend
+		url: "http://localhost:9000"
+
 		embedded:
 			parts: ns.Parts
 
-		parse: parseForNesteds
+		parse: (response) ->
+			response = parseForNesteds.call this, response
+			delete response['selectedVariant']
+			return response
 
 		getPart: (name) ->
 			@get('parts').where({name: name})[0]

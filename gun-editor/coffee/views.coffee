@@ -8,6 +8,9 @@ define ['editor/shapes', 'editor/ui', 'editor/models'], (shapes, ui, models) ->
 			"click .variant": "selectVariant"
 			"click .new-part": "newVariant"
 
+		initialize: ->
+			@model.on 'change:parts', => @render()
+
 		selectVariant: (e) ->
 			data	= e.toElement.dataset
 			part	= data.part

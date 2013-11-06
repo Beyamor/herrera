@@ -39,3 +39,7 @@ define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/
 					data: JSON.stringify(data)
 				success: ->
 					console.log "saved"
+
+
+		$('#load').click ->
+			gun.fetch()

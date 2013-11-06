@@ -12,9 +12,13 @@ class Handler(BaseHTTPServer.BaseHTTPRequestHandler):
 	def do_GET(self):
 		self.send_response(200)
 		self.send_header("Content-type", "text/html")
+		self.send_header('Access-Control-Allow-Origin', '*')
 		self.end_headers()
 
-		self.wfile.write("Response!")
+		with open(file_name, "r") as f:
+			content = f.read()[len("define "):]
+
+		self.wfile.write(content)
 
 	def do_POST(self):
 		ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
