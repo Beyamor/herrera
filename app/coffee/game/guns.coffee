@@ -1,8 +1,10 @@
-define ['core/util', 'core/app', 'core/canvas'],
-	(util, app, canvas) ->
+define ['core/util', 'core/app', 'core/canvas', 'game/guns/models', 'game/guns/smg-data'],
+	(util, app, canvas, models, smgModel) ->
 		ns = {}
 
 		random = util.random
+
+		SMG_MODEL = new models.Gun smgModel, parse: true
 
 		class ns.GunModel
 			constructor: ({capacity: @maxCapacity, firingRate: firingRate,\
@@ -22,6 +24,8 @@ define ['core/util', 'core/app', 'core/canvas'],
 							callback: =>
 								@canShoot = true
 						}
+
+						@model = SMG_MODEL.realize()
 
 			update: ->
 				if @isRecharging

@@ -1,8 +1,8 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
-	'game/consts', 'core/canvas'],
-	(app, entities, gfx, input, particles, util, bt, behaviours, guns, consts, canvas) ->
+	'game/consts', 'core/canvas', 'game/guns/sprites'],
+	(app, entities, gfx, input, particles, util, bt, behaviours, guns, consts, canvas, gunSprites) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -11,14 +11,15 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 		class ns.Gun extends Entity
 			constructor: ->
+				@model = guns.GunModel.createRandom()
+
 				super {
-					graphic: new Image("gun-sprite", centered: true)
+					graphic: new gunSprites.GunSprite @model.model
 					width: 24
 					layer: 150
 					type: 'gun'
 					centered: true
 				}
-				@model = guns.GunModel.createRandom()
 
 			update: ->
 				super()
