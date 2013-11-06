@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Herrera - Gun Editor</title>
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+		<script src="http://code.createjs.com/preloadjs-0.4.0.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/backbone.js/1.1.0/backbone-min.js"></script>
+		<script>
+			var require = {
+				urlArgs: 'bust=' + (new Date()).getTime(),
+				baseUrl: 'js/',
+				paths: {
+					"core": "/app/js/core",
+					"game": "/app/js/game",
+					"editor": "/gun-editor/js"
+				}
+			};
+		</script>
+		<script src="../app/js/require.js" data-main="editor/main.js"></script>
+	</head>
+	<body>
+		<!-- View templates -->
+		<script id="parts-browser-template" type="text/template">
+			<ul>
+				<% for (var partIndex=0; partIndex<parts.length; ++partIndex) { %>
+					<% var part = parts[partIndex]; %>
+					<li>
+						<div class="part-name"><%- part.name %></div>
+						<ul>
+							<% for (var variantIndex=0; variantIndex<part.variants.length; ++variantIndex) { %>
+								<% var variant = part.variants[variantIndex]; %>
+								<li class ="variant"
+									data-part="<%- partIndex %>"
+									data-variant="<%- variantIndex %>">
+										<%- variantIndex %>
+								</li>
+							<% } %>
+						</ul>
+						<button class="new-part" data-part="<%- partIndex %>">New</button>
+					</li>
+				<% } %>
+			</ul>
+		</script>
+		<script id="piece-browser-template" type="text/template">
+			<ul>
+			<% for (var vertexIndex = 0; vertexIndex < vertices.length; ++vertexIndex) { %>
+				<% var vertex = vertices[vertexIndex]; %>
+				<%- vertexIndex %><br/>
+				name: <input type="text" class="name"
+					value="<%- vertex.name %>"
+					data-vertex="<%- vertexIndex %>"></br>
+				wiggle:
+				<div>
+					<ul>
+					<% for (var wiggleIndex = 0; wiggleIndex < 4; ++wiggleIndex) { %>
+						<% direction = ["north", "east", "south", "west"][wiggleIndex]; %>
+						<li>
+							<%- direction %>: 
+							<input type="text" class="wiggle"
+								value="<%- vertex.wiggle[direction] %>"
+								data-vertex="<%- vertexIndex %>"
+								data-direction="<%- direction %>" />
+						</li>
+					<% } %>
+					</ul>
+				</div>
+			<% } %>
+			</ul>
+		</script>
+
+		<!-- The actual page -->
+		<div id="parts-browser"></div>
+		<div id="center-stuff">
+			<div id="pieces-toolbar"></div>
+			<div id="variant-viewer"></div>
+			<div id="renders">Render</div>
+		</div>
+		<div id="vertex-browser"></div>
+		<div id="file-stuff">
+			<button id="save">Save</button>
+			<button id="load">Load</button>
+		</div>
+	</body>
+</html>

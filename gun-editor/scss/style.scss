@@ -1,0 +1,45 @@
+body {
+	font-family: Verdana, Geneva, sans-serif
+}
+
+li {
+	list-style-type: none;
+}
+
+#parts-browser {
+	float: left;
+	margin-right: 100px;
+
+	.part-name {
+		margin-top: 20px;
+		margin-bottom: 5px;
+	}
+
+	.variant {
+		cursor: pointer;
+	}
+}
+
+#vertex-browser {
+	float: left;
+	margin-left: 10px;
+
+	.shape-name {
+		margin-top: 20px;
+		margin-bottom: 5px;
+	}
+}
+
+#center-stuff {
+	float: left;
+}
+
+canvas {
+	border-style: solid;
+	border-width: 1px;
+}
+
+#renders {
+	margin-top: 20px;
+	margin-bottom: 30px;
+}
