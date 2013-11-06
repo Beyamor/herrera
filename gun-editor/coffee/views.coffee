@@ -1,4 +1,4 @@
-define ['editor/shapes', 'editor/ui', 'editor/models'], (shapes, ui, models) ->
+define ['game/guns/shapes', 'editor/ui', 'game/guns/models'], (shapes, ui, models) ->
 	ns = {}
 
 	ns.PartsBrowser = Backbone.View.extend

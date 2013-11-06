@@ -1,4 +1,4 @@
-define ['core/util', 'editor/shapes'], (util, shapes) ->
+define ['core/util', 'game/guns/shapes'], (util, shapes) ->
 	ns = {}
 
 	random = util.random

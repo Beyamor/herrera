@@ -1,4 +1,4 @@
-define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/renders'],
+define ['game/guns/models', 'editor/views', 'editor/views/variants', 'editor/views/renders'],
 	(models, views, vv, renders) ->
 		gun = new models.Gun {
 			parts: [{
