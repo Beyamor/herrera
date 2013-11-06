@@ -54,7 +54,7 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 				piece.wiggle()
 
 			for piece in @get 'pieces'
-				realizedPieces.push piece.toJSON()
+				realizedPieces.push piece.renderData()
 
 			for piece in @get 'pieces'
 				piece.restoreVertices()
@@ -71,9 +71,45 @@ define ['core/util', 'editor/shapes'], (util, shapes) ->
 		toJSON: ->
 			pieces = (piece.toJSON() for piece in @get 'pieces')
 
+			pins = []
+			for pin in @get 'pins'
+				pinData = []
+				for vertex in pin.vertices
+					pinData.push {
+						piece: @get('pieces').indexOf vertex.shape
+						vertex: vertex.shape.vertices.indexOf vertex
+					}
+				pins.push pinData
+
 			return {
-				pieces: pieces
+				pieces:		pieces
+				pins:		pins
 			}
+
+		parse: (response) ->
+			pieces = []
+			for pieceData in response.pieces
+				pieceClass = switch pieceData.shape
+					when "triangle"		then shapes.Triangle
+					when "quad"		then shapes.Quad
+					when "rectangle"	then shapes.Rectangle
+
+				piece = new pieceClass this, pieceData
+				pieces.push piece
+			response.pieces = pieces
+
+			pins = []
+			for pinData in response.pins
+				pin = new shapes.Pin this
+
+				for {piece: pieceIndex, vertex: vertexIndex} in pinData
+					vertex = pieces[pieceIndex].vertices[vertexIndex]
+					pin.add vertex
+
+				pins.push pin
+			response.pins = pins
+
+			return response
 
 	ns.Variants = Backbone.Collection.extend
 		model: ns.Variant

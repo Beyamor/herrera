@@ -38,8 +38,8 @@ define ['core/util'], (util) ->
 			@vertices.contains vertex
 
 	class Vertex
-		constructor: (@x, @y) ->
-			@wiggle = {
+		constructor: (@x, @y, @name, @wiggle) ->
+			@wiggle or= {
 				north:	0
 				east:	0
 				south:	0
@@ -84,8 +84,22 @@ define ['core/util'], (util) ->
 			@x = @savedX
 			@y = @savedY
 
+		toJSON: ->
+			# ugh surely there's a better way
+			x:	@x
+			y:	@y
+			name:	@name
+			wiggle:	@wiggle
+
+	vertexList = (vertices) ->
+		(new Vertex v.x, v.y, v.name, v.wiggle for v in vertices)
+
 	class Shape
-		constructor: (model, @vertices...) ->
+		constructor: (model, args) ->
+			@shape		= args.shape
+			@vertices	= args.vertices
+			@painted	= if args.painted? then args.painted else true
+
 			for vertex in @vertices
 				vertex.model	= model
 				vertex.shape	= this
@@ -94,21 +108,28 @@ define ['core/util'], (util) ->
 			@painted	= true
 
 		edgeIsInvisible: (v1, v2) ->
+			indexOfV1 = @vertices.indexOf v1
+			indexOfV2 = @vertices.indexOf v2
+
 			for edge in @invisibleEdges
-				if (edge[0] is v1 and edge[1] is v2) or (edge[1] is v1 and edge[0] is v2)
+				if (edge[0] is indexOfV1 and edge[1] is indexOfV2) or (edge[1] is indexOfV2 and edge[0] is indexOfV1)
 					return true
 			return false
 
 		toggleEdgeVisibility: ([v1, v2]) ->
+			v1Index	= @vertices.indexOf v1
+			v2Index = @vertices.indexOf v2
+
 			for edge in @invisibleEdges
-				if (edge[0] is v1 and edge[1] is v2) or (edge[1] is v1 and edge[0] is v2)
-					invisibleEdge = edge
-					break
+				if (edge[0] is v1Index and edge[1] is v2Index) or
+					(edge[1] is v1Index and edge[0] is v2Index)
+						invisibleEdge = edge
+						break
 
 			if invisibleEdge?
 				@invisibleEdges.remove invisibleEdge
 			else
-				@invisibleEdges.push [v1, v2]
+				@invisibleEdges.push [v1Index, v2Index]
 
 		saveVertices: ->
 			for vertex in @vertices
@@ -119,28 +140,24 @@ define ['core/util'], (util) ->
 				vertex.restorePosition()
 
 		toJSON: ->
-			vertices = []
-			for vertex in @vertices
-				vertices.push {x: vertex.x, y: vertex.y, name: vertex.name}
+			vertices:	(vertex.toJSON() for vertex in @vertices)
+			invisibleEdges:	@invisibleEdges
+			painted:	@painted
+			shape:		@shape
 
+		renderData: ->
 			visibleEdges = []
 			for vertexIndex in [0...@vertices.length]
 				v1 = @vertices[vertexIndex]
-				v2 = @vertices[(vertexIndex + 1) % @vertices.length]
+				v2 = @vertices[(vertexIndex+1) % @vertices.length]
 
 				unless @edgeIsInvisible v1, v2
-					visibleEdges.push [{
-						x: v1.x
-						y: v1.y
-					}, {
-						x: v2.x
-						y: v2.y
-					}]
+					visibleEdges.push [v1.toJSON(), v2.toJSON()]
 
 			return {
-				vertices:	vertices
-				visibleEdges:	visibleEdges
-				painted:	@painted
+				vertices: (vertex.toJSON() for vertex in @vertices)
+				visibleEdges: visibleEdges
+				painted: @painted
 			}
 
 		wiggle: ->
@@ -152,31 +169,47 @@ define ['core/util'], (util) ->
 				vertex.applyVertexConstraints()
 
 	class ns.Triangle extends Shape
-		constructor: (model) ->
-			super(
-				model,
-				new Vertex(0, -5),
-				new Vertex(4.33, 2.5),
-				new Vertex(-4.33, 2.5)
-			)
+		constructor: (model, args) ->
+			args or= {}
 
+			super model,
+				shape: "triangle"
+				vertices: vertexList(
+					args.vertices or [
+						{x: 0,		y: -5}
+						{x: 4.33,	y: 2.5}
+						{x: -4.33,	y: 2.5}
+					]
+				)
 
 	class ns.Quad extends Shape
-		constructor: (model) ->
-			super(
-				model,
-				new Vertex(-5, -5),
-				new Vertex(5, -5),
-				new Vertex(5, 5),
-				new Vertex(-5, 5)
-			)
+		constructor: (model, args) ->
+			args or= {}
+
+			super model,
+				shape: "quad"
+				vertices: vertexList(
+					args.vertices or [
+						{x: -5,	y: -5}
+						{x: 5,	y: -5}
+						{x: 5,	y: 5}
+						{x: -5,	y: 5}
+					]
+				)
 
 	class ns.Rectangle extends Shape
-		constructor: (model) ->
-			topLeft		= new Vertex(-5, -5)
-			topRight	= new Vertex(5, -5)
-			bottomRight	= new Vertex(5, 5)
-			bottomLeft	= new Vertex(-5, 5)
+		constructor: (model, args) ->
+			args or= {}
+
+			[topLeft, topRight, bottomRight, bottomLeft] =
+				vertexList(
+					args.vertices or [
+						{x: -5,	y: -5}
+						{x: 5,	y: -5}
+						{x: 5,	y: 5}
+						{x: -5,	y: 5}
+					]
+				)
 
 			topLeft.vertexConstraints = -> [
 				{vertex: topRight, y: @y}
@@ -198,6 +231,8 @@ define ['core/util'], (util) ->
 				{vertex: topLeft, x: @x}
 			]
 
-			super model, topLeft, topRight, bottomRight, bottomLeft
+			super model,
+				shape:		"rectangle"
+				vertices:	[topLeft, topRight, bottomRight, bottomLeft]
 
 	return ns

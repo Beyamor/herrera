@@ -31,6 +31,7 @@ define ['editor/models', 'editor/views', 'editor/views/variants', 'editor/views/
 
 		$('#save').click ->
 			data = gun.toJSON()
+			delete data.selectedVariant
 
 			$.ajax
 				url: "http://localhost:9000"
