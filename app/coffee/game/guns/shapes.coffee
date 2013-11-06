@@ -99,13 +99,11 @@ define ['core/util'], (util) ->
 			@shape		= args.shape
 			@vertices	= args.vertices
 			@painted	= if args.painted? then args.painted else true
+			@invisibleEdges	= if args.invisibleEdges? then args.invisibleEdges else []
 
 			for vertex in @vertices
 				vertex.model	= model
 				vertex.shape	= this
-
-			@invisibleEdges	= []
-			@painted	= true
 
 		edgeIsInvisible: (v1, v2) ->
 			indexOfV1 = @vertices.indexOf v1
@@ -173,29 +171,31 @@ define ['core/util'], (util) ->
 			args or= {}
 
 			super model,
-				shape: "triangle"
-				vertices: vertexList(
-					args.vertices or [
-						{x: 0,		y: -5}
-						{x: 4.33,	y: 2.5}
-						{x: -4.33,	y: 2.5}
-					]
-				)
+				_.extend args,
+					shape: "triangle"
+					vertices: vertexList(
+						args.vertices or [
+							{x: 0,		y: -5}
+							{x: 4.33,	y: 2.5}
+							{x: -4.33,	y: 2.5}
+						]
+					)
 
 	class ns.Quad extends Shape
 		constructor: (model, args) ->
 			args or= {}
 
 			super model,
-				shape: "quad"
-				vertices: vertexList(
-					args.vertices or [
-						{x: -5,	y: -5}
-						{x: 5,	y: -5}
-						{x: 5,	y: 5}
-						{x: -5,	y: 5}
-					]
-				)
+				_.extend args,
+					shape: "quad"
+					vertices: vertexList(
+						args.vertices or [
+							{x: -5,	y: -5}
+							{x: 5,	y: -5}
+							{x: 5,	y: 5}
+							{x: -5,	y: 5}
+						]
+					)
 
 	class ns.Rectangle extends Shape
 		constructor: (model, args) ->
@@ -232,7 +232,8 @@ define ['core/util'], (util) ->
 			]
 
 			super model,
-				shape:		"rectangle"
-				vertices:	[topLeft, topRight, bottomRight, bottomLeft]
+				_.extend args,
+					shape:		"rectangle"
+					vertices:	[topLeft, topRight, bottomRight, bottomLeft]
 
 	return ns
