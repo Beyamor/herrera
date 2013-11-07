@@ -102,10 +102,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 					centered: true
 					type: 'player'
 				
-				@speed = 800 #400
+				@speed = 400
 
 				@collisionHandlers =
-					wall: -> false #true
+					wall: -> true
 
 				@gun = new ns.Gun
 
