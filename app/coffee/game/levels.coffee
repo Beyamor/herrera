@@ -9,11 +9,15 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 		random = util.random
 
-		tryCreatingLayout = (desiredMainPathLength) ->
+		tryCreatingLayout = ({desiredMainPathLength:	desiredMainPathLength, \
+					desiredExtraRooms:	desiredExtraRooms}) ->
+
 			rooms		= util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
 			connections	= []
 
 			mainPathLength		= 0
+			extraRooms		= 0
+			extraRoomExtensions	= []
 			previousRoom		= null
 			previousDirection	= null
 
@@ -41,6 +45,8 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 				previousRoom = nextRoom
 				++mainPathLength
 
+				return nextRoom
+
 			startX = random.intInRange LEVEL_WIDTH
 			startY = random.intInRange LEVEL_HEIGHT
 			addToMainPath startX, startY, "start"
@@ -60,9 +66,37 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 				throw new Error "No candidates" if candidates.length is 0
 
-				candidate = random.any candidates
-				addToMainPath candidate.x, candidate.y, "regular"
+				candidate	= random.any candidates
+				room		= addToMainPath candidate.x, candidate.y, "regular"
 
+				isLastRoom = (mainPathLength == desiredMainPathLength)
+				unless isLastRoom
+					extraRoomExtensions.push room
+
+			while extraRooms < desiredExtraRooms
+				candidates = []
+				for room in extraRoomExtensions
+					for direction in util.DIRECTIONS
+						[dx, dy]	= util.directionToDelta direction
+						nextX		= room.x + dx
+						nextY		= room.y + dy
+
+						if isFree nextX, nextY
+							candidates.push  [nextX, nextY, room]
+
+				# could throw but really, who cares
+				break if candidates.length is 0
+
+				[nextX, nextY, fromRoom] = random.any candidates
+				rooms[nextX][nextY] = toRoom = {
+					x: nextX
+					y: nextY
+					type: "regular"
+				}
+
+				connections.push from: fromRoom, to: toRoom
+				extraRoomExtensions.push toRoom
+				++extraRooms
 
 			return {
 				rooms: rooms
@@ -79,7 +113,10 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 			while true
 				try
-					return tryCreatingLayout 3
+					return tryCreatingLayout
+						desiredMainPathLength: 3
+						desiredExtraRooms: 3
+
 				catch error
 					++attempts
 

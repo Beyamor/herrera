@@ -102,7 +102,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					centered: true
 					type: 'player'
 				
-				@speed = 400
+				@speed = 800 #400
 
 				@collisionHandlers =
 					wall: -> false #true
