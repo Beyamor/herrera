@@ -114,8 +114,8 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 			while true
 				try
 					return tryCreatingLayout
-						desiredMainPathLength: 3
-						desiredExtraRooms: 3
+						desiredMainPathLength: random.intInRange 8, 10
+						desiredExtraRooms: random.intInRange 3, 5
 
 				catch error
 					++attempts
