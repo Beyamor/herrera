@@ -7,12 +7,13 @@ define ['core/app', 'core/scenes', 'core/canvas', 'game/entities', 'core/cameras
 		class ns.PlayScene extends scenes.Scene
 			constructor: ->
 				super()
-				player = new Player 100, 100
-				@add player
 
-				level = new levels.Level
-				for e in (new levels.Reifier).reify(level)
+				level	= new levels.Level
+				reifier	= new levels.Reifier
+				for e in reifier.reify(level)
 					@add e
+
+				player = reifier.player
 
 				@camera = new cameras.EntityFollower player, @camera
 

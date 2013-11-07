@@ -16,7 +16,7 @@ define ['core/app'], (app) ->
 		for i in [0...width]
 			a.push []
 			for j in [0...height]
-				a[i].push if constructor then constructor() else null
+				a[i].push if constructor then constructor(i, j) else null
 
 		a.each = (f) ->
 			for i in [0...a.length]
@@ -92,8 +92,24 @@ define ['core/app'], (app) ->
 			return Math.sqrt dx*dx + dy*dy
 
 		random:
-			inRange: (min, max) -> min + Math.random() * (max - min)
-			intInRange: (min, max) -> Math.floor(@inRange min, max)
+			inRange: (args...) ->
+				if args.length is 2
+					[min, max] = args
+					return min + Math.random() * (max - min)
+				else if args.length is 1
+					[max] = args
+					return @inRange 0, max
+				else throw new Error "Bad arglength #{args.length}"
+
+			intInRange: (args...) ->
+				if args.length is 2
+					[min, max] = args
+					return Math.floor(@inRange min, max)
+				else if args.length is 1
+					[max] = args
+					return @intInRange 0, max
+				else throw new Error "Bad arglength #{args.length}"
+
 			angle: -> @inRange 0, 2 * Math.PI
 			any: (coll) -> coll[Math.floor(Math.random() * coll.length)]
 			coinFlip: -> Math.random() < 0.5

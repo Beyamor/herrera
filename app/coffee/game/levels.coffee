@@ -9,6 +9,38 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 		random = util.random
 
+		createLayout = ->
+			MAX_MAIN_PATH_LENGTH	= 3
+
+			rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
+
+			mainPathLength	= 0
+			lastRoom	= null
+
+			isFree = (x, y) ->
+				return false if x < 0 or x >= LEVEL_WIDTH or
+						y < 0 or y >= LEVEL_HEIGHT
+
+				return rooms[x][y] is null
+
+			addToMainPath = (x, y, type) ->
+				throw new Error "#{x}, #{y} isn't free" unless isFree x, y
+				rooms[x][y]	= {type: "start", exits: []}
+				lastRoom	= {x: x, y: y}
+				++mainPathLength
+
+			startX = random.intInRange LEVEL_WIDTH
+			startY = random.intInRange LEVEL_HEIGHT
+			addToMainPath startX, startY, "start"
+
+			return {
+				rooms: rooms
+				start: {
+					x: startX
+					y: startY
+				}
+			}
+
 		class Level
 			constructor: ->
 				@rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
@@ -21,117 +53,19 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 				@construct()
 
 			construct: ->
-				crossovers	= (Math.floor(Math.random() * LEVEL_HEIGHT) for i in [0...LEVEL_WIDTH])
-				@connections	= []
+				layout = createLayout()
 
-				# assuming the player always starts at (0,0)
-				for j in [0...crossovers[0]]
-					@rooms[0][j+1] or= new RegularRoom 0, j+1
-					@connections.push {from: @rooms[0][j], to: @rooms[0][j+1], direction: "south"}
+				@start = layout.start
 
-				for i in [1...LEVEL_WIDTH]
-					crossover	= crossovers[i]
-					prevCrossover	= crossovers[i-1]
+				@rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT, (i, j) ->
+					room = layout.rooms[i][j]
+					if room?
+						roomClass = switch room.type
+							when "start"
+								StartRoom
 
-					@rooms[i][crossover] or= new RegularRoom i, crossover
-
-					@rooms[i][prevCrossover] or= new RegularRoom i, prevCrossover
-					@connections.push {
-						from: @rooms[i-1][prevCrossover],
-						to: @rooms[i][prevCrossover],
-						direction: "east"
-					}
-
-					unused = [0...LEVEL_HEIGHT]
-					unused.remove crossover
-
-					for j in [prevCrossover...crossover]
-						unused.remove j
-
-						@rooms[i][j] or= new RegularRoom i, j
-
-						if prevCrossover < crossover
-							@rooms[i][j+1] or= new RegularRoom i, j+1
-							@connections.push {from: @rooms[i][j], to: @rooms[i][j+1], direction: "south"}
-						else
-							@rooms[i][j-1] or= new RegularRoom i,j-1
-							@connections.push {from: @rooms[i][j], to: @rooms[i][j-1], direction: "north"}
-
-				for {from: from, to: to, direction: direction} in @connections
-					from.addExit direction
-					to.addEntrance util.oppositeDirection(direction)
-
-				@rooms.each (_, _, room) ->
-					room.finalize() if room and room.finalize?
-
-				for {from: from, to: to, direction: direction} in @connections
-					exit		= from.exits[direction]
-					entrance	= to.entrance
-
-					path = []
-					switch direction
-						when "south"
-							middleY = @levelY(to, -1)
-
-							for y in [@levelY(from, exit.y+1)...middleY]
-								path.push [@levelX(from, exit.x), y]
-
-							for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
-								path.push [x, middleY]
-
-							for y in [@levelY(to, entrance.y-1)...middleY]
-								path.push [@levelX(to, entrance.x), y]
-
-						when "north"
-							middleY = @levelY(from, -1)
-
-							for y in [@levelY(from, exit.y-1)...middleY]
-								path.push [@levelX(from, exit.x), y]
-
-							for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
-								path.push [x, middleY]
-
-							for y in [@levelY(to, entrance.y+1)...middleY]
-								path.push [@levelX(to, entrance.x), y]
-
-						when "east"
-							middleX = @levelX(to, -1)
-
-							for x in [@levelX(from, exit.x+1)...middleX]
-								path.push [x, @levelY(from, exit.y)]
-
-							for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
-								path.push [middleX, y]
-
-							for x in [@levelX(to, entrance.x-1)...middleX]
-								path.push [x, @levelY(to, entrance.y)]
-
-						when "west"
-							middleX = @levelX(from, -1)
-
-							for x in [@levelX(from, exit.x-1)...middleX]
-								path.push [x, @levelY(from, exit.y)]
-
-							for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
-								path.push [middleX, y]
-
-							for x in [@levelX(to, entrance.x+1)...middleX]
-								path.push [x, @levelY(to, entrance.y)]
-
-
-					for [tileX, tileY] in path
-						@tiles[tileX][tileY] = "."
-
-						for neighbourX in [tileX-1..tileX+1]
-							for neighbourY in [tileY-1..tileY+1]
-								continue if neighbourX < 0 or
-										neighbourX >= LEVEL_WIDTH * (ROOM_WIDTH + 1) or
-										neighbourY < 0 or
-										neighbourY >= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
-
-								existingTile = @existingTile neighbourX, neighbourY
-								if (not existingTile) or (existingTile is " ")
-									@tiles[neighbourX][neighbourY] = "W"
+						return new roomClass i, j
+						
 
 			existingTile: (tileX, tileY) ->
 				tile = null
@@ -211,6 +145,11 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 					entity = @reifyEntity tileX, tileY, tile
 					if entity
 						es.push entity
+
+				startRoom	= level.rooms[level.start.x][level.start.y]
+				@player		= new entities.Player 100, 100
+				es.push @player
+				@addRoomOffset startRoom, @player
 
 				return es
 
