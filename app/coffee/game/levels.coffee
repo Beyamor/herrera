@@ -9,9 +9,7 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 		random = util.random
 
-		createLayout = ->
-			desiredMainPathLength	= 3
-
+		tryCreatingLayout = (desiredMainPathLength) ->
 			rooms		= util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
 			connections	= []
 
@@ -74,6 +72,20 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 					y: startY
 				}
 			}
+
+		createLayout = ->
+			attempts	= 0
+			maxAttempts	= 10
+
+			while true
+				try
+					return tryCreatingLayout 3
+				catch error
+					++attempts
+
+					if attempts >= maxAttempts
+						alert "Whoa, couldn't create a level"
+						throw new Error "Couldn't create layout"
 
 		class Level
 			constructor: ->
