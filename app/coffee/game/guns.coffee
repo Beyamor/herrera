@@ -77,17 +77,14 @@ define ['core/util', 'core/app', 'core/canvas', 'game/guns/models', 'game/guns/s
 				@canvas.clear()
 				context = @canvas.context
 
-				left = (1 - gun.capacity / gun.maxCapacity) * 100
-				context.beginPath()
-				context.moveTo left, 0
-				context.lineTo 100, 0
-				context.lineTo 100, 20
-				context.lineTo left - 15, 20
-				context.fill()
-
-				context.beginPath()
-				context.rect 0, 0, 100, 20
-				context.stroke()
+				width = Math.floor (100 / gun.maxCapacity)
+				for i in [0...Math.floor(gun.capacity)]
+					context.beginPath()
+					context.rect 100 - (i + 1) * width, 0, width, 20
+					context.fillStyle = "#FACB0F"
+					context.fill()
+					context.strokeStyle	= "black"
+					context.stroke()
 
 				@canvas.renderTo @hud, @hud.width - 100, 0
 
