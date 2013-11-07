@@ -10,12 +10,14 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 		random = util.random
 
 		createLayout = ->
-			MAX_MAIN_PATH_LENGTH	= 3
+			desiredMainPathLength	= 3
 
-			rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
+			rooms		= util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
+			connections	= []
 
-			mainPathLength	= 0
-			lastRoom	= null
+			mainPathLength		= 0
+			previousRoom		= null
+			previousDirection	= null
 
 			isFree = (x, y) ->
 				return false if x < 0 or x >= LEVEL_WIDTH or
@@ -25,16 +27,48 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 			addToMainPath = (x, y, type) ->
 				throw new Error "#{x}, #{y} isn't free" unless isFree x, y
-				rooms[x][y]	= {type: "start", exits: []}
-				lastRoom	= {x: x, y: y}
+
+				nextRoom = {
+					x: x
+					y: y
+					type: type
+				}
+				rooms[x][y] = nextRoom
+
+				if previousRoom?
+					connections.push
+						from: previousRoom
+						to: nextRoom
+
+				previousRoom = nextRoom
 				++mainPathLength
 
 			startX = random.intInRange LEVEL_WIDTH
 			startY = random.intInRange LEVEL_HEIGHT
 			addToMainPath startX, startY, "start"
 
+			while mainPathLength < desiredMainPathLength
+
+				candidates = []
+				for direction in util.DIRECTIONS
+					[dx, dy]	= util.directionToDelta direction
+					nextX		=  previousRoom.x + dx
+					nextY		=  previousRoom.y + dy
+
+					if isFree nextX, nextY
+						candidates.push
+							x: nextX
+							y: nextY
+
+				throw new Error "No candidates" if candidates.length is 0
+
+				candidate = random.any candidates
+				addToMainPath candidate.x, candidate.y, "regular"
+
+
 			return {
 				rooms: rooms
+				connections: connections
 				start: {
 					x: startX
 					y: startY
@@ -44,7 +78,6 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 		class Level
 			constructor: ->
 				@rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT
-				@rooms[0][0] = new StartRoom 0, 0
 
 				tileWidth	= LEVEL_WIDTH * (ROOM_WIDTH + 1)
 				tileHeight	= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
@@ -57,15 +90,107 @@ define ['game/entities', 'game/entities/statics', 'core/util', 'game/consts', 'g
 
 				@start = layout.start
 
+				# create rooms
 				@rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT, (i, j) ->
 					room = layout.rooms[i][j]
 					if room?
 						roomClass = switch room.type
-							when "start"
-								StartRoom
+							when "start"	then StartRoom
+							when "regular"	then RegularRoom
 
 						return new roomClass i, j
-						
+
+				# set connections between them
+				@connections = []
+				for {from: from, to: to} in layout.connections
+					dx		= to.x - from.x
+					dy		= to.y - from.y
+					direction	= util.deltaToDirection dx, dy
+					fromRoom	= @rooms[from.x][from.y]
+					toRoom		= @rooms[to.x][to.y]
+
+					fromRoom.addExit direction
+					toRoom.addEntrance util.oppositeDirection direction
+
+					@connections.push
+						from: fromRoom
+						to: toRoom
+						direction: direction
+
+				# finalize the rooms
+				@rooms.each (_, _, room) ->
+					room.finalize() if room and room.finalize?
+
+				# and build the connections
+				for {from: from, to: to, direction: direction} in @connections
+                                        exit		= from.exits[direction]
+                                        entrance        = to.entrance
+
+                                        path = []
+                                        switch direction
+                                                when "south"
+                                                        middleY = @levelY(to, -1)
+
+                                                        for y in [@levelY(from, exit.y+1)...middleY]
+                                                                path.push [@levelX(from, exit.x), y]
+
+                                                        for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
+                                                                path.push [x, middleY]
+
+                                                        for y in [@levelY(to, entrance.y-1)...middleY]
+                                                                path.push [@levelX(to, entrance.x), y]
+
+                                                when "north"
+                                                        middleY = @levelY(from, -1)
+
+                                                        for y in [@levelY(from, exit.y-1)...middleY]
+                                                                path.push [@levelX(from, exit.x), y]
+
+                                                        for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
+                                                                path.push [x, middleY]
+
+                                                        for y in [@levelY(to, entrance.y+1)...middleY]
+                                                                path.push [@levelX(to, entrance.x), y]
+
+                                                when "east"
+                                                        middleX = @levelX(to, -1)
+
+                                                        for x in [@levelX(from, exit.x+1)...middleX]
+                                                                path.push [x, @levelY(from, exit.y)]
+
+                                                        for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
+                                                                path.push [middleX, y]
+
+                                                        for x in [@levelX(to, entrance.x-1)...middleX]
+                                                                path.push [x, @levelY(to, entrance.y)]
+
+                                                when "west"
+                                                        middleX = @levelX(from, -1)
+
+                                                        for x in [@levelX(from, exit.x-1)...middleX]
+                                                                path.push [x, @levelY(from, exit.y)]
+
+                                                        for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
+                                                                path.push [middleX, y]
+
+                                                        for x in [@levelX(to, entrance.x+1)...middleX]
+                                                                path.push [x, @levelY(to, entrance.y)]
+
+
+                                        for [tileX, tileY] in path
+                                                @tiles[tileX][tileY] = "."
+
+                                                for neighbourX in [tileX-1..tileX+1]
+                                                        for neighbourY in [tileY-1..tileY+1]
+                                                                continue if neighbourX < 0 or
+                                                                                neighbourX >= LEVEL_WIDTH * (ROOM_WIDTH + 1) or
+                                                                                neighbourY < 0 or
+                                                                                neighbourY >= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
+
+                                                                existingTile = @existingTile neighbourX, neighbourY
+                                                                if (not existingTile) or (existingTile is " ")
+                                                                        @tiles[neighbourX][neighbourY] = "W"
+
 
 			existingTile: (tileX, tileY) ->
 				tile = null

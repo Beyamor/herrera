@@ -185,4 +185,23 @@ define ['core/app'], (app) ->
 		oppositeDirection: (direction) ->
 			@DIRECTIONS[(@DIRECTIONS.indexOf(direction) + 2) % @DIRECTIONS.length]
 
+		deltaToDirection: (dx, dy) ->
+			if dx < 0 and dy is 0
+				"west"
+			else if dx > 0 and dy is 0
+				"east"
+			else if dy < 0 and dx is 0
+				"north"
+			else if dy > 0 and dx is 0
+				"south"
+			else
+				throw new Error "Unconvertible delta #{dx}, #{dy}"
+
+		directionToDelta: (direction) ->
+			switch direction
+				when "north" then [0, -1]
+				when "south" then [0, 1]
+				when "east" then [1, 0]
+				when "west" then [-1, 0]
+				else throw new Error "Unknown direction #{direction}"
 	}
