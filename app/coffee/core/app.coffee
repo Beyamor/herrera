@@ -43,7 +43,7 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			@canvas = new cnvs.Canvas {
 				width: @width
 				height: @height
-				clearColor: (opts.clearColor or 'white')
+				backgroundColor: (opts.backgroundColor or 'white')
 			}
 			@container.append @canvas.$el
 

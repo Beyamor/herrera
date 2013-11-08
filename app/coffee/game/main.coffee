@@ -34,6 +34,6 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		width: 800
 		height: 600
 		id: 'game'
-		clearColor: 'black'
+		backgroundColor: 'black'
 		init: ->
 			app.scene = new play.PlayScene

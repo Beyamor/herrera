@@ -6,8 +6,8 @@ define ->
 			@el = @$el[0]
 			@context = @el.getContext '2d'
 
-			if opts.clearColor
-				@$el.css 'background-color', opts.clearColor
+			if opts.backgroundColor
+				@$el.css 'background-color', opts.backgroundColor
 
 			opts.width or= @$el.width()
 			opts.height or= @$el.height()

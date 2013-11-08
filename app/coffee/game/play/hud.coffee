@@ -6,7 +6,6 @@ define ['core/canvas'], (canvas) ->
 			@canvas = new canvas.Canvas {
 				width: 100
 				height: 20
-				clearColor: 'black'
 			}
 
 			context = @canvas.context
