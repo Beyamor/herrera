@@ -40,7 +40,7 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 				@dirty = true
 			return this
 
-		drawToCanvas: ->
+		draw: ->
 			# implement in subclasses
 
 		prerender: ->
@@ -54,7 +54,7 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			if @rotation isnt 0
 				context.rotate @rotation
 
-			@drawToCanvas()
+			@draw context
 			context.restore()
 			@dirty = false
 
@@ -81,7 +81,6 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 				height: @img.height
 			}, args
 					
-		drawToCanvas: ->
-			context = @canvas.context
+		draw: (context) ->
 			context.drawImage @img, -@origin.x, -@origin.y
 	return ns
