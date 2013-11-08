@@ -51,6 +51,7 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 					for {type: type, pos: tilePos} in entityDescriptions
 						entityClass = switch type
 							when "enemy" then entities.Silverfish
+							when "portal" then staticEntities.Portal
 
 						entity = new entityClass(
 							(tilePos.x + 0.5) * TILE_WIDTH,

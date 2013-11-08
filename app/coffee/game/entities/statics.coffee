@@ -1,6 +1,5 @@
-define ['core/app', 'core/entities',
-	'core/graphics', 'core/util',
-	'game/consts', 'core/canvas'],
+define ['core/app', 'core/entities', 'core/graphics',
+	'core/util', 'game/consts', 'core/canvas'],
 	(app, entities, gfx, util, consts, canvas) ->
 		ns = {}
 
@@ -106,4 +105,18 @@ define ['core/app', 'core/entities',
 					layer: 300
 					static: true
 
+		class ns.Portal extends Entity
+			constructor: (x, y) ->
+				super
+					x: x
+					y: y
+					centered: true
+					graphic: (new gfx.Image 'portal-sprite', centered: true)
+					layer: 100
+					static: true
+
+				play = require 'game/play'
+				@collisionHandlers =
+					player: ->
+						app.scene = new play.PlayScene
 		return ns

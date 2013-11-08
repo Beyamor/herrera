@@ -1,10 +1,8 @@
 define ['core/app', 'core/scenes', 'core/canvas',
-	'game/entities', 'core/cameras', 'game/levels',
+	'core/cameras', 'game/levels',
 	'game/levels/reification', 'game/play/hud'],
-	(app, scenes, canvas, entities, cameras, levels, levelReification, hud) ->
+	(app, scenes, canvas, cameras, levels, levelReification, hud) ->
 		ns = {}
-
-		Player = entities.Player
 
 		class ns.PlayScene extends scenes.Scene
 			constructor: ->

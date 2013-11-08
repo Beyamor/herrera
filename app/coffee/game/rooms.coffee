@@ -330,4 +330,11 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@tiles[x][y] = "."
 			@exits[direction] = {x: x, y: y}
 
+		entities: -> [
+				type: "portal"
+				pos:
+					x: 2
+					y: 2
+		]
+
 	return ns
