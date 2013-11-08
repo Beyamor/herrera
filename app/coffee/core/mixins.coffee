@@ -8,6 +8,9 @@ define ['core/util'], (util) ->
 
 		mixins[name] = mixin
 
+	ns.defineAll = (specs) ->
+		ns.define(name, mixin) for name, mixin of specs
+
 	ns.realize = (name, arg) ->
 		mixin = mixins[name]
 		throw new Error "Uknown mixin #{name}" unless mixin?
