@@ -52,8 +52,8 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 
 			@createRandom: ->
 				new ns.GunModel {
-					capacity: random.intInRange 1, 20
-					firingRate: random.inRange 0.1, 10
+					capacity: random.intInRange 10, 20
+					firingRate: random.inRange 5, 20
 					rechargeDelay: 0.5
 					rechargeSpeed: random.inRange 0.5, 3
 				}
