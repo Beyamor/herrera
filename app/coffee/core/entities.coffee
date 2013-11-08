@@ -1,4 +1,4 @@
-define ['core/app', 'core/util'], (app, util) ->
+define ['core/app', 'core/util', 'core/mixins'], (app, util, mixins) ->
 	ns = {}
 
 	CELL_WIDTH = CELL_HEIGHT = 200
@@ -15,8 +15,11 @@ define ['core/app', 'core/util'], (app, util) ->
 			@collisionHandlers	= {}
 			@type			= args.type
 			@static			= args.static
+			@mixins			= if args.mixins? then mixins.realizeAll args.mixins else []
 
 			@center() if args.centered?
+
+			mixin.initialize.call(this) for mixin in @mixins when mixin.initialize?
 
 		center: ->
 			@offset.x = -@width * 0.5
@@ -74,6 +77,8 @@ define ['core/app', 'core/util'], (app, util) ->
 				for type, handler of @collisionHandlers
 					collision = @collide type, @pos.x, @pos.y
 					handler(collision) if collision
+
+			mixin.update.call(this) for mixin in @mixins when mixin.update?
 			
 		render: ->
 			return unless @graphic and @scene and @scene.camera

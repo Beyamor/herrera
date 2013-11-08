@@ -1,8 +1,10 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
-	'game/consts', 'game/guns/sprites', 'game/entities/graphics'],
-	(app, entities, gfx, input, particles, util, bt, behaviours, guns, consts, gunSprites, entityGfx) ->
+	'game/consts', 'game/guns/sprites', 'game/entities/graphics',
+	'game/mixins'],
+	(app, entities, gfx, input, particles, util, bt, behaviours, \
+	guns, consts, gunSprites, entityGfx, gameMixins) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -63,9 +65,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 					width: 8
 					layer: 100
 					centered: true
-
-				@vel.x = speed * Math.cos direction
-				@vel.y = speed * Math.sin direction
+					mixins:
+						straightMover:
+							speed: speed
+							direction: direction
 
 				@graphic.rotate(direction).centerOrigin()
 
@@ -268,22 +271,20 @@ define ['core/app', 'core/entities', 'core/graphics',
 					y: y
 					graphic: new entityGfx.DamageCounterSprite damage
 					layer: -50
+					mixins:
+						straightMover:
+							speed: 20
+							direction: random.angle()
 				}
 
 				@elapsed = 0
 
-				direction = random.angle()
-
-				@vx = Math.cos(direction) * 20
-				@vy = Math.sin(direction) * 20
-
 			update: ->
+				super()
+
 				@elapsed += app.elapsed
 
 				if @elapsed > 0.25 and @scene
 					@scene.remove this
-
-				@x += @vx * app.elapsed
-				@y += @vy * app.elapsed
 
 		return ns
