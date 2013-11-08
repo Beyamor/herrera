@@ -1,8 +1,8 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
-	'game/consts', 'core/canvas', 'game/guns/sprites'],
-	(app, entities, gfx, input, particles, util, bt, behaviours, guns, consts, canvas, gunSprites) ->
+	'game/consts', 'game/guns/sprites', 'game/entities/graphics'],
+	(app, entities, gfx, input, particles, util, bt, behaviours, guns, consts, gunSprites, entityGfx) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -245,6 +245,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 			hit: (damage) ->
 				@hp -= damage
 
+				@scene.add new ns.DamageCounter @x, @y, damage
+
 				if @hp <= 0
 					loot = new ns.Gun
 					loot.x = @x
@@ -256,5 +258,30 @@ define ['core/app', 'core/entities', 'core/graphics',
 				else
 					@escaping	= true
 					@escapingPoint	= {x: @x, y: @y}
+
+		class ns.DamageCounter extends Entity
+			constructor: (x, y, damage) ->
+				super {
+					x: x
+					y: y
+					graphic: new entityGfx.DamageCounterSprite damage
+					layer: -50
+				}
+
+				@elapsed = 0
+
+				direction = random.angle()
+
+				@vx = Math.cos(direction) * 20
+				@vy = Math.sin(direction) * 20
+
+			update: ->
+				@elapsed += app.elapsed
+
+				if @elapsed > 0.25 and @scene
+					@scene.remove this
+
+				@x += @vx * app.elapsed
+				@y += @vy * app.elapsed
 
 		return ns
