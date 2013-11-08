@@ -113,10 +113,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 				super()
 
 				dx = dy = 0
-				dx += 1 if input.isDown 'right'
-				dx -= 1 if input.isDown 'left'
-				dy += 1 if input.isDown 'down'
-				dy -= 1 if input.isDown 'up'
+				dx += 1 if input.isDown 'walkRight'
+				dx -= 1 if input.isDown 'walkLeft'
+				dy += 1 if input.isDown 'walkDown'
+				dy -= 1 if input.isDown 'walkUp'
 
 				if dx isnt 0 and dy isnt 0
 					dx *= Math.SQRT1_2
@@ -127,11 +127,27 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 				if @gun
 					@gun.update()
-					if input.isDown 'shoot'
+
+					dx = 0
+					dy = 0
+					tryingToShoot = false
+
+					if input.isDown 'aimUp'
+						dy -= 1
+						tryingToShoot = true
+					if input.isDown 'aimDown'
+						dy += 1
+						tryingToShoot = true
+					if input.isDown 'aimRight'
+						dx += 1
+						tryingToShoot = true
+					if input.isDown 'aimLeft'
+						dx -= 1
+						tryingToShoot = true
+
+					if tryingToShoot
 							if @gun.tryShooting()
-								dx = input.mouseX - @pos.x + @scene.camera.x
-								dy = input.mouseY - @pos.y + @scene.camera.y
-								shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2 dy, dx
+								shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2(dy, dx)
 								@scene.add shot
 
 				if input.pressed 'grab'

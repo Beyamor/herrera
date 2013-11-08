@@ -19,11 +19,14 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 	]
 
 	input.define
-		up: 87
-		down: 83
-		left: 65
-		right: 68
-		shoot: 'mouse-left'
+		walkUp: 87
+		walkDown: 83
+		walkLeft: 65
+		walkRight: 68
+		aimUp: 38
+		aimDown: 40
+		aimLeft: 37
+		aimRight: 39
 		grab: 69
 
 	app.launch
