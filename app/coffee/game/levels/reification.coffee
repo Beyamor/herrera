@@ -45,7 +45,7 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 							es.push entity
 
 					numberOfEnemies = random.intInRange(2, 5)
-					for {x: tileX, y: tileY} in room.enemies numberOfEnemies
+					for {x: tileX, y: tileY} in room.enemyPositions numberOfEnemies
 						enemy = new entities.Silverfish(
 							(tileX + 0.5) * TILE_WIDTH,
 							(tileY + 0.5) * TILE_HEIGHT
