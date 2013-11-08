@@ -273,10 +273,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 					layer: -50
 					mixins:
 						straightMover:
-							speed: random.inRange 50, 80
-							direction: random.angle()
+							speed: [50, 80]
+							direction: [0, 2 * Math.PI]
 
-						lifespan: random.inRange 0.2, 0.3
+						lifespan: [0.2, 0.3]
 				}
 
 		return ns

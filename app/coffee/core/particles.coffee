@@ -1,11 +1,7 @@
 define ['core/graphics', 'core/app', 'core/util'], (gfx, app, util) ->
 	ns = {}
 
-	realizeArg = (arg) ->
-		if Array.isArray arg
-			arg[0] + Math.random() * (arg[1] - arg[0])
-		else
-			arg
+	realizeArg = util.realizeArg
 
 	class ns.Particle
 		constructor: (args, @target, @camera) ->

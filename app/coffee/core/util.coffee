@@ -204,4 +204,10 @@ define ['core/app'], (app) ->
 				when "east" then [1, 0]
 				when "west" then [-1, 0]
 				else throw new Error "Unknown direction #{direction}"
+
+		realizeArg: (arg) ->
+			if Array.isArray arg
+				arg[0] + Math.random() * (arg[1] - arg[0])
+			else
+				arg
 	}
