@@ -72,7 +72,7 @@ define ['core/app'], (app) ->
 
 		return newInstance
 
-	return {
+	util = {
 		sign: (x) -> (x > 0) - (x < 0)
 
 		aabbsIntersect: (a, b) ->
@@ -98,19 +98,19 @@ define ['core/app'], (app) ->
 					return min + Math.random() * (max - min)
 				else if args.length is 1
 					[max] = args
-					return @inRange 0, max
+					return util.random.inRange 0, max
 				else throw new Error "Bad arglength #{args.length}"
 
 			intInRange: (args...) ->
 				if args.length is 2
 					[min, max] = args
-					return Math.floor(@inRange min, max)
+					return Math.floor(util.random.inRange min, max)
 				else if args.length is 1
 					[max] = args
-					return @intInRange 0, max
+					return util.random.intInRange 0, max
 				else throw new Error "Bad arglength #{args.length}"
 
-			angle: -> @inRange 0, 2 * Math.PI
+			angle: -> util.random.inRange 0, 2 * Math.PI
 			any: (coll) -> coll[Math.floor(Math.random() * coll.length)]
 			coinFlip: -> Math.random() < 0.5
 
@@ -118,7 +118,7 @@ define ['core/app'], (app) ->
 			x and typeof(x) is "function"
 
 		thunkWrap: (x) ->
-			if @isFunction(x) then x else -> x
+			if util.isFunction(x) then x else -> x
 
 		copy: copy
 
@@ -183,7 +183,7 @@ define ['core/app'], (app) ->
 		DIRECTIONS: ["north", "east", "south", "west"]
 
 		oppositeDirection: (direction) ->
-			@DIRECTIONS[(@DIRECTIONS.indexOf(direction) + 2) % @DIRECTIONS.length]
+			util.DIRECTIONS[(util.DIRECTIONS.indexOf(direction) + 2) % util.DIRECTIONS.length]
 
 		deltaToDirection: (dx, dy) ->
 			if dx < 0 and dy is 0
@@ -211,3 +211,5 @@ define ['core/app'], (app) ->
 			else
 				arg
 	}
+
+	return util

@@ -30,4 +30,12 @@ define ['core/mixins', 'core/app', 'core/util'],
 					if @vel.x isnt 0 or @vel.y isnt 0
 						@graphic.rotate Math.atan2(@vel.y, @vel.x)
 
+			updates: (thingsToUpdate) ->
+				thingsToUpdate = _.map thingsToUpdate, util.thunkWrap
+
+				update: ->
+					for thingThunk in thingsToUpdate
+						thing = thingThunk.call(this)
+						thing.update() if thing?
+
 		return ns

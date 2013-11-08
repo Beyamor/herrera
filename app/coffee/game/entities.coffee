@@ -21,11 +21,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 					layer: 150
 					type: 'gun'
 					centered: true
+					mixins:
+						updates: [
+							@model
+						]
 				}
-
-			update: ->
-				super()
-				@model.update()
 
 			tryShooting: ->
 				@model.tryShooting()
@@ -105,6 +105,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 					width: 36
 					centered: true
 					type: 'player'
+					mixins:
+						updates: [
+							-> @gun
+						]
 				
 				@speed = 400
 
@@ -130,8 +134,6 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@vel.y = dy * @speed
 
 				if @gun
-					@gun.update()
-
 					dx = 0
 					dy = 0
 					tryingToShoot = false
@@ -178,6 +180,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 					type: 'hittable'
 					mixins:
 						rotateGraphicToVel: true
+						updates: [
+							-> @behaviour
+						]
 
 				@hp = 30
 
@@ -240,11 +245,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 				)
 
 			update: ->
-				super()
-
 				@player = @scene.entities.first "player"
-
-				@behaviour.update()
+				super()
 
 			hit: ({damage: damage, source: source}) ->
 				@hp -= damage
