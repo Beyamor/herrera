@@ -273,18 +273,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 					layer: -50
 					mixins:
 						straightMover:
-							speed: 20
+							speed: random.inRange 50, 80
 							direction: random.angle()
+
+						lifespan: random.inRange 0.2, 0.3
 				}
-
-				@elapsed = 0
-
-			update: ->
-				super()
-
-				@elapsed += app.elapsed
-
-				if @elapsed > 0.25 and @scene
-					@scene.remove this
 
 		return ns
