@@ -18,12 +18,18 @@ define ['core/app', 'core/util', 'core/ai/bt'], (app, util, bt) ->
 		target		= util.thunkWrap target
 		speed		= args.speed or 200
 		minDistance	= args.minDistance
+		timeout		= args.timeout
+		elapsed		= 0
 
 		begin: ->
 		update: ->
 			if minDistance?
 				distance = util.distanceBetween entity, target()
 				return bt.SUCCESS if distance >= minDistance
+
+			if timeout?
+				elapsed += app.elapsed
+				return bt.SUCCESS if elapsed >= timeout
 
 			direction = util.directionFrom target(), entity
 

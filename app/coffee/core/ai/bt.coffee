@@ -131,4 +131,57 @@ define ['core/app', 'core/util'], (app, util) ->
 				@hasChecked = true
 				return result
 
+	ns.seq = (children...) ->
+		begin: ->
+			@index		= 0
+			@pendingBegin	= true
+
+		update: ->
+			if @pendingBegin
+				children[@index].begin()
+				@pendingBegin = false
+
+			result = children[@index].update()
+
+			switch result
+				when SUCCESS
+					++@index
+					if @index >= children.length
+						SUCCESS
+					else
+						@pendingBegin = true
+						RUNNING
+
+				when FAILURE
+					FAILURE
+
+				else
+					RUNNING
+
+	ns.cb = (cb) ->
+		begin: ->
+
+		update: ->
+			cb()
+			return SUCCESS
+
+	ns.test = (test) ->
+		begin: ->
+
+		update: ->
+			if test()
+				SUCCESS
+			else
+				FAILURE
+
+	ns.or = (tests...) ->
+		begin: ->
+			test.begin() for test in tests
+
+		update: ->
+			for test in tests
+				result = test.update()
+				return SUCCESS if result is SUCCESS
+			return FAILURE
+
 	return ns

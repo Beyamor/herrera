@@ -201,9 +201,22 @@ define ['core/app', 'core/entities', 'core/graphics',
 						bt.cond(
 							bt.checkOnce(
 								behaviours.closeTo(this, (=> @player), 50)),
-							behaviours.flee(this, (=> @player),
-								speed: 425
-								minDistance: 150
+							bt.seq(
+								behaviours.flee(this, (=> @player),
+									speed: 425
+									minDistance: 150
+								)
+							)
+						),
+						bt.cond(
+							bt.test(=> @escaping),
+							bt.seq(
+								behaviours.flee(this, (=> @escapingPoint),
+									speed: 425
+									minDistance: 150
+									timeout: 1
+								),
+								bt.cb(=> @escaping = false)
 							)
 						),
 						bt.loop(
@@ -237,5 +250,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 					@scene.add loot
 
 					@scene.remove(this) if @scene
+
+				@escaping	= true
+				@escapingPoint	= {x: @x, y: @y}
 
 		return ns
