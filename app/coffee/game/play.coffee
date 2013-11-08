@@ -1,5 +1,7 @@
-define ['core/app', 'core/scenes', 'core/canvas', 'game/entities', 'core/cameras', 'game/levels', 'game/play/hud'],
-	(app, scenes, canvas, entities, cameras, levels, hud) ->
+define ['core/app', 'core/scenes', 'core/canvas',
+	'game/entities', 'core/cameras', 'game/levels',
+	'game/levels/reification', 'game/play/hud'],
+	(app, scenes, canvas, entities, cameras, levels, levelReification, hud) ->
 		ns = {}
 
 		Player = entities.Player
@@ -9,7 +11,7 @@ define ['core/app', 'core/scenes', 'core/canvas', 'game/entities', 'core/cameras
 				super()
 
 				level	= new levels.Level
-				reifier	= new levels.Reifier
+				reifier	= new levelReification.Reifier
 				for e in reifier.reify(level)
 					@add e
 
