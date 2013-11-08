@@ -17,15 +17,14 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			y = point.y - camera.y
 			target.context.drawImage @canvas.el, x, y
 
-	class ns.Image
-		constructor: (src, args) ->
-			@img		= app.assets.get src
-			@canvas		= new Canvas width: @img.width, height: @img.height
+	class ns.StandardGraphic
+		constructor: (args) ->
+			@canvas		= new Canvas width: args.width, height: args.height
 			@origin		= x: 0, y: 0
 			@rotation	= 0
 			@dirty		= true
-			@width		= @img.width
-			@height		= @img.height
+			@width		= @canvas.width
+			@height		= @canvas.height
 
 			@centerOrigin() if args? and args.centered?
 
@@ -41,6 +40,9 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 				@dirty = true
 			return this
 
+		drawToCanvas: ->
+			# implement in subclasses
+
 		prerender: ->
 			# I kinda feeel like this is wrong,
 			# but who cares whatever
@@ -52,7 +54,7 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 			if @rotation isnt 0
 				context.rotate @rotation
 
-			context.drawImage @img, -@origin.x, -@origin.y
+			@drawToCanvas()
 			context.restore()
 			@dirty = false
 
@@ -70,4 +72,16 @@ define ['core/app', 'core/canvas'], (app, cnvs) ->
 
 			target.context.drawImage @canvas.el, x, y
 
+	class ns.Image extends ns.StandardGraphic
+		constructor: (src, args) ->
+			@img = app.assets.get src
+
+			super _.extend {
+				width: @img.width
+				height: @img.height
+			}, args
+					
+		drawToCanvas: ->
+			context = @canvas.context
+			context.drawImage @img, -@origin.x, -@origin.y
 	return ns
