@@ -89,7 +89,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 					hittable: (hittable) =>
 						@scene.remove this if @scene
-						hittable.hit(@damage)
+						hittable.hit
+							source: this
+							damage: @damage
 						return true
 
 		class ns.Player extends Entity
@@ -242,7 +244,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				if @vel.x isnt 0 or @vel.y isnt 0
 					@graphic.rotate Math.atan2(@vel.y, @vel.x)
 
-			hit: (damage) ->
+			hit: ({damage: damage, source: source}) ->
 				@hp -= damage
 
 				@scene.add new ns.DamageCounter @x, @y, damage
@@ -257,7 +259,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 				else
 					@escaping	= true
-					@escapingPoint	= {x: @x, y: @y}
+					@escapingPoint	= {x: source.x, y: source.y}
 
 		class ns.DamageCounter extends Entity
 			constructor: (x, y, damage) ->
