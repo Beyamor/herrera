@@ -25,4 +25,9 @@ define ['core/mixins', 'core/app', 'core/util'],
 					if @elapsedLife >= lifespan and @scene
 						@scene.remove this
 
+			rotateGraphicToVel: ->
+				update: ->
+					if @vel.x isnt 0 or @vel.y isnt 0
+						@graphic.rotate Math.atan2(@vel.y, @vel.x)
+
 		return ns

@@ -69,8 +69,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 						straightMover:
 							speed: speed
 							direction: direction
-
-				@graphic.rotate(direction).centerOrigin()
+						rotateGraphicToVel: true
 
 				@collisionHandlers =
 					wall: =>
@@ -177,6 +176,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 					width: 40
 					centered: true
 					type: 'hittable'
+					mixins:
+						rotateGraphicToVel: true
 
 				@hp = 30
 
@@ -244,8 +245,6 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@player = @scene.entities.first "player"
 
 				@behaviour.update()
-				if @vel.x isnt 0 or @vel.y isnt 0
-					@graphic.rotate Math.atan2(@vel.y, @vel.x)
 
 			hit: ({damage: damage, source: source}) ->
 				@hp -= damage
