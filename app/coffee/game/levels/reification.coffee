@@ -45,13 +45,19 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 							es.push entity
 
 					numberOfEnemies = random.intInRange(2, 5)
-					for {x: tileX, y: tileY} in room.enemyPositions numberOfEnemies
-						enemy = new entities.Silverfish(
-							(tileX + 0.5) * TILE_WIDTH,
-							(tileY + 0.5) * TILE_HEIGHT
+					entityDescriptions = room.entities
+								numberOfEnemies: numberOfEnemies
+
+					for {type: type, pos: tilePos} in entityDescriptions
+						entityClass = switch type
+							when "enemy" then entities.Silverfish
+
+						entity = new entityClass(
+							(tilePos.x + 0.5) * TILE_WIDTH,
+							(tilePos.y + 0.5) * TILE_HEIGHT
 						)
-						@addRoomOffset room, enemy
-						es.push enemy
+						@addRoomOffset room, entity
+						es.push entity
 
 				level.tiles.each (tileX, tileY, tile) =>
 					entity = @reifyEntity tileX, tileY, tile
