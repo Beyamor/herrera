@@ -55,7 +55,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@scene.remove this
 
 		class ns.Shot extends Entity
-			constructor: (x, y, speed, direction) ->
+			constructor: (x, y, speed, direction, @damage) ->
 				super
 					x: x
 					y: y
@@ -89,7 +89,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 					hittable: (hittable) =>
 						@scene.remove this if @scene
-						hittable.hit()
+						hittable.hit(@damage)
 						return true
 
 		class ns.Player extends Entity
@@ -147,7 +147,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 					if tryingToShoot
 							if @gun.tryShooting()
-								shot = new ns.Shot @pos.x, @pos.y, 600, Math.atan2(dy, dx)
+								shot = new ns.Shot @pos.x, @pos.y,
+										600, Math.atan2(dy, dx),
+										@gun.model.damage
 								@scene.add shot
 
 				if input.pressed 'grab'
@@ -171,7 +173,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					centered: true
 					type: 'hittable'
 
-				@hits		= 3
+				@hp = 30
 
 				@collisionHandlers =
 					wall: -> true
@@ -240,10 +242,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 				if @vel.x isnt 0 or @vel.y isnt 0
 					@graphic.rotate Math.atan2(@vel.y, @vel.x)
 
-			hit: ->
-				--@hits
+			hit: (damage) ->
+				@hp -= damage
 
-				if @hits <= 0
+				if @hp <= 0
 					loot = new ns.Gun
 					loot.x = @x
 					loot.y = @y
@@ -251,7 +253,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 					@scene.remove(this) if @scene
 
-				@escaping	= true
-				@escapingPoint	= {x: @x, y: @y}
+				else
+					@escaping	= true
+					@escapingPoint	= {x: @x, y: @y}
 
 		return ns

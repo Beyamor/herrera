@@ -7,8 +7,10 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 		SMG_MODEL = new models.Gun smgModel, parse: true
 
 		class ns.GunModel
-			constructor: ({capacity: @maxCapacity, firingRate: firingRate,\
-					rechargeDelay: rechargeDelay, rechargeSpeed: @rechargeSpeed}) ->
+			constructor: ({capacity: @maxCapacity, firingRate: firingRate, \
+					rechargeDelay: rechargeDelay, rechargeSpeed: @rechargeSpeed, \
+					damage: @damage}) ->
+
 						@capacity	= @maxCapacity
 						@isRecharging	= false
 						@canShoot	= true
@@ -56,6 +58,7 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 					firingRate: random.inRange 5, 20
 					rechargeDelay: 0.5
 					rechargeSpeed: random.inRange 0.5, 3
+					damage: random.intInRange 4, 6
 				}
 		
 		return ns
