@@ -330,11 +330,48 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@tiles[x][y] = "."
 			@exits[direction] = {x: x, y: y}
 
+	class ns.EndRoom extends ns.Room
+		constructor: (xIndex, yIndex) ->
+			super xIndex, yIndex
+
+			for i in [0...ROOM_WIDTH]
+				@tiles[i][0] = "wall"
+				@tiles[i][ROOM_HEIGHT-1] = "wall"
+
+			for j in [0...ROOM_HEIGHT]
+				@tiles[0][j] = "wall"
+				@tiles[ROOM_WIDTH-1][j] = "wall"
+
+			for i in [1...ROOM_WIDTH-1]
+				for j in [1...ROOM_HEIGHT-1]
+					@tiles[i][j] = "floor"
+
+			@exits = {}
+
+		addEntrance: (direction) ->
+			switch direction
+				when "west"
+					x = 0
+					y = ROOM_HEIGHT/2
+				when "east"
+					x = ROOM_WIDTH - 1
+					y = ROOM_HEIGHT/2
+				when "north"
+					x = ROOM_WIDTH/2
+					y = 0
+				when "south"
+					x = ROOM_WIDTH/2
+					y = ROOM_HEIGHT-1
+
+			@tiles[x][y] = "."
+			@entrance = {x: x, y: y}
+
 		entities: -> [
 				type: "portal"
 				pos:
-					x: 2
-					y: 2
+					x: Math.floor(ROOM_WIDTH/2)
+					y: Math.floor(ROOM_HEIGHT/2)
 		]
+
 
 	return ns

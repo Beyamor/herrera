@@ -4,6 +4,7 @@ define ['core/util', 'game/consts', 'game/rooms'],
 
 		StartRoom	= rooms.StartRoom
 		RegularRoom	= rooms.RegularRoom
+		EndRoom		= rooms.EndRoom
 
 		TILE_WIDTH	= TILE_HEIGHT	= consts.TILE_WIDTH
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
@@ -69,9 +70,10 @@ define ['core/util', 'game/consts', 'game/rooms'],
 				throw new Error "No candidates" if candidates.length is 0
 
 				candidate	= random.any candidates
-				room		= addToMainPath candidate.x, candidate.y, "regular"
+				isLastRoom	= (mainPathLength == desiredMainPathLength - 1)
+				type		= if isLastRoom then "end" else "regular"
+				room		= addToMainPath candidate.x, candidate.y, type
 
-				isLastRoom = (mainPathLength == desiredMainPathLength)
 				unless isLastRoom
 					extraRoomExtensions.push room
 
@@ -148,6 +150,7 @@ define ['core/util', 'game/consts', 'game/rooms'],
 						roomClass = switch room.type
 							when "start"	then StartRoom
 							when "regular"	then RegularRoom
+							when "end"	then EndRoom
 
 						return new roomClass i, j
 
