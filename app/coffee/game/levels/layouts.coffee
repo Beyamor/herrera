@@ -98,9 +98,64 @@ define ['game/consts', 'core/util'],
 				extraRoomExtensions.push toRoom
 				++extraRooms
 
+			superRooms	= []
+			unmergedRooms	= []
+			rooms.each (i, j, room) =>
+				if room and room.type is "regular"
+					unmergedRooms.push({x: i, y: j})
+
+			# okay, let's see
+			# while we have umerged rooms
+			while unmergedRooms.length > 0#and false
+
+				# start building a superroom with one of them
+				roomsToMerge	= [unmergedRooms.pop()]
+				superRoom	= []
+				superRooms.push superRoom
+
+				# now, while we've got rooms to add to the superroom
+				while roomsToMerge.length > 0
+					room = roomsToMerge.pop()
+
+					# add a room (noting it as merged)
+					superRoom.push(room)
+					unmergedRooms = _.filter unmergedRooms, (unmergedRoom) ->
+						unmergedRoom.x isnt room.x or unmergedRoom.y isnt room.y
+
+					# then add the room's neighbours
+					for direction in util.DIRECTIONS
+						[dx, dy]	= util.directionToDelta direction
+						neighbourX	= room.x + dx
+						neighbourY	= room.y + dy
+
+						continue if neighbourX < 0 or neighbourY < 0 or
+								neighbourX >= LEVEL_WIDTH or neighbourY >= LEVEL_HEIGHT
+
+						neighbour = rooms[neighbourX][neighbourY]
+
+						continue unless neighbour
+						continue unless neighbour.type is "regular"
+
+						alreadyInMergeList = false
+						for {x: x, y: y} in roomsToMerge
+							if x is neighbourX and y is neighbourY
+								alreadyInMergeList = true
+								break
+						continue if alreadyInMergeList
+
+						alreadyInSuperRoom = false
+						for {x: x, y: y} in superRoom
+							if x is neighbourX and y is neighbourY
+								alreadyInSuperRoom = true
+								break
+						continue if alreadyInSuperRoom
+
+						roomsToMerge.push {x: neighbourX, y: neighbourY}
+
 			return {
 				rooms: rooms
 				connections: connections
+				superRooms: superRooms
 				start: {
 					x: startX
 					y: startY
