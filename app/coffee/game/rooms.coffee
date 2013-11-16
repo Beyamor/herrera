@@ -386,8 +386,39 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		addExit: (direction) ->
 			@exits[direction] = {x: Math.floor(ROOM_WIDTH/2), y: Math.floor(ROOM_HEIGHT/2)}
 
+		finalize: ->
+			@superRoom.finalize()
+
 	class ns.SuperRoom
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
+			
+		finalize: ->
+			return if @finalized
+			@finalized = true
+
+			minRoomX = minRoomY = Infinity
+			maxRoomX = maxRoomY = -Infinity
+
+			for section in @sections
+				minRoomX = section.xIndex if section.xIndex < minRoomX
+				minRoomY = section.yIndex if section.yIndex < minRoomY
+				maxRoomX = section.xIndex if section.xIndex > maxRoomX
+				maxRoomY = section.yIndex if section.yIndex > maxRoomY
+
+			widthInRooms	= maxRoomX - minRoomX + 1
+			heightInRooms	= maxRoomY - minRoomY + 1
+
+			# set up the super room's tiles
+			tiles = util.array2d widthInRooms * ROOM_WIDTH, heightInRooms * ROOM_HEIGHT, => "floor"
+
+			# and copy 'em over to the sections
+			for section in @sections
+				xOffset	= (section.xIndex - minRoomX) * ROOM_WIDTH
+				yOffset	= (section.yIndex - minRoomY) * ROOM_HEIGHT
+
+				for x in [0...ROOM_WIDTH]
+					for y in [0...ROOM_HEIGHT]
+						section.tiles[x][y] = tiles[x + xOffset][y + yOffset]
 
 	return ns
