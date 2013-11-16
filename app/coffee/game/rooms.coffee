@@ -412,16 +412,21 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@superRoom.realize.apply(@superRoom, args)
 
 	class ns.SuperRoom
-		@MIN_ROOM_DIM: 5
+		# better vals, but bad for testing
+		#@MIN_ROOM_DIM: 7
+		#@MAX_ROOM_DIM: 12
+
+		@MIN_ROOM_DIM: 4
 		@MAX_ROOM_DIM: 10
+
 
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
 
 		initialize: (x, y) ->
-			@tiles[x][y] = "floor"
+			@cells[x][y].isInitialized = true
 
-		initializeTiles: ->
+		initializeCells: ->
 			@occupationGrid.each (gridX, gridY, isOccupied) =>
 				return unless isOccupied
 
@@ -444,15 +449,17 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		establishPossibleRooms: ->
 			@possibleRooms = []
 
-			@tiles.each (left, top, tile) =>
-				return unless tile
+			@cells.each (left, top, cell) =>
+				return unless cell.isInitialized
 
-				for width in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM]
-					for height in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM]
+				for width in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
+												left + width <= @widthInCells
+					for height in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
+												top + height <= @heightInCells
 						isValid = true
-						for i in [0...width] when left + i < @widthInTiles
-							for j in [0...height] when top + j < @heightInTiles
-								unless @tiles[left + i][top + j]
+						for i in [0...width]
+							for j in [0...height]
+								unless @cells[left + i][top + j]
 									isValid = false
 									break
 							break unless isValid
@@ -461,8 +468,23 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 							@possibleRooms.push
 								left:	left
 								top:	top
-								width:	width
-								height:	height
+								right:	left + width
+								bottom:	top + height
+
+		makeRooms: ->
+			area			= @widthInRooms * @heightInRooms
+			numberOfRooms		= 0
+
+			while @possibleRooms.length > 0
+				room		= random.any @possibleRooms
+				roomsToRemove	= []
+				@possibleRooms	= (r for r in @possibleRooms when not util.aabbsIntersect r, room)
+
+				for i in [room.left...room.right]
+					for j in [room.top...room.bottom]
+						@cells[i][j].type = "floor"
+
+				++numberOfRooms
 
 		finalize: ->
 			return if @finalized
@@ -479,17 +501,17 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 			@widthInRooms	= @maxRoomX - @minRoomX + 1
 			@heightInRooms	= @maxRoomY - @minRoomY + 1
-			@widthInTiles	= @widthInRooms * (ROOM_WIDTH + 1) - 1
-			@heightInTiles	= @heightInRooms * (ROOM_HEIGHT + 1) - 1
+			@widthInCells	= @widthInRooms * (ROOM_WIDTH + 1) - 1
+			@heightInCells	= @heightInRooms * (ROOM_HEIGHT + 1) - 1
 
-			@tiles		= util.array2d @widthInTiles, @heightInTiles
+			@cells		= util.array2d @widthInCells, @heightInCells, => isInitialized: false
 			@occupationGrid	= util.array2d @widthInRooms, @heightInRooms, => false
 
 			for section in @sections
 				# figure out what's occupied
 				@occupationGrid[section.xIndex - @minRoomX][section.yIndex - @minRoomY] = true
 
-				# initialize cell tiles
+				# initialize cells
 				xOffset = (section.xIndex - @minRoomX) * (ROOM_WIDTH + 1)
 				yOffset = (section.yIndex - @minRoomY) * (ROOM_HEIGHT + 1)
 
@@ -497,8 +519,9 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					for j in [0...ROOM_HEIGHT]
 						@initialize i + xOffset, j + yOffset
 
-			@initializeTiles()
+			@initializeCells()
 			@establishPossibleRooms()
+			@makeRooms()
 
 		realize: (reifier) ->
 			return [] if @realized
@@ -508,12 +531,14 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			yOffset = @minRoomY * (ROOM_HEIGHT + 1) * TILE_HEIGHT
 
 			es = []
-			@tiles.each (i, j, type) =>
+			@cells.each (i, j, cell) =>
+				return unless cell.isInitialized
+
 				x = xOffset + i * TILE_WIDTH
 				y = yOffset + j * TILE_HEIGHT
 
-				tile = reifyWallOrFloor reifier, x, y, type
-				es.push tile if tile?
+				tile = reifyWallOrFloor reifier, x, y, cell.type
+				es.push tile if tile
 
 			return es
 
