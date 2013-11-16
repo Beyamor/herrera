@@ -169,8 +169,8 @@ define ['game/consts', 'core/util'],
 			while true
 				try
 					return tryCreatingLayout
-						desiredMainPathLength: random.intInRange 8, 10
-						desiredExtraRooms: random.intInRange 3, 5
+						desiredMainPathLength: 4 #random.intInRange 8, 10
+						desiredExtraRooms: 0 #random.intInRange 3, 5
 
 				catch error
 					++attempts
