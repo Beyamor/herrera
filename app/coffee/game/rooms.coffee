@@ -468,21 +468,29 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 							@possibleRooms.push
 								left:	left
 								top:	top
-								right:	left + width
-								bottom:	top + height
+								right:	left + width - 1
+								bottom:	top + height - 1
 
 		makeRooms: ->
 			area			= @widthInRooms * @heightInRooms
 			numberOfRooms		= 0
+			@rooms			= []
 
 			while @possibleRooms.length > 0
 				room		= random.any @possibleRooms
-				roomsToRemove	= []
 				@possibleRooms	= (r for r in @possibleRooms when not util.aabbsIntersect r, room)
+				@rooms.push room
 
-				for i in [room.left...room.right]
-					for j in [room.top...room.bottom]
-						@cells[i][j].type = "floor"
+				for i in [room.left..room.right]
+					for j in [room.top..room.bottom]
+						isWall	= i is room.left or i is room.right or
+								j is room.top or j is room.bottom
+
+						@cells[i][j].type =
+							if isWall
+								"wall"
+							else
+								"floor"
 
 				++numberOfRooms
 
