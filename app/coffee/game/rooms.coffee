@@ -424,9 +424,9 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			section.superRoom = this for section in @sections
 
 		initialize: (x, y) ->
-			cell			= @cells[x][y]
+			cell		= @cells[x][y]
 			cell.isActive	= true
-			cell.weight		= 4
+			cell.weight	= 4
 
 		initializeCells: ->
 			for section in @sections
@@ -611,7 +611,12 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 				@makePath startingCell, endingCel
 
-
+		closePaths: ->
+			for path in @paths
+				for cell in path
+					for neighbour in @neighbouringCells cell
+						unless neighbour.type?
+							@setAsWall neighbour.x, neighbour.y
 
 		finalize: ->
 			return if @finalized
@@ -645,6 +650,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@establishPossibleRooms()
 			@makeRooms()
 			@connectRooms()
+			@closePaths()
 
 		realize: (reifier) ->
 			return [] if @realized
