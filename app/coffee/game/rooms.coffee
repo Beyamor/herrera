@@ -597,22 +597,29 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 			@paths.push path
 
-		connectRooms: ->
-			isCircular	= random.coinFlip()
-			maxIndex	= if isCircular then @rooms.length - 1 else @rooms.length - 2
+		centerCell: (room) ->
+			cellX	= Math.floor((room.left + room.right) / 2)
+			cellY	= Math.floor((room.top + room.bottom) / 2)
+			return @cells[cellX][cellY]
 
-			for roomIndex in [0..maxIndex]
+		connectRooms: ->
+			for roomIndex in [0...@rooms.length]
 				currentRoom	= @rooms[roomIndex]
 				nextRoom	= @rooms[(roomIndex + 1) % @rooms.length]
 
-				startingCellX	= Math.floor((currentRoom.left + currentRoom.right) / 2)
-				startingCellY	= Math.floor((currentRoom.top + currentRoom.bottom) / 2)
-				endingCelX	= Math.floor((nextRoom.left + nextRoom.right) / 2)
-				endingCelY	= Math.floor((nextRoom.top + nextRoom.bottom) / 2)
-				startingCell	= @cells[startingCellX][startingCellY]
-				endingCel	= @cells[endingCelX][endingCelY]
+				@makePath @centerCell(currentRoom), @centerCell(nextRoom)
 
-				@makePath startingCell, endingCel
+			if @rooms.length > 1
+				numberOfAdditionalPaths		= 0
+				maxNumberOfAdditionalPaths	= random.intInRange 3
+				while numberOfAdditionalPaths < maxNumberOfAdditionalPaths
+					first	= random.intInRange @rooms.length
+					second	= random.intInRange @rooms.length
+					until second isnt first
+						second	= random.intInRange @rooms.length
+
+					@makePath @centerCell(@rooms[first]), @centerCell(@rooms[second])
+					++numberOfAdditionalPaths
 
 		closePaths: ->
 			for path in @paths
