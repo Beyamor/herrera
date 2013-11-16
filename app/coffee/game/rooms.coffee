@@ -412,13 +412,16 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@superRoom.realize.apply(@superRoom, args)
 
 	class ns.SuperRoom
+		@MIN_ROOM_DIM: 5
+		@MAX_ROOM_DIM: 10
+
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
 
 		initialize: (x, y) ->
 			@tiles[x][y] = "floor"
 
-		initializeCells: ->
+		initializeTiles: ->
 			@occupationGrid.each (gridX, gridY, isOccupied) =>
 				return unless isOccupied
 
@@ -438,6 +441,28 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					for i in [0...ROOM_WIDTH]
 						@initialize xOffset + i, yOffset
 
+		establishPossibleRooms: ->
+			@possibleRooms = []
+
+			@tiles.each (left, top, tile) =>
+				return unless tile
+
+				for width in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM]
+					for height in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM]
+						isValid = true
+						for i in [0...width] when left + i < @widthInTiles
+							for j in [0...height] when top + j < @heightInTiles
+								unless @tiles[left + i][top + j]
+									isValid = false
+									break
+							break unless isValid
+
+						if isValid
+							@possibleRooms.push
+								left:	left
+								top:	top
+								width:	width
+								height:	height
 
 		finalize: ->
 			return if @finalized
@@ -454,10 +479,10 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 			@widthInRooms	= @maxRoomX - @minRoomX + 1
 			@heightInRooms	= @maxRoomY - @minRoomY + 1
-			widthInTiles	= @widthInRooms * (ROOM_WIDTH + 1) - 1
-			heightInTiles	= @heightInRooms * (ROOM_HEIGHT + 1) - 1
+			@widthInTiles	= @widthInRooms * (ROOM_WIDTH + 1) - 1
+			@heightInTiles	= @heightInRooms * (ROOM_HEIGHT + 1) - 1
 
-			@tiles		= util.array2d widthInTiles, heightInTiles
+			@tiles		= util.array2d @widthInTiles, @heightInTiles
 			@occupationGrid	= util.array2d @widthInRooms, @heightInRooms, => false
 
 			for section in @sections
@@ -472,7 +497,8 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					for j in [0...ROOM_HEIGHT]
 						@initialize i + xOffset, j + yOffset
 
-			@initializeCells()
+			@initializeTiles()
+			@establishPossibleRooms()
 
 		realize: (reifier) ->
 			return [] if @realized
