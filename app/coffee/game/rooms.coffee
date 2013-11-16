@@ -424,9 +424,19 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			section.superRoom = this for section in @sections
 
 		initialize: (x, y) ->
-			@cells[x][y].isInitialized = true
+			cell			= @cells[x][y]
+			cell.isActive	= true
+			cell.weight		= 4
 
 		initializeCells: ->
+			for section in @sections
+				xOffset = (section.xIndex - @minRoomX) * (ROOM_WIDTH + 1)
+				yOffset = (section.yIndex - @minRoomY) * (ROOM_HEIGHT + 1)
+
+				for i in [0...ROOM_WIDTH]
+					for j in [0...ROOM_HEIGHT]
+						@initialize i + xOffset, j + yOffset
+
 			@occupationGrid.each (gridX, gridY, isOccupied) =>
 				return unless isOccupied
 
@@ -450,7 +460,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@possibleRooms = []
 
 			@cells.each (left, top, cell) =>
-				return unless cell.isInitialized
+				return unless cell.isActive
 
 				for width in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
 												left + width <= @widthInCells
@@ -486,13 +496,122 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 						isWall	= i is room.left or i is room.right or
 								j is room.top or j is room.bottom
 
-						@cells[i][j].type =
-							if isWall
-								"wall"
-							else
-								"floor"
+						if isWall
+							@setAsWall i, j
+						else
+							@setAsFloor i, j
 
 				++numberOfRooms
+
+		setAsWall: (x, y) ->
+			cell		= @cells[x][y]
+			cell.type	= "wall"
+			cell.weight	= 20
+
+		setAsFloor: (x, y) ->
+			cell		= @cells[x][y]
+			cell.type	= "floor"
+			cell.weight	= 1
+
+		neighbouringCells: ({x: x, y: y}) ->
+			cells = []
+
+			cells.push @cells[x-1][y] if x > 0
+			cells.push @cells[x+1][y] if x < @widthInCells - 1
+			cells.push @cells[x][y-1] if y > 0
+			cells.push @cells[x][y+1] if y < @heightInCells - 1
+
+			return _.filter cells, (cell) -> cell.isActive
+
+		makePath: (startingCell, endingCell) ->
+			initialNode	= {cell: startingCell}
+			closedList	= [initialNode]
+			openList	= []
+
+			g = (node, indent=0) =>
+				weight = node.cell.weight
+				if node.parent?
+					weight += g(node.parent, indent+1)
+				return weight
+
+			h = (node) =>
+				dx	= node.cell.x - endingCell.x
+				dy	= node.cell.y - endingCell.y
+
+				return Math.sqrt dx*dx + dy*dy
+
+			addAdjacentNodes = (parent) =>
+				for neighbouringCell in @neighbouringCells parent.cell
+					alreadyInList	= false
+					existingNode	= null
+					for node in openList
+						if node.cell is neighbouringCell
+							alreadyInList	= true
+							existingNode	= node
+							break
+
+					unless alreadyInList
+						for node in closedList
+							if node.cell is neighbouringCell
+								alreadyInList	= true
+								existingNode	= node
+								break
+
+					if alreadyInList
+						if existingNode.parent and g(parent) < g(existingNode.parent)
+							existingNode.parent = parent
+					else
+						openList.push
+							cell:	neighbouringCell
+							parent:	parent
+
+			addAdjacentNodes initialNode
+
+			until lastNode?
+				nextNode	= null
+				minF		= Infinity
+				for node in openList
+					throw Error "no node" unless node?
+					f = g(node) + h(node)
+					if f < minF
+						minF		= f
+						nextNode	= node
+
+				if nextNode.cell is endingCell
+					lastNode = nextNode
+				else
+					openList.remove nextNode
+					closedList.push nextNode
+					addAdjacentNodes nextNode
+
+			path = []
+			addToPath = (node) ->
+				return unless node?
+
+				path.unshift node.cell
+				addToPath node.parent
+			addToPath lastNode
+
+			for cell in path
+				@setAsFloor cell.x, cell.y
+
+			@paths.push path
+
+		connectRooms: ->
+			for roomIndex in [0...@rooms.length]
+				currentRoom	= @rooms[roomIndex]
+				nextRoom	= @rooms[(roomIndex + 1) % @rooms.length]
+
+				startingCellX	= Math.floor((currentRoom.left + currentRoom.right) / 2)
+				startingCellY	= Math.floor((currentRoom.top + currentRoom.bottom) / 2)
+				endingCelX	= Math.floor((nextRoom.left + nextRoom.right) / 2)
+				endingCelY	= Math.floor((nextRoom.top + nextRoom.bottom) / 2)
+				startingCell	= @cells[startingCellX][startingCellY]
+				endingCel	= @cells[endingCelX][endingCelY]
+
+				@makePath startingCell, endingCel
+
+
 
 		finalize: ->
 			return if @finalized
@@ -512,24 +631,20 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@widthInCells	= @widthInRooms * (ROOM_WIDTH + 1) - 1
 			@heightInCells	= @heightInRooms * (ROOM_HEIGHT + 1) - 1
 
-			@cells		= util.array2d @widthInCells, @heightInCells, => isInitialized: false
+			@cells		= util.array2d @widthInCells, @heightInCells, (i, j) =>
+											isActive: false
+											x: i
+											y: j
 			@occupationGrid	= util.array2d @widthInRooms, @heightInRooms, => false
+			@paths		= []
 
 			for section in @sections
-				# figure out what's occupied
 				@occupationGrid[section.xIndex - @minRoomX][section.yIndex - @minRoomY] = true
-
-				# initialize cells
-				xOffset = (section.xIndex - @minRoomX) * (ROOM_WIDTH + 1)
-				yOffset = (section.yIndex - @minRoomY) * (ROOM_HEIGHT + 1)
-
-				for i in [0...ROOM_WIDTH]
-					for j in [0...ROOM_HEIGHT]
-						@initialize i + xOffset, j + yOffset
-
+				
 			@initializeCells()
 			@establishPossibleRooms()
 			@makeRooms()
+			@connectRooms()
 
 		realize: (reifier) ->
 			return [] if @realized
@@ -540,7 +655,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 			es = []
 			@cells.each (i, j, cell) =>
-				return unless cell.isInitialized
+				return unless cell.isActive
 
 				x = xOffset + i * TILE_WIDTH
 				y = yOffset + j * TILE_HEIGHT
