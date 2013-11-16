@@ -2,9 +2,11 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 	(util, consts, rooms, layouts) ->
 		ns = {}
 
-		StartRoom	= rooms.StartRoom
-		RegularRoom	= rooms.RegularRoom
-		EndRoom		= rooms.EndRoom
+		StartRoom		= rooms.StartRoom
+		RegularRoom		= rooms.RegularRoom
+		EndRoom			= rooms.EndRoom
+		SuperRoom		= rooms.SuperRoom
+		SuperRoomSection	= rooms.SuperRoomSection
 
 		TILE_WIDTH	= TILE_HEIGHT	= consts.TILE_WIDTH
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
@@ -33,10 +35,15 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 					if room?
 						roomClass = switch room.type
 							when "start"	then StartRoom
-							when "regular"	then RegularRoom
+							when "regular"	then SuperRoomSection
 							when "end"	then EndRoom
 
 						return new roomClass i, j
+
+				# create superrooms
+				for superRoomList in layout.superRooms
+					sections = (@rooms[x][y] for {x: x, y: y} in superRoomList)
+					superRoom = new SuperRoom sections
 
 				# set connections between them
 				@connections = []

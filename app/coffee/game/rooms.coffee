@@ -373,5 +373,21 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					y: Math.floor(ROOM_HEIGHT/2)
 		]
 
+	class ns.SuperRoomSection extends ns.Room
+		constructor: (xIndex, yIndex) ->
+			super xIndex, yIndex
+			@exits = {}
+
+			@tiles[Math.floor(ROOM_WIDTH/2)][Math.floor(ROOM_HEIGHT/2)] = "."
+
+		addEntrance: (direction) ->
+			@entrance = {x: Math.floor(ROOM_WIDTH/2), y: Math.floor(ROOM_HEIGHT/2)}
+
+		addExit: (direction) ->
+			@exits[direction] = {x: Math.floor(ROOM_WIDTH/2), y: Math.floor(ROOM_HEIGHT/2)}
+
+	class ns.SuperRoom
+		constructor: (@sections) ->
+			section.room = this for section in @sections
 
 	return ns
