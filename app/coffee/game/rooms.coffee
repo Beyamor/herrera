@@ -27,6 +27,12 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 		return [x, y]
 
+	reifyWallOrFloor = (reifier, x, y, type) ->
+		if type is "." or type is "floor"
+			return reifier.reifyFloor x, y
+		else if type is "W" or type is "wall"
+			return reifier.reifyWall x, y
+
 	class ns.Room
 		constructor: (@xIndex, @yIndex) ->
 			@tiles		= util.array2d ROOM_WIDTH, ROOM_HEIGHT
@@ -39,13 +45,8 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				x = @xOffset + i * TILE_WIDTH
 				y = @yOffset + j * TILE_HEIGHT
 
-				if type is "." or type is "floor"
-					tile = reifier.reifyFloor x, y
-				else if type is "W" or type is "wall"
-					tile = reifier.reifyWall x, y
-
-				if tile?
-					tiles.push tile
+				tile = reifyWallOrFloor reifier, x, y, type
+				tiles.push(tile) if tile?
 
 			return tiles
 
@@ -407,6 +408,9 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		finalize: ->
 			@superRoom.finalize()
 
+		realize: (args...) ->
+			@superRoom.realize.apply(@superRoom, args)
+
 	class ns.SuperRoom
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
@@ -415,28 +419,37 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			return if @finalized
 			@finalized = true
 
-			minRoomX = minRoomY = Infinity
-			maxRoomX = maxRoomY = -Infinity
+			@minRoomX = @minRoomY = Infinity
+			@maxRoomX = @maxRoomY = -Infinity
 
 			for section in @sections
-				minRoomX = section.xIndex if section.xIndex < minRoomX
-				minRoomY = section.yIndex if section.yIndex < minRoomY
-				maxRoomX = section.xIndex if section.xIndex > maxRoomX
-				maxRoomY = section.yIndex if section.yIndex > maxRoomY
+				@minRoomX = section.xIndex if section.xIndex < @minRoomX
+				@minRoomY = section.yIndex if section.yIndex < @minRoomY
+				@maxRoomX = section.xIndex if section.xIndex > @maxRoomX
+				@maxRoomY = section.yIndex if section.yIndex > @maxRoomY
 
-			widthInRooms	= maxRoomX - minRoomX + 1
-			heightInRooms	= maxRoomY - minRoomY + 1
+			widthInRooms	= @maxRoomX - @minRoomX + 1
+			heightInRooms	= @maxRoomY - @minRoomY + 1
+			widthInTiles	= widthInRooms * (ROOM_WIDTH + 1) - 1
+			heightInTiles	= heightInRooms * (ROOM_HEIGHT + 1) - 1
 
-			# set up the super room's tiles
-			tiles = util.array2d widthInRooms * ROOM_WIDTH, heightInRooms * ROOM_HEIGHT, => "floor"
+			@tiles = util.array2d widthInTiles, heightInTiles, => "floor"
 
-			# and copy 'em over to the sections
-			for section in @sections
-				xOffset	= (section.xIndex - minRoomX) * ROOM_WIDTH
-				yOffset	= (section.yIndex - minRoomY) * ROOM_HEIGHT
+		realize: (reifier) ->
+			return [] if @realized
+			@realized = true
 
-				for x in [0...ROOM_WIDTH]
-					for y in [0...ROOM_HEIGHT]
-						section.tiles[x][y] = tiles[x + xOffset][y + yOffset]
+			xOffset = @minRoomX * (ROOM_WIDTH + 1) * TILE_WIDTH
+			yOffset = @minRoomY * (ROOM_HEIGHT + 1) * TILE_HEIGHT
+
+			es = []
+			@tiles.each (i, j, type) =>
+				x = xOffset + i * TILE_WIDTH
+				y = yOffset + j * TILE_HEIGHT
+
+				tile = reifyWallOrFloor reifier, x, y, type
+				es.push tile if tile?
+
+			return es
 
 	return ns
