@@ -29,11 +29,29 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 	class ns.Room
 		constructor: (@xIndex, @yIndex) ->
-			@tiles = util.array2d ROOM_WIDTH, ROOM_HEIGHT
+			@tiles		= util.array2d ROOM_WIDTH, ROOM_HEIGHT
+			@xOffset	= @xIndex * (ROOM_WIDTH + 1) * TILE_WIDTH # +1 for the spaces between rooms
+			@yOffset	= @yIndex * (ROOM_HEIGHT + 1) * TILE_HEIGHT
 
-		entities: (opts) ->
-			[]
+		realizeTiles: (reifier) ->
+			tiles = []
+			@tiles.each (i, j, type) =>
+				x = @xOffset + i * TILE_WIDTH
+				y = @yOffset + j * TILE_HEIGHT
 
+				if type is "." or type is "floor"
+					tile = reifier.reifyFloor x, y
+				else if type is "W" or type is "wall"
+					tile = reifier.reifyWall x, y
+
+				if tile?
+					tiles.push tile
+
+			return tiles
+
+		realize: (reifier) ->
+			return @realizeTiles(reifier)
+			
 	class ns.RegularRoom extends ns.Room
 		constructor: (xIndex, yIndex) ->
 			super xIndex, yIndex
@@ -277,22 +295,21 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				for tile in someArea.tiles
 					areas = (area for area in areas when not area.hasTile tile)
 
-		entities: ({numberOfEnemies: numberOfEnemies}) ->
+		realize: (reifier, {numberOfEnemies: numberOfEnemies}) ->
 			candidates = []
 			@tiles.each (tileX, tileY, tile) =>
 				if tile is "."
-					candidates.push {x: tileX, y: tileY}
+					candidates.push {x: tileX + TILE_WIDTH/2, y: tileY + TILE_HEIGHT/2}
 
 			enemies = []
-			while enemies.length < numberOfEnemies and candidates.length > 0
+			while enemies.length <  numberOfEnemies and candidates.length > 0
 				candidate = random.any candidates
 				candidates.remove candidate
 
-				enemies.push
-					pos: candidate
-					type: "enemy"
+				enemies.push reifier.reifyEnemy candidate.x, candidate.y
 
-			return enemies
+
+			return super(reifier).concat enemies
 
 	class ns.StartRoom extends ns.Room
 		constructor: (xIndex, yIndex) ->
@@ -366,12 +383,13 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@tiles[x][y] = "."
 			@entrance = {x: x, y: y}
 
-		entities: -> [
+		entities: (reifier) ->
+			super(reifier).concat [
 				type: "portal"
 				pos:
 					x: Math.floor(ROOM_WIDTH/2)
 					y: Math.floor(ROOM_HEIGHT/2)
-		]
+			]
 
 	class ns.SuperRoomSection extends ns.Room
 		constructor: (xIndex, yIndex) ->

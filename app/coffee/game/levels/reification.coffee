@@ -9,23 +9,14 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 		random = util.random
 
 		class ns.Reifier
-			reifyEntity: (tileX, tileY, tile) ->
-				x = tileX * TILE_WIDTH
-				y = tileY * TILE_HEIGHT
+			reifyFloor: (x, y) ->
+				new staticEntities.Floor x, y
 
-				switch tile
-					when "wall"
-						new staticEntities.Wall x, y
-					when "W"
-						new staticEntities.Wall x, y
-					when "floor"
-						new staticEntities.Floor x, y
-					when "."
-						new staticEntities.Floor x, y
-					when "silverfish"
-						new entities.Silverfish x, y
-					when "barrel"
-						new entities.Barrel x, y
+			reifyWall: (x, y) ->
+				new staticEntities.Wall x, y
+
+			reifyEnemy: (x, y) ->
+				new entities.Silverfish x, y
 
 			addRoomOffset: (room, pos) ->
 				pos.x += room.xIndex * (ROOM_WIDTH + 1) * TILE_WIDTH
@@ -38,32 +29,17 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 				level.rooms.each (roomX, roomY, room) =>
 					return unless room
 
-					room.tiles.each (tileX, tileY, tile) =>
-						entity = @reifyEntity tileX, tileY, tile
-						if entity
-							@addRoomOffset room, entity
-							es.push entity
-
 					numberOfEnemies = random.intInRange(2, 5)
-					entityDescriptions = room.entities
+					roomEntities = room.realize this,
 								numberOfEnemies: numberOfEnemies
+					es.push(e) for e in roomEntities
 
-					for {type: type, pos: tilePos} in entityDescriptions
-						entityClass = switch type
-							when "enemy" then entities.Silverfish
-							when "portal" then staticEntities.Portal
 
-						entity = new entityClass(
-							(tilePos.x + 0.5) * TILE_WIDTH,
-							(tilePos.y + 0.5) * TILE_HEIGHT
-						)
-						@addRoomOffset room, entity
-						es.push entity
-
-				level.tiles.each (tileX, tileY, tile) =>
-					entity = @reifyEntity tileX, tileY, tile
-					if entity
-						es.push entity
+				# TODO add inter-level paths back in
+				#level.tiles.each (tileX, tileY, tile) =>
+				#	entity = @reifyEntity tileX, tileY, tile
+				#	if entity
+				#		es.push entity
 
 				startRoom	= level.rooms[level.start.x][level.start.y]
 				@player		= new entities.Player 100, 100
