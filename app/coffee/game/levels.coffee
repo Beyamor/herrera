@@ -54,13 +54,16 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 					fromRoom	= @rooms[from.x][from.y]
 					toRoom		= @rooms[to.x][to.y]
 
-					fromRoom.addExit direction
-					toRoom.addEntrance util.oppositeDirection direction
+					inSameSuperRoom	= fromRoom.superRoom? and toRoom.superRoom? and
+								fromRoom.superoom is toRoom.super
+					unless inSameSuperRoom
+						fromRoom.addExit direction
+						toRoom.addEntrance util.oppositeDirection direction
 
-					@connections.push
-						from: fromRoom
-						to: toRoom
-						direction: direction
+						@connections.push
+							from: fromRoom
+							to: toRoom
+							direction: direction
 
 				# finalize the rooms
 				@rooms.each (_, _, room) ->

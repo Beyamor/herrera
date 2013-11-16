@@ -388,6 +388,6 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 	class ns.SuperRoom
 		constructor: (@sections) ->
-			section.room = this for section in @sections
+			section.superRoom = this for section in @sections
 
 	return ns
