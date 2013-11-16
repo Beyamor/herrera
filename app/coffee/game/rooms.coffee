@@ -414,7 +414,31 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 	class ns.SuperRoom
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
-			
+
+		initialize: (x, y) ->
+			@tiles[x][y] = "floor"
+
+		initializeCells: ->
+			@occupationGrid.each (gridX, gridY, isOccupied) =>
+				return unless isOccupied
+
+				# check for a neighbour to the right
+				if gridX < @widthInRooms - 1 and @occupationGrid[gridX+1][gridY]
+					xOffset	= (gridX + 1) * (ROOM_WIDTH + 1) - 1
+					yOffset	= gridY * (ROOM_HEIGHT + 1)
+
+					for j in [0...ROOM_HEIGHT]
+						@initialize xOffset, j + yOffset
+
+				# check for a neighbour below
+				if gridY < @heightInRooms - 1 and @occupationGrid[gridX][gridY+1]
+					xOffset	= gridX * (ROOM_WIDTH + 1)
+					yOffset	= (gridY + 1) * (ROOM_HEIGHT + 1) - 1
+
+					for i in [0...ROOM_WIDTH]
+						@initialize xOffset + i, yOffset
+
+
 		finalize: ->
 			return if @finalized
 			@finalized = true
@@ -428,18 +452,17 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				@maxRoomX = section.xIndex if section.xIndex > @maxRoomX
 				@maxRoomY = section.yIndex if section.yIndex > @maxRoomY
 
-			widthInRooms	= @maxRoomX - @minRoomX + 1
-			heightInRooms	= @maxRoomY - @minRoomY + 1
-			areaInRooms	= widthInRooms * heightInRooms
-			widthInTiles	= widthInRooms * (ROOM_WIDTH + 1) - 1
-			heightInTiles	= heightInRooms * (ROOM_HEIGHT + 1) - 1
+			@widthInRooms	= @maxRoomX - @minRoomX + 1
+			@heightInRooms	= @maxRoomY - @minRoomY + 1
+			widthInTiles	= @widthInRooms * (ROOM_WIDTH + 1) - 1
+			heightInTiles	= @heightInRooms * (ROOM_HEIGHT + 1) - 1
 
 			@tiles		= util.array2d widthInTiles, heightInTiles
-			occupationGrid	= util.array2d widthInRooms, heightInRooms, => false
+			@occupationGrid	= util.array2d @widthInRooms, @heightInRooms, => false
 
 			for section in @sections
 				# figure out what's occupied
-				occupationGrid[section.xIndex - @minRoomX][section.yIndex - @minRoomY] = true
+				@occupationGrid[section.xIndex - @minRoomX][section.yIndex - @minRoomY] = true
 
 				# initialize cell tiles
 				xOffset = (section.xIndex - @minRoomX) * (ROOM_WIDTH + 1)
@@ -447,27 +470,9 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 				for i in [0...ROOM_WIDTH]
 					for j in [0...ROOM_HEIGHT]
-						@tiles[i + xOffset][j + yOffset] = "floor"
+						@initialize i + xOffset, j + yOffset
 
-			# initialize tiles between occupied cells
-			occupationGrid.each (gridX, gridY, isOccupied) =>
-				if isOccupied
-					
-					# check for a neighbour to the right
-					if gridX < widthInRooms - 1 and occupationGrid[gridX+1][gridY]
-						xOffset	= (gridX + 1) * (ROOM_WIDTH + 1) - 1
-						yOffset	= gridY * (ROOM_HEIGHT + 1)
-
-						for j in [0...ROOM_HEIGHT]
-							@tiles[xOffset][j + yOffset] = "floor"
-
-					# check for a neighbour below
-					if gridY < heightInRooms - 1 and occupationGrid[gridX][gridY+1]
-						xOffset	= gridX * (ROOM_WIDTH + 1)
-						yOffset	= (gridY + 1) * (ROOM_HEIGHT + 1) - 1
-
-						for i in [0...ROOM_WIDTH]
-							@tiles[xOffset + i][yOffset] = "floor"
+			@initializeCells()
 
 		realize: (reifier) ->
 			return [] if @realized
