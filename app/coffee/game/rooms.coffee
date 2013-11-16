@@ -598,7 +598,10 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@paths.push path
 
 		connectRooms: ->
-			for roomIndex in [0...@rooms.length]
+			isCircular	= random.coinFlip()
+			maxIndex	= if isCircular then @rooms.length - 1 else @rooms.length - 2
+
+			for roomIndex in [0..maxIndex]
 				currentRoom	= @rooms[roomIndex]
 				nextRoom	= @rooms[(roomIndex + 1) % @rooms.length]
 
