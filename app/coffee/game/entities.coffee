@@ -113,7 +113,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@speed = 400
 
 				@collisionHandlers =
-					wall: -> false #true
+					wall: -> true
 
 				@gun = new ns.Gun
 
