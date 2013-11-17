@@ -294,7 +294,9 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			candidates = []
 			@tiles.each (tileX, tileY, tile) =>
 				if tile is "."
-					candidates.push {x: tileX + TILE_WIDTH/2, y: tileY + TILE_HEIGHT/2}
+					candidates.push
+						x: @xOffset + tileX * TILE_WIDTH + TILE_WIDTH/2
+						y: @yOffset + tileY * TILE_HEIGHT + TILE_HEIGHT/2
 
 			enemies = []
 			while enemies.length <  numberOfEnemies and candidates.length > 0
@@ -436,7 +438,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		return superRoomColors[(superRoomColorIndex + 1) % superRoomColors.length]
 
 	class ns.SuperRoom
-		@MIN_ROOM_DIM: 6
+		@MIN_ROOM_DIM: 5
 		@MAX_ROOM_DIM: 14
 		@MIN_ROOM_RATIO: 0.7
 

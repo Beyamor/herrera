@@ -6,7 +6,7 @@ define ['game/consts', 'core/util'],
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
 		LEVEL_WIDTH	= LEVEL_HEIGHT	= consts.LEVEL_WIDTH
 
-		MAX_SUPERROOM_SIZE = 4
+		MAX_SUPERROOM_SIZE = 3
 
 		random = util.random
 
@@ -100,15 +100,16 @@ define ['game/consts', 'core/util'],
 				extraRoomExtensions.push toRoom
 				++extraRooms
 
-			superRooms	= []
-			unmergedRooms	= []
+			superRooms			= []
+			unmergedRooms			= []
+			desiredNumberOfSuperRooms	= random.any [0, 1, 1, 1, 2]
 			rooms.each (i, j, room) =>
 				if room and room.type is "regular"
 					unmergedRooms.push({x: i, y: j})
 
 			# okay, let's see
 			# while we have umerged rooms
-			while unmergedRooms.length > 0
+			while unmergedRooms.length > 0 and superRooms.length < desiredNumberOfSuperRooms
 
 				# start building a superroom with one of them
 				initialIndex	= random.intInRange unmergedRooms.length
