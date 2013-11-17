@@ -399,11 +399,34 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 			@tiles[Math.floor(ROOM_WIDTH/2)][Math.floor(ROOM_HEIGHT/2)] = "."
 
+		anyBorderPoint: (direction) ->
+			switch direction
+				when "north"
+					x = random.intInRange 1, ROOM_WIDTH - 1
+					y = 0
+
+				when "south"
+					x = random.intInRange 1, ROOM_WIDTH - 1
+					y = ROOM_HEIGHT - 1
+
+				when "east"
+					x = ROOM_WIDTH - 1
+					y = random.intInRange 1, ROOM_HEIGHT - 1
+
+				when "west"
+					x = 0
+					y = random.intInRange 1, ROOM_HEIGHT - 1
+
+				else
+					throw new Error "Unrecognized direction #{direction}"
+
+			return {x: x, y: y}
+
 		addEntrance: (direction) ->
-			@entrance = {x: Math.floor(ROOM_WIDTH/2), y: Math.floor(ROOM_HEIGHT/2)}
+			@entrance = @anyBorderPoint direction
 
 		addExit: (direction) ->
-			@exits[direction] = {x: Math.floor(ROOM_WIDTH/2), y: Math.floor(ROOM_HEIGHT/2)}
+			@exits[direction] = @anyBorderPoint direction
 
 		finalize: ->
 			@superRoom.finalize()
@@ -481,11 +504,13 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			area			= @widthInRooms * @heightInRooms
 			numberOfRooms		= 0
 			@rooms			= []
+			@roomCenters		= []
 
 			while @possibleRooms.length > 0
 				room		= random.any @possibleRooms
 				@possibleRooms	= (r for r in @possibleRooms when not util.aabbsIntersect r, room)
 				@rooms.push room
+				@roomCenters.push @centerCell room
 
 				for i in [room.left..room.right]
 					for j in [room.top..room.bottom]
@@ -617,6 +642,36 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					@makePath @centerCell(@rooms[first]), @centerCell(@rooms[second])
 					++numberOfAdditionalPaths
 
+		closestRoomCenter: ({x: x, y: y}) ->
+			smallestDistance = Infinity
+
+			for center in @roomCenters
+				dx	= x - center.x
+				dy	= y - center.y
+				d	= dx*dx + dy*dy
+
+				if d < smallestDistance
+					smallestDistance	= d
+					closestCenter		= center
+
+			return closestCenter
+
+		addBorderConnections: ->
+			for section in @sections
+				xOffset	= (section.xIndex - @minRoomX) * (ROOM_WIDTH + 1)
+				yOffset	= (section.yIndex - @minRoomY) * (ROOM_HEIGHT + 1)
+
+				entrance = section.entrance
+				if section.entrance?
+					entranceCell	= @cells[entrance.x + xOffset][entrance.y + yOffset]
+					center		= @closestRoomCenter entranceCell
+					@makePath center, entranceCell
+
+				for direction, exit of section.exits
+					exitCell	= @cells[exit.x + xOffset][exit.y + yOffset]
+					center		= @closestRoomCenter exitCell
+					@makePath center, exitCell
+
 		closePaths: ->
 			for path in @paths
 				for cell in path
@@ -656,6 +711,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@establishPossibleRooms()
 			@makeRooms()
 			@connectRooms()
+			@addBorderConnections()
 			@closePaths()
 
 		realize: (reifier) ->
