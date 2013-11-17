@@ -6,7 +6,7 @@ define ['game/consts', 'core/util'],
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
 		LEVEL_WIDTH	= LEVEL_HEIGHT	= consts.LEVEL_WIDTH
 
-		MAX_SUPERROOM_SIZE = 3
+		MAX_SUPERROOM_SIZE = 4
 
 		random = util.random
 

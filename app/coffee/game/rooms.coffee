@@ -437,7 +437,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 	class ns.SuperRoom
 		@MIN_ROOM_DIM: 6
 		@MAX_ROOM_DIM: 16
-		@MIN_ROOM_RATIO: 0.5
+		@MIN_ROOM_RATIO: 0.7
 
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
@@ -539,13 +539,13 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			throw new Error "Cell not active" unless @cells[x][y].isActive
 			cell		= @cells[x][y]
 			cell.type	= "wall"
-			cell.weight	= 20
+			cell.weight	= 10
 
 		setAsFloor: (x, y) ->
 			throw new Error "Cell not active" unless @cells[x][y].isActive
 			cell		= @cells[x][y]
 			cell.type	= "floor"
-			cell.weight	= 0
+			cell.weight	= 1
 
 		neighbouringCells: ({x: x, y: y}, opts) ->
 			cells = []
@@ -676,7 +676,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				@makePath @centerCell(currentRoom), @centerCell(nextRoom)
 
 			numberOfAdditionalPaths		= 0
-			maxNumberOfAdditionalPaths	= 0 #random.intInRange 3
+			maxNumberOfAdditionalPaths	= random.intInRange 2
 			while numberOfAdditionalPaths < maxNumberOfAdditionalPaths
 				first	= random.intInRange @rooms.length
 				second	= random.intInRange @rooms.length
