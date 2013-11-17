@@ -108,18 +108,19 @@ define ['game/consts', 'core/util'],
 
 			# okay, let's see
 			# while we have umerged rooms
-			while unmergedRooms.length > 0#and false
+			while unmergedRooms.length > 0
 
 				# start building a superroom with one of them
 				initialIndex	= random.intInRange unmergedRooms.length
 				initialRoom	= unmergedRooms[initialIndex]
 				roomsToMerge	= [initialRoom]
 				superRoom	= []
+				desiredLength	= random.intInRange 2, MAX_SUPERROOM_SIZE
 				superRooms.push superRoom
 				unmergedRooms.remove initialRoom
 
 				# now, while we've got rooms to add to the superroom
-				while roomsToMerge.length > 0 and superRoom.length < MAX_SUPERROOM_SIZE
+				while roomsToMerge.length > 0 and superRoom.length < desiredLength
 					index	= random.intInRange roomsToMerge.length
 					room	= roomsToMerge[index]
 					roomsToMerge.remove room
