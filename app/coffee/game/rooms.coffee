@@ -475,10 +475,14 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@cells.each (left, top, cell) =>
 				return unless cell.isActive
 
+				# some magic numbers to ensure we can always close a path
+				# (a path requires 1 for floors, 1 for walls)
+				return unless left >= 2 and top >= 2
+
 				for width in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
-												left + width <= @widthInCells
+												left + width <= @widthInCells - 2
 					for height in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
-												top + height <= @heightInCells
+												top + height <= @heightInCells - 2
 						isValid = true
 						for i in [0...width]
 							for j in [0...height]
