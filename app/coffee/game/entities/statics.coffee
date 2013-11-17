@@ -1,6 +1,7 @@
 define ['core/app', 'core/entities', 'core/graphics',
-	'core/util', 'game/consts', 'game/entities/graphics'],
-	(app, entities, gfx, util, consts, entityGfx) ->
+	'core/util', 'game/consts', 'game/entities/graphics'
+	'core/debug'],
+	(app, entities, gfx, util, consts, entityGfx, debug) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -26,8 +27,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 				super
 					x: x
 					y: y
-					#graphic: random.any entityGfx.floorSprites
-					graphic: (new gfx.Rect consts.TILE_WIDTH, consts.TILE_WIDTH, color or "white")
+					graphic:
+						if debug.isEnabled "colorFloors"
+							(new gfx.Rect consts.TILE_WIDTH, consts.TILE_WIDTH, color or "white")
+						else
+							random.any entityGfx.floorSprites
 					layer: 300
 					static: true
 
