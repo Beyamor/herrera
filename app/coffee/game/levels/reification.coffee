@@ -9,8 +9,8 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 		random = util.random
 
 		class ns.Reifier
-			reifyFloor: (x, y) ->
-				new staticEntities.Floor x, y
+			reifyFloor: (x, y, color) ->
+				new staticEntities.Floor x, y, color
 
 			reifyWall: (x, y) ->
 				new staticEntities.Wall x, y
@@ -18,9 +18,9 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 			reifyEnemy: (x, y) ->
 				new entities.Silverfish x, y
 
-			reifyWallOrFloor: (x, y, type) ->
+			reifyWallOrFloor: (x, y, type, color) ->
 				if type is "." or type is "floor"
-					return @reifyFloor x, y
+					return @reifyFloor x, y, color
 				else if type is "W" or type is "wall"
 					return @reifyWall x, y
 

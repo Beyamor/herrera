@@ -22,11 +22,12 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 		
 		class ns.Floor extends Entity
-			constructor: (x, y) ->
+			constructor: (x, y, color) ->
 				super
 					x: x
 					y: y
-					graphic: random.any entityGfx.floorSprites
+					#graphic: random.any entityGfx.floorSprites
+					graphic: (new gfx.Rect consts.TILE_WIDTH, consts.TILE_WIDTH, color or "white")
 					layer: 300
 					static: true
 

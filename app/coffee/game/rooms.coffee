@@ -428,13 +428,19 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		realize: (args...) ->
 			@superRoom.realize.apply(@superRoom, args)
 
+	superRoomColors = ["red", "green", "blue", "yellow", "purple"]
+	superRoomColorIndex = -1
+	nextSuperRoomColor = ->
+		++superRoomColorIndex
+		return superRoomColors[(superRoomColorIndex + 1) % superRoomColors.length]
+
 	class ns.SuperRoom
 		@MIN_ROOM_DIM: 6
 		@MAX_ROOM_DIM: 16
 
-
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
+			@color = nextSuperRoomColor()
 
 		initialize: (x, y) ->
 			cell		= @cells[x][y]
@@ -475,7 +481,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@cells.each (left, top, cell) =>
 				return unless cell.isActive
 
-				# some magic numbers to ensure we can always close a path
+				# some magic 2s to ensure we can always close a path
 				# (a path requires 1 for floors, 1 for walls)
 				return unless left - 2 >= 0 and top - 2 >= 0
 
@@ -484,19 +490,19 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					for height in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
 												top + height + 2 <= @heightInCells
 						isValid = true
-						for i in [0...width]
-							for j in [0...height]
+						for i in [-2...width + 2]
+							for j in [-2...height + 2]
 								unless @cells[left + i][top + j].isActive
 									isValid = false
 									break
 							break unless isValid
+						continue unless isValid
 
-						if isValid
-							@possibleRooms.push
-								left:	left
-								top:	top
-								right:	left + width - 1
-								bottom:	top + height - 1
+						@possibleRooms.push
+							left:	left
+							top:	top
+							right:	left + width - 1
+							bottom:	top + height - 1
 
 		makeRooms: ->
 			area			= @widthInRooms * @heightInRooms
@@ -523,14 +529,16 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				++numberOfRooms
 
 		setAsWall: (x, y) ->
+			throw new Error "Cell not active" unless @cells[x][y].isActive
 			cell		= @cells[x][y]
 			cell.type	= "wall"
 			cell.weight	= 20
 
 		setAsFloor: (x, y) ->
+			throw new Error "Cell not active" unless @cells[x][y].isActive
 			cell		= @cells[x][y]
 			cell.type	= "floor"
-			cell.weight	= 1
+			cell.weight	= 0
 
 		neighbouringCells: ({x: x, y: y}, opts) ->
 			cells = []
@@ -551,7 +559,20 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				cells.push @cells[x+1][y-1] if right and top
 				cells.push @cells[x+1][y+1] if right and bottom
 
-			return _.filter cells, (cell) -> cell.isActive
+			if opts and opts.excludeBorders
+				previousLength = cells.length
+				cells = _.filter cells, (cell) =>
+					return false if	cell.x - 1 < 0 or cell.x + 1 >= @widthInCells or
+							cell.y - 1 < 0 or cell.y + 1 >= @heightInCells
+
+					return false unless	@cells[cell.x - 1][cell.y].isActive and
+								@cells[cell.x + 1][cell.y].isActive and
+								@cells[cell.x][cell.y - 1].isActive and
+								@cells[cell.x][cell.y + 1].isActive
+
+					return true
+
+			return cells
 
 		makePath: (startingCell, endingCell) ->
 			initialNode	= {cell: startingCell}
@@ -571,26 +592,30 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				return dx*dx + dy*dy
 
 			addAdjacentNodes = (parent) =>
-				for neighbouringCell in @neighbouringCells parent.cell
-					alreadyInList	= false
-					existingNode	= null
+				for neighbouringCell in @neighbouringCells parent.cell, {excludeBorders: true}
+					alreadyInClosedList	= false
+					alreadyInOpenList	= false
+					existingNode		= null
+
 					for node in openList
 						if node.cell is neighbouringCell
-							alreadyInList	= true
-							existingNode	= node
+							alreadyInOpenList	= true
+							existingNode		= node
 							break
 
-					unless alreadyInList
+					unless alreadyInOpenList
 						for node in closedList
 							if node.cell is neighbouringCell
-								alreadyInList	= true
-								existingNode	= node
+								alreadyInClosedList	= true
+								existingNode		= node
 								break
 
-					if alreadyInList
+					if alreadyInOpenList
 						if existingNode.parent and g(parent) < g(existingNode.parent)
 							existingNode.parent = parent
-					else
+					else if not alreadyInClosedList
+						unless neighbouringCell.isActive
+							throw new Error "Whoa, adding inactive cell to the open list"
 						openList.push
 							cell:	neighbouringCell
 							parent:	parent
@@ -598,6 +623,9 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			addAdjacentNodes initialNode
 
 			until lastNode?
+				if openList.length is 0
+					throw Error "No nodes in open list"
+
 				nextNode	= null
 				minF		= Infinity
 				for node in openList
@@ -674,18 +702,18 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				if section.entrance?
 					entranceCell	= @cells[entrance.x + xOffset][entrance.y + yOffset]
 					center		= @closestRoomCenter entranceCell
-					@makePath center, entranceCell
+					@makePath entranceCell, center
 
 				for direction, exit of section.exits
 					exitCell	= @cells[exit.x + xOffset][exit.y + yOffset]
 					center		= @closestRoomCenter exitCell
-					@makePath center, exitCell
+					@makePath exitCell, center
 
 		closePaths: ->
 			for path in @paths
 				for cell in path
 					for neighbour in @neighbouringCells cell, {includeDiagonals: true}
-						unless neighbour.type?
+						if neighbour.isActive and not neighbour.type?
 							@setAsWall neighbour.x, neighbour.y
 
 		copyTilesToSections: ->
@@ -747,7 +775,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				x = xOffset + i * TILE_WIDTH
 				y = yOffset + j * TILE_HEIGHT
 
-				tile = reifier.reifyWallOrFloor x, y, cell.type
+				tile = reifier.reifyWallOrFloor x, y, cell.type, @color
 				es.push tile if tile
 
 			return es
