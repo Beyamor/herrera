@@ -34,9 +34,10 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 					room = layout.rooms[i][j]
 					if room?
 						roomClass = switch room.type
-							when "start"	then StartRoom
-							when "regular"	then SuperRoomSection
-							when "end"	then EndRoom
+							when "start"		then StartRoom
+							when "regular"		then Regular
+							when "superroom"	then SuperRoomSection
+							when "end"		then EndRoom
 
 						return new roomClass i, j
 

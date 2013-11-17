@@ -125,6 +125,7 @@ define ['game/consts', 'core/util'],
 					roomsToMerge.remove room
 
 					# add a room (noting it as merged)
+					rooms[room.x][room.y].type = "superroom"
 					superRoom.push(room)
 					unmergedRooms = _.filter unmergedRooms, (unmergedRoom) ->
 						unmergedRoom.x isnt room.x or unmergedRoom.y isnt room.y
