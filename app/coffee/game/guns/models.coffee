@@ -165,9 +165,29 @@ define ['core/util', 'game/guns/shapes'], (util, shapes) ->
 					v2.x += dx
 					v2.y += dy
 
-			return [
-				barrel,
-				body
+			paintColor = random.any [
+				"#5A5F6E",
+				"#BA2525",
+				"#BA8B25",
+				"#49853E",
+				"#B89AA6",
+				"#7A442F",
+				"#0A010D",
+				"#D5DBF5"
 			]
+
+			metalColor = random.any [
+				"#848687",
+				"#B8BDBF"
+			]
+
+			return {
+				paint: paintColor
+				metal: metalColor
+				parts: [
+					barrel,
+					body
+				]
+			}
 
 	return ns

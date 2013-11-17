@@ -7,30 +7,14 @@ define ['core/canvas', 'core/util'], (canvas, util) ->
 	random = util.random
 
 	class ns.GunSprite
-		constructor: (model) ->
+		constructor: ({parts: parts, metal: metalColor, paint: paintColor}) ->
 			@canvas		= new canvas.Canvas width: SPRITE_WIDTH, height: SPRITE_HEIGHT
 			context		= @canvas.context
 
 			context.save()
 			context.translate SPRITE_WIDTH/2, SPRITE_HEIGHT/2
 
-			paintColor = random.any [
-				"#5A5F6E",
-				"#BA2525",
-				"#BA8B25",
-				"#49853E",
-				"#B89AA6",
-				"#7A442F",
-				"#0A010D",
-				"#D5DBF5"
-			]
-
-			metalColor = random.any [
-				"#848687",
-				"#B8BDBF"
-			]
-
-			for part in model
+			for part in parts
 				for piece in part.pieces
 					lastVertex = piece.vertices[piece.vertices.length - 1]
 
