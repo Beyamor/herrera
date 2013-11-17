@@ -129,7 +129,7 @@ define ['game/consts', 'core/util'],
 					unmergedRooms = _.filter unmergedRooms, (unmergedRoom) ->
 						unmergedRoom.x isnt room.x or unmergedRoom.y isnt room.y
 
-					# then add the room's neighbours
+					# then add other reachable rooms
 					for direction in util.DIRECTIONS
 						[dx, dy]	= util.directionToDelta direction
 						neighbourX	= room.x + dx
@@ -137,6 +137,15 @@ define ['game/consts', 'core/util'],
 
 						continue if neighbourX < 0 or neighbourY < 0 or
 								neighbourX >= LEVEL_WIDTH or neighbourY >= LEVEL_HEIGHT
+
+						# we only want add reachable rooms
+						# e.g., rooms we can reach by exiting this one
+						reachable = false
+						for {from: from, to: to} in connections
+							if from.x is room.x and from.y is room.y and
+								to.x is neighbourX and to.y is neighbourY
+									reachable = true
+						continue unless reachable
 
 						neighbour = rooms[neighbourX][neighbourY]
 
