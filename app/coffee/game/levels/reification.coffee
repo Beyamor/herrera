@@ -24,6 +24,9 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 				else if type is "W" or type is "wall"
 					return @reifyWall x, y
 
+			reifyPortal: (x, y) ->
+				new staticEntities.Portal x, y
+
 			addRoomOffset: (room, pos) ->
 				pos.x += room.xIndex * (ROOM_WIDTH + 1) * TILE_WIDTH
 				pos.y += room.yIndex * (ROOM_HEIGHT + 1) * TILE_HEIGHT

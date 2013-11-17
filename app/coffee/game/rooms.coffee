@@ -378,13 +378,13 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@tiles[x][y] = "."
 			@entrance = {x: x, y: y}
 
-		entities: (reifier) ->
-			super(reifier).concat [
-				type: "portal"
-				pos:
-					x: Math.floor(ROOM_WIDTH/2)
-					y: Math.floor(ROOM_HEIGHT/2)
-			]
+		realize: (reifier) ->
+			es = super(reifier)
+			es.push reifier.reifyPortal(
+				@xOffset + Math.floor(ROOM_WIDTH/2) * TILE_WIDTH,
+				@yOffset + Math.floor(ROOM_HEIGHT/2) * TILE_HEIGHT
+			)
+			return es
 
 	class ns.SuperRoomSection extends ns.Room
 		constructor: (xIndex, yIndex) ->
