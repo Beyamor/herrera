@@ -596,7 +596,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				dx	= node.cell.x - endingCell.x
 				dy	= node.cell.y - endingCell.y
 
-				return dx*dx + dy*dy
+				return Math.sqrt(dx*dx + dy*dy)
 
 			addAdjacentNodes = (parent) =>
 				for neighbouringCell in @neighbouringCells parent.cell, {excludeBorders: true}
