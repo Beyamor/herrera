@@ -674,7 +674,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				@makePath @centerCell(currentRoom), @centerCell(nextRoom)
 
 			numberOfAdditionalPaths		= 0
-			maxNumberOfAdditionalPaths	= random.intInRange 3
+			maxNumberOfAdditionalPaths	= 0 #random.intInRange 3
 			while numberOfAdditionalPaths < maxNumberOfAdditionalPaths
 				first	= random.intInRange @rooms.length
 				second	= random.intInRange @rooms.length
