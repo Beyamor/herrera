@@ -38,7 +38,7 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 				level.rooms.each (roomX, roomY, room) =>
 					return unless room
 
-					numberOfEnemies = random.intInRange(2, 5)
+					numberOfEnemies = random.intInRange(2, 4)
 					roomEntities = room.realize this,
 								numberOfEnemies: numberOfEnemies
 					es.push(e) for e in roomEntities

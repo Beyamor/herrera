@@ -516,6 +516,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			numberOfRooms		= 0
 			@rooms			= []
 			@roomCenters		= []
+			@floorCells		= []
 
 			while @possibleRooms.length > 0
 				weightedPossibleRooms = []
@@ -538,6 +539,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 							@setAsWall i, j
 						else
 							@setAsFloor i, j
+							@floorCells.push @cells[i][j]
 
 				++numberOfRooms
 
@@ -774,6 +776,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 											isActive: false
 											x: i
 											y: j
+
 			@occupationGrid	= util.array2d @widthInRooms, @heightInRooms, => false
 			@paths		= []
 
@@ -788,7 +791,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@closePaths()
 			@copyTilesToSections()
 
-		realize: (reifier) ->
+		realize: (reifier, {numberOfEnemies: numberOfEnemies}) ->
 			return [] if @realized
 			@realized = true
 
@@ -804,6 +807,14 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 				tile = reifier.reifyWallOrFloor x, y, cell.type, @color
 				es.push tile if tile
+
+			for i in [0...numberOfEnemies * @sections.length]
+				floor	= random.any @floorCells
+				x	= xOffset + floor.x * TILE_WIDTH + TILE_WIDTH/2
+				y	= yOffset + floor.y * TILE_HEIGHT + TILE_HEIGHT/2
+
+				es.push reifier.reifyEnemy x, y
+				@floorCells.remove floor
 
 			return es
 
