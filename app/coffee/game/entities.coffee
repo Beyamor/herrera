@@ -2,9 +2,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
 	'game/consts', 'game/guns/sprites', 'game/entities/graphics',
-	'game/mixins'],
+	'game/mixins', 'core/debug'],
 	(app, entities, gfx, input, particles, util, bt, behaviours, \
-	guns, consts, gunSprites, entityGfx, gameMixins) ->
+	guns, consts, gunSprites, entityGfx, gameMixins, debug) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -113,7 +113,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@speed = 400
 
 				@collisionHandlers =
-					wall: -> true
+					wall: -> not debug.isEnabled "passThuWalls"
 
 				@gun = new ns.Gun
 
@@ -168,6 +168,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 							@scene.add @gun
 						@scene.remove gun
 						@gun = gun
+
+				if input.pressed 192 # ~
+					debug.toggle "passThuWalls"
 
 		class ns.Silverfish extends Entity
 			constructor: (x, y) ->

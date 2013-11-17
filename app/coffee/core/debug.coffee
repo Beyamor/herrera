@@ -32,4 +32,7 @@ define {
 
 	isEnabled: (type) ->
 		return @enabled and @types[type]
+
+	toggle: (type) ->
+		@types[type] = not @types[type]
 }
