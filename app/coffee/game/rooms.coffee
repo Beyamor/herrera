@@ -526,6 +526,8 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 						isWall	= i is room.left or i is room.right or
 								j is room.top or j is room.bottom
 
+						throw new Error "Cell #{i}, #{j} already set" if @cells[i][j].type?
+
 						if isWall
 							@setAsWall i, j
 						else
