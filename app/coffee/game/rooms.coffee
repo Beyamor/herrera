@@ -486,7 +486,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 						isValid = true
 						for i in [0...width]
 							for j in [0...height]
-								unless @cells[left + i][top + j]
+								unless @cells[left + i][top + j].isActive
 									isValid = false
 									break
 							break unless isValid
