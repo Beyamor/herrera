@@ -139,10 +139,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 										@gun.damage
 								@scene.add shot
 
-				if input.pressed 'grab'
-					item = @scene.entities.collide this, 'item'
-					if item
-						item.equip this
+				itemOfInterest = @scene.entities.collide this, 'item'
+				if itemOfInterest and input.pressed 'grab'
+					itemOfInterest.equip this
 
 				if input.pressed 192 # ~
 					debug.toggle "passThuWalls"
