@@ -1,21 +1,34 @@
-define ['core/entities', "game/guns",'game/guns/sprites'],
-	(entities, guns, gunSprites) ->
+define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/displays'],
+	(entities, guns, gunSprites, displays) ->
 		ns = {}
 
-		class Item extends entities.Entity
+		Entity = entities.Entity
+
+		class ItemDisplay extends Entity
+			constructor: (x, y, graphic) ->
+				super
+					x: x
+					y: y
+					graphic: graphic
+					centered: true
+					layer: -50
+
+		class Item extends Entity
 			constructor: (opts) ->
 				super _.extend {
-					width: 23
+					width: 24
+					centered: true
 					layer: 150
 					type: "item"
-					centered: true
 				}, opts
 
 			showDisplay: ->
-				console.log "showing display"
+				@display = new ItemDisplay @x, @y, @createDisplay()
+				@scene.add @display
 
 			hideDisplay: ->
-				console.log "hiding display"
+				@scene.remove @display
+				@display = null
 
 		class Gun extends Item
 			constructor: (@model) ->
@@ -34,6 +47,9 @@ define ['core/entities', "game/guns",'game/guns/sprites'],
 					@scene.add oldGun
 				@scene.remove this
 				entity.gun = @model
+
+			createDisplay: ->
+				new displays.GunDisplay @model
 
 		getItemClass = multimethod()
 				.dispatch (i) ->

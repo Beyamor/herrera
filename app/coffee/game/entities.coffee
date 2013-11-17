@@ -149,7 +149,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 						@grabbableItem.showDisplay()
 
 				if @grabbableItem and input.pressed 'grab'
+					@grabbableItem.hideDisplay()
 					@grabbableItem.equip this
+					@grabbableItem = previousGrabbableItem = null
 
 				if input.pressed 192 # ~
 					debug.toggle "passThuWalls"

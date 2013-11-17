@@ -7,8 +7,8 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 		SMG_MODEL = new models.Gun smgModel, parse: true
 
 		class ns.GunModel
-			constructor: ({capacity: @maxCapacity, firingRate: firingRate, \
-					rechargeDelay: rechargeDelay, rechargeSpeed: @rechargeSpeed, \
+			constructor: ({capacity: @maxCapacity, firingRate: @firingRate, \
+					rechargeDelay: @rechargeDelay, rechargeSpeed: @rechargeSpeed, \
 					damage: @damage}) ->
 
 						@capacity	= @maxCapacity
@@ -16,13 +16,13 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 						@canShoot	= true
 
 						@rechargeTimer	= new util.Timer {
-							period: rechargeDelay,
+							period: @rechargeDelay,
 							callback: =>
 								@isRecharging = true
 						}
 
 						@shotTimer = new util.Timer {
-							period: (1 / firingRate)
+							period: (1 / @firingRate)
 							callback: =>
 								@canShoot = true
 						}
