@@ -1,34 +1,15 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
-	'game/consts', 'game/guns/sprites', 'game/entities/graphics',
-	'game/mixins', 'core/debug'],
+	'game/consts',  'game/entities/graphics',
+	'game/mixins', 'core/debug', 'game/entities/items'],
 	(app, entities, gfx, input, particles, util, bt, behaviours, \
-	guns, consts, gunSprites, entityGfx, gameMixins, debug) ->
+	guns, consts, entityGfx, gameMixins, debug, items) ->
 		ns = {}
 
 		Entity		= entities.Entity
 		Image		= gfx.Image
 		random		= util.random
-
-		class ns.Gun extends Entity
-			constructor: ->
-				@model = guns.GunModel.createRandom()
-
-				super {
-					graphic: new gunSprites.GunSprite @model.model
-					width: 24
-					layer: 150
-					type: 'gun'
-					centered: true
-					mixins:
-						updates: [
-							@model
-						]
-				}
-
-			tryShooting: ->
-				@model.tryShooting()
 
 		class ns.Barrel extends Entity
 			constructor: (x, y) ->
@@ -115,7 +96,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@collisionHandlers =
 					wall: -> not debug.isEnabled "passThuWalls"
 
-				@gun = new ns.Gun
+				@gun = guns.GunModel.createRandom()
 
 			update: ->
 				super()
@@ -155,7 +136,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 							if @gun.tryShooting()
 								shot = new ns.Shot @pos.x, @pos.y,
 										600, Math.atan2(dy, dx),
-										@gun.model.damage
+										@gun.damage
 								@scene.add shot
 
 				if input.pressed 'grab'
@@ -163,11 +144,12 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 					if gun
 						if @gun
-							@gun.x = @x
-							@gun.y = @y
-							@scene.add @gun
+							droppedGun	= items.for @gun
+							droppedGun.x	= @x
+							droppedGun.y	= @y
+							@scene.add droppedGun
 						@scene.remove gun
-						@gun = gun
+						@gun = gun.model
 
 				if input.pressed 192 # ~
 					debug.toggle "passThuWalls"
@@ -257,7 +239,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@scene.add new ns.DamageCounter @x, @y, damage
 
 				if @hp <= 0
-					loot = new ns.Gun
+					loot = items.for guns.GunModel.createRandom()
 					loot.x = @x
 					loot.y = @y
 					@scene.add loot

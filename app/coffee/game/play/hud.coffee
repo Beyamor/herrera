@@ -14,7 +14,7 @@ define ['core/canvas'], (canvas) ->
 
 		render: ->
 			return unless @player.gun
-			gun = @player.gun.model
+			gun = @player.gun
 
 			@canvas.clear()
 			context = @canvas.context
