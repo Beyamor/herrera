@@ -139,9 +139,17 @@ define ['core/app', 'core/entities', 'core/graphics',
 										@gun.damage
 								@scene.add shot
 
-				itemOfInterest = @scene.entities.collide this, 'item'
-				if itemOfInterest and input.pressed 'grab'
-					itemOfInterest.equip this
+				previousGrabbableItem	= @grabbableItem
+				@grabbableItem		= @scene.entities.collide this, 'item'
+
+				if previousGrabbableItem isnt @grabbableItem
+					if previousGrabbableItem?
+						previousGrabbableItem.hideDisplay()
+					if @grabbableItem?
+						@grabbableItem.showDisplay()
+
+				if @grabbableItem and input.pressed 'grab'
+					@grabbableItem.equip this
 
 				if input.pressed 192 # ~
 					debug.toggle "passThuWalls"

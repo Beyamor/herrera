@@ -11,6 +11,12 @@ define ['core/entities', "game/guns",'game/guns/sprites'],
 					centered: true
 				}, opts
 
+			showDisplay: ->
+				console.log "showing display"
+
+			hideDisplay: ->
+				console.log "hiding display"
+
 		class Gun extends Item
 			constructor: (@model) ->
 				super
