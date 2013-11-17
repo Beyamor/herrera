@@ -6,6 +6,8 @@ define ['game/consts', 'core/util'],
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
 		LEVEL_WIDTH	= LEVEL_HEIGHT	= consts.LEVEL_WIDTH
 
+		MAX_SUPERROOM_SIZE = 3
+
 		random = util.random
 
 		tryCreatingLayout = ({desiredMainPathLength:	desiredMainPathLength, \
@@ -109,13 +111,18 @@ define ['game/consts', 'core/util'],
 			while unmergedRooms.length > 0#and false
 
 				# start building a superroom with one of them
-				roomsToMerge	= [unmergedRooms.pop()]
+				initialIndex	= random.intInRange unmergedRooms.length
+				initialRoom	= unmergedRooms[initialIndex]
+				roomsToMerge	= [initialRoom]
 				superRoom	= []
 				superRooms.push superRoom
+				unmergedRooms.remove initialRoom
 
 				# now, while we've got rooms to add to the superroom
-				while roomsToMerge.length > 0
-					room = roomsToMerge.pop()
+				while roomsToMerge.length > 0 and superRoom.length < MAX_SUPERROOM_SIZE
+					index	= random.intInRange roomsToMerge.length
+					room	= roomsToMerge[index]
+					roomsToMerge.remove room
 
 					# add a room (noting it as merged)
 					superRoom.push(room)
@@ -144,11 +151,14 @@ define ['game/consts', 'core/util'],
 						continue if alreadyInMergeList
 
 						alreadyInSuperRoom = false
-						for {x: x, y: y} in superRoom
-							if x is neighbourX and y is neighbourY
-								alreadyInSuperRoom = true
-								break
+						for existingSuperRoom in superRooms
+							for {x: x, y: y} in existingSuperRoom
+								if x is neighbourX and y is neighbourY
+									alreadyInSuperRoom = true
+									break
+							break if alreadyInSuperRoom
 						continue if alreadyInSuperRoom
+
 
 						roomsToMerge.push {x: neighbourX, y: neighbourY}
 

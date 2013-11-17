@@ -633,23 +633,23 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			return @cells[cellX][cellY]
 
 		connectRooms: ->
+			return unless @rooms.length > 1
 			for roomIndex in [0...@rooms.length]
 				currentRoom	= @rooms[roomIndex]
 				nextRoom	= @rooms[(roomIndex + 1) % @rooms.length]
 
 				@makePath @centerCell(currentRoom), @centerCell(nextRoom)
 
-			if @rooms.length > 1
-				numberOfAdditionalPaths		= 0
-				maxNumberOfAdditionalPaths	= random.intInRange 3
-				while numberOfAdditionalPaths < maxNumberOfAdditionalPaths
-					first	= random.intInRange @rooms.length
+			numberOfAdditionalPaths		= 0
+			maxNumberOfAdditionalPaths	= random.intInRange 3
+			while numberOfAdditionalPaths < maxNumberOfAdditionalPaths
+				first	= random.intInRange @rooms.length
+				second	= random.intInRange @rooms.length
+				until second isnt first
 					second	= random.intInRange @rooms.length
-					until second isnt first
-						second	= random.intInRange @rooms.length
 
-					@makePath @centerCell(@rooms[first]), @centerCell(@rooms[second])
-					++numberOfAdditionalPaths
+				@makePath @centerCell(@rooms[first]), @centerCell(@rooms[second])
+				++numberOfAdditionalPaths
 
 		closestRoomCenter: ({x: x, y: y}) ->
 			smallestDistance = Infinity
