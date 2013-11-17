@@ -2,11 +2,11 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 	(util, consts, rooms, layouts) ->
 		ns = {}
 
-		StartRoom		= rooms.StartRoom
-		RegularRoom		= rooms.RegularRoom
-		EndRoom			= rooms.EndRoom
-		SuperRoom		= rooms.SuperRoom
-		SuperRoomSection	= rooms.SuperRoomSection
+		StartRoom			= rooms.StartRoom
+		RegularRoom			= rooms.RegularRoom
+		EndRoom				= rooms.EndRoom
+		OrganicLayoutMiniDungeon	= rooms.OrganicLayoutMiniDungeon
+		SuperRoomSection		= rooms.SuperRoomSection
 
 		TILE_WIDTH	= TILE_HEIGHT	= consts.TILE_WIDTH
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
@@ -44,7 +44,7 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 				# create superrooms
 				for superRoomList in layout.superRooms
 					sections = (@rooms[x][y] for {x: x, y: y} in superRoomList)
-					superRoom = new SuperRoom sections
+					superRoom = new OrganicLayoutMiniDungeon sections
 
 				# set connections between them
 				@connections = []

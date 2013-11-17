@@ -437,7 +437,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		++superRoomColorIndex
 		return superRoomColors[(superRoomColorIndex + 1) % superRoomColors.length]
 
-	class ns.SuperRoom
+	class ns.OrganicLayoutMiniDungeon
 		@MIN_ROOM_DIM: 5
 		@MAX_ROOM_DIM: 14
 		@MIN_ROOM_RATIO: 0.7
@@ -489,13 +489,13 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				# (a path requires 1 for floors, 1 for walls)
 				return unless left - 2 >= 0 and top - 2 >= 0
 
-				for width in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
-												left + width + 2 <= @widthInCells
-					for height in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
-												top + height + 2 <= @heightInCells
+				for width in [ns.OrganicLayoutMiniDungeon.MIN_ROOM_DIM..ns.OrganicLayoutMiniDungeon.MAX_ROOM_DIM]\
+						when left + width + 2 <= @widthInCells
+					for height in [ns.OrganicLayoutMiniDungeon.MIN_ROOM_DIM..ns.OrganicLayoutMiniDungeon.MAX_ROOM_DIM]\
+						when top + height + 2 <= @heightInCells
 
-						continue if (width / height) < ns.SuperRoom.MIN_ROOM_RATIO
-						continue if (height / width) < ns.SuperRoom.MIN_ROOM_RATIO
+						continue if (width / height) < ns.OrganicLayoutMiniDungeon.MIN_ROOM_RATIO
+						continue if (height / width) < ns.OrganicLayoutMiniDungeon.MIN_ROOM_RATIO
 
 						isValid = true
 						for i in [-2...width + 2]
