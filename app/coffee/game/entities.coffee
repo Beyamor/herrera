@@ -146,7 +146,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					if previousGrabbableItem?
 						previousGrabbableItem.hideDisplay()
 					if @grabbableItem?
-						@grabbableItem.showDisplay()
+						@grabbableItem.showDisplay this
 
 				if @grabbableItem and input.pressed 'grab'
 					@grabbableItem.hideDisplay()

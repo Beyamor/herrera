@@ -22,8 +22,8 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 					type: "item"
 				}, opts
 
-			showDisplay: ->
-				@display = new ItemDisplay @x, @y, @createDisplay()
+			showDisplay: (entity) ->
+				@display = new ItemDisplay @x, @y, @createDisplay(entity)
 				@scene.add @display
 
 			hideDisplay: ->
@@ -48,8 +48,8 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				@scene.remove this
 				entity.gun = @model
 
-			createDisplay: ->
-				new displays.GunDisplay @model
+			createDisplay: (entity) ->
+				new displays.GunDisplay @model, entity.gun
 
 		getItemClass = multimethod()
 				.dispatch (i) ->
