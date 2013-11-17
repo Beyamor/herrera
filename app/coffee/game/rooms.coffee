@@ -538,18 +538,21 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 						throw new Error "Cell #{i}, #{j} already set" if @cells[i][j].type?
 
 						if isWall
-							@setAsWall i, j
+							@setAsWall i, j, includePossibleGaps: true
 						else
 							@setAsFloor i, j
 							@floorCells.push @cells[i][j]
 
 				++numberOfRooms
 
-		setAsWall: (x, y) ->
+		setAsWall: (x, y, opts) ->
 			throw new Error "Cell not active" unless @cells[x][y].isActive
 			cell		= @cells[x][y]
 			cell.type	= "wall"
 			cell.weight	= 10
+
+			if opts and opts.includePossibleGaps and random.chance(30)
+				cell.weight = 4
 
 		setAsFloor: (x, y) ->
 			throw new Error "Cell not active" unless @cells[x][y].isActive
@@ -686,7 +689,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				@makePath @centerCell(currentRoom), @centerCell(nextRoom)
 
 			numberOfAdditionalPaths		= 0
-			maxNumberOfAdditionalPaths	= random.intInRange 2
+			maxNumberOfAdditionalPaths	= random.intInRange 3
 			while numberOfAdditionalPaths < maxNumberOfAdditionalPaths
 				first	= random.intInRange @rooms.length
 				second	= random.intInRange @rooms.length

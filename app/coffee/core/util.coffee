@@ -112,7 +112,8 @@ define ['core/app'], (app) ->
 
 			angle: -> util.random.inRange 0, 2 * Math.PI
 			any: (coll) -> coll[Math.floor(Math.random() * coll.length)]
-			coinFlip: -> Math.random() < 0.5
+			coinFlip: -> util.random.chance 50
+			chance: (probability) -> Math.random() * 100 < probability
 
 		isFunction: (x) ->
 			x and typeof(x) is "function"
