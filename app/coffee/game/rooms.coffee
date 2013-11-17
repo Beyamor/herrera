@@ -435,8 +435,8 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		return superRoomColors[(superRoomColorIndex + 1) % superRoomColors.length]
 
 	class ns.SuperRoom
-		@MIN_ROOM_DIM: 6
-		@MAX_ROOM_DIM: 16
+		@MIN_ROOM_DIM: 5
+		@MAX_ROOM_DIM: 12
 		@MIN_ROOM_RATIO: 0.7
 
 		constructor: (@sections) ->
@@ -508,6 +508,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 							top:	top
 							right:	left + width - 1
 							bottom:	top + height - 1
+							area:	width * height
 
 		makeRooms: ->
 			area			= @widthInRooms * @heightInRooms
@@ -516,7 +517,11 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@roomCenters		= []
 
 			while @possibleRooms.length > 0
-				room		= random.any @possibleRooms
+				weightedPossibleRooms = []
+				for room in @possibleRooms
+					for i in [0...room.area]
+						weightedPossibleRooms.push room
+				room		= random.any weightedPossibleRooms
 				@possibleRooms	= (r for r in @possibleRooms when not util.aabbsIntersect r, room)
 				@rooms.push room
 				@roomCenters.push @centerCell room
