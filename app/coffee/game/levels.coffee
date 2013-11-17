@@ -71,73 +71,73 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 
 				# and build the connections
 				for {from: from, to: to, direction: direction} in @connections
-                                        exit		= from.exits[direction]
-                                        entrance        = to.entrance
+					exit		= from.exits[direction]
+					entrance	= to.entrance
+					
+					path = []
+					switch direction
+						when "south"
+							middleY = @levelY(to, -1)
 
-                                        path = []
-                                        switch direction
-                                                when "south"
-                                                        middleY = @levelY(to, -1)
+							for y in [@levelY(from, exit.y+1)...middleY]
+								path.push [@levelX(from, exit.x), y]
 
-                                                        for y in [@levelY(from, exit.y+1)...middleY]
-                                                                path.push [@levelX(from, exit.x), y]
+							for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
+								path.push [x, middleY]
 
-                                                        for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
-                                                                path.push [x, middleY]
+							for y in [@levelY(to, entrance.y-1)...middleY]
+								path.push [@levelX(to, entrance.x), y]
 
-                                                        for y in [@levelY(to, entrance.y-1)...middleY]
-                                                                path.push [@levelX(to, entrance.x), y]
+						when "north"
+							middleY = @levelY(from, -1)
 
-                                                when "north"
-                                                        middleY = @levelY(from, -1)
+							for y in [@levelY(from, exit.y-1)...middleY]
+								path.push [@levelX(from, exit.x), y]
 
-                                                        for y in [@levelY(from, exit.y-1)...middleY]
-                                                                path.push [@levelX(from, exit.x), y]
+							for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
+								path.push [x, middleY]
 
-                                                        for x in [@levelX(from, exit.x)..@levelX(to, entrance.x)]
-                                                                path.push [x, middleY]
+							for y in [@levelY(to, entrance.y+1)...middleY]
+								path.push [@levelX(to, entrance.x), y]
 
-                                                        for y in [@levelY(to, entrance.y+1)...middleY]
-                                                                path.push [@levelX(to, entrance.x), y]
+						when "east"
+							middleX = @levelX(to, -1)
 
-                                                when "east"
-                                                        middleX = @levelX(to, -1)
+							for x in [@levelX(from, exit.x+1)...middleX]
+								path.push [x, @levelY(from, exit.y)]
 
-                                                        for x in [@levelX(from, exit.x+1)...middleX]
-                                                                path.push [x, @levelY(from, exit.y)]
+							for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
+								path.push [middleX, y]
 
-                                                        for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
-                                                                path.push [middleX, y]
+							for x in [@levelX(to, entrance.x-1)...middleX]
+								path.push [x, @levelY(to, entrance.y)]
 
-                                                        for x in [@levelX(to, entrance.x-1)...middleX]
-                                                                path.push [x, @levelY(to, entrance.y)]
+						when "west"
+							middleX = @levelX(from, -1)
 
-                                                when "west"
-                                                        middleX = @levelX(from, -1)
+							for x in [@levelX(from, exit.x-1)...middleX]
+								path.push [x, @levelY(from, exit.y)]
 
-                                                        for x in [@levelX(from, exit.x-1)...middleX]
-                                                                path.push [x, @levelY(from, exit.y)]
+							for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
+								path.push [middleX, y]
 
-                                                        for y in [@levelY(from, exit.y)..@levelY(to, entrance.y)]
-                                                                path.push [middleX, y]
-
-                                                        for x in [@levelX(to, entrance.x+1)...middleX]
-                                                                path.push [x, @levelY(to, entrance.y)]
+							for x in [@levelX(to, entrance.x+1)...middleX]
+								path.push [x, @levelY(to, entrance.y)]
 
 
-                                        for [tileX, tileY] in path
-                                                @tiles[tileX][tileY] = "."
+					for [tileX, tileY] in path
+						@tiles[tileX][tileY] = "."
 
-                                                for neighbourX in [tileX-1..tileX+1]
-                                                        for neighbourY in [tileY-1..tileY+1]
-                                                                continue if neighbourX < 0 or
-                                                                                neighbourX >= LEVEL_WIDTH * (ROOM_WIDTH + 1) or
-                                                                                neighbourY < 0 or
-                                                                                neighbourY >= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
+						for neighbourX in [tileX-1..tileX+1]
+							for neighbourY in [tileY-1..tileY+1]
+								continue if neighbourX < 0 or
+										neighbourX >= LEVEL_WIDTH * (ROOM_WIDTH + 1) or
+										neighbourY < 0 or
+										neighbourY >= LEVEL_HEIGHT * (ROOM_HEIGHT + 1)
 
-                                                                existingTile = @existingTile neighbourX, neighbourY
-                                                                if (not existingTile) or (existingTile is " ")
-                                                                        @tiles[neighbourX][neighbourY] = "W"
+								existingTile = @existingTile neighbourX, neighbourY
+								if (not existingTile) or (existingTile is " ")
+									@tiles[neighbourX][neighbourY] = "W"
 
 
 			existingTile: (tileX, tileY) ->

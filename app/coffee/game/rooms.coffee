@@ -27,12 +27,6 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 
 		return [x, y]
 
-	reifyWallOrFloor = (reifier, x, y, type) ->
-		if type is "." or type is "floor"
-			return reifier.reifyFloor x, y
-		else if type is "W" or type is "wall"
-			return reifier.reifyWall x, y
-
 	class ns.Room
 		constructor: (@xIndex, @yIndex) ->
 			@tiles		= util.array2d ROOM_WIDTH, ROOM_HEIGHT
@@ -45,7 +39,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				x = @xOffset + i * TILE_WIDTH
 				y = @yOffset + j * TILE_HEIGHT
 
-				tile = reifyWallOrFloor reifier, x, y, type
+				tile = reifier.reifyWallOrFloor x, y, type
 				tiles.push(tile) if tile?
 
 			return tiles
@@ -679,6 +673,15 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 						unless neighbour.type?
 							@setAsWall neighbour.x, neighbour.y
 
+		copyTilesToSections: ->
+			for section in @sections
+				xOffset = (section.xIndex - @minRoomX) * (ROOM_WIDTH + 1)
+				yOffset = (section.yIndex - @minRoomY) * (ROOM_HEIGHT + 1)
+
+				for i in [0...ROOM_WIDTH]
+					for j in [0...ROOM_HEIGHT]
+						section.tiles[i][j] = @cells[i + xOffset][j + yOffset].type
+
 		finalize: ->
 			return if @finalized
 			@finalized = true
@@ -713,6 +716,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@connectRooms()
 			@addBorderConnections()
 			@closePaths()
+			@copyTilesToSections()
 
 		realize: (reifier) ->
 			return [] if @realized
@@ -728,7 +732,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				x = xOffset + i * TILE_WIDTH
 				y = yOffset + j * TILE_HEIGHT
 
-				tile = reifyWallOrFloor reifier, x, y, cell.type
+				tile = reifier.reifyWallOrFloor x, y, cell.type
 				es.push tile if tile
 
 			return es

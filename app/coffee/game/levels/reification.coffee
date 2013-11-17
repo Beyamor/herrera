@@ -18,6 +18,12 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 			reifyEnemy: (x, y) ->
 				new entities.Silverfish x, y
 
+			reifyWallOrFloor: (x, y, type) ->
+				if type is "." or type is "floor"
+					return @reifyFloor x, y
+				else if type is "W" or type is "wall"
+					return @reifyWall x, y
+
 			addRoomOffset: (room, pos) ->
 				pos.x += room.xIndex * (ROOM_WIDTH + 1) * TILE_WIDTH
 				pos.y += room.yIndex * (ROOM_HEIGHT + 1) * TILE_HEIGHT
@@ -34,12 +40,10 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 								numberOfEnemies: numberOfEnemies
 					es.push(e) for e in roomEntities
 
-
-				# TODO add inter-level paths back in
-				#level.tiles.each (tileX, tileY, tile) =>
-				#	entity = @reifyEntity tileX, tileY, tile
-				#	if entity
-				#		es.push entity
+				level.tiles.each (tileX, tileY, type) =>
+					entity = @reifyWallOrFloor tileX * TILE_WIDTH, tileY * TILE_HEIGHT, type
+					if entity
+						es.push entity
 
 				startRoom	= level.rooms[level.start.x][level.start.y]
 				@player		= new entities.Player 100, 100
