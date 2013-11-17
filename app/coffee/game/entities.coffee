@@ -140,16 +140,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 								@scene.add shot
 
 				if input.pressed 'grab'
-					gun = @scene.entities.collide this, 'gun'
-
-					if gun
-						if @gun
-							droppedGun	= items.for @gun
-							droppedGun.x	= @x
-							droppedGun.y	= @y
-							@scene.add droppedGun
-						@scene.remove gun
-						@gun = gun.model
+					item = @scene.entities.collide this, 'item'
+					if item
+						item.equip this
 
 				if input.pressed 192 # ~
 					debug.toggle "passThuWalls"

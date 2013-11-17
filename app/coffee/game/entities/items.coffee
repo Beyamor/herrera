@@ -2,18 +2,32 @@ define ['core/entities', "game/guns",'game/guns/sprites'],
 	(entities, guns, gunSprites) ->
 		ns = {}
 
-		class Gun extends entities.Entity
+		class Item extends entities.Entity
+			constructor: (opts) ->
+				super _.extend {
+					width: 23
+					layer: 150
+					type: "item"
+					centered: true
+				}, opts
+
+		class Gun extends Item
 			constructor: (@model) ->
 				super
 					graphic: new gunSprites.GunSprite @model.model
-					width: 24
-					layer: 150
-					type: 'gun'
-					centered: true
 					mixins:
 						updates: [
 							@model
 						]
+
+			equip: (entity) ->
+				if entity.gun?
+					oldGun		= new Gun entity.gun
+					oldGun.x	= entity.x
+					oldGun.y	= entity.y
+					@scene.add oldGun
+				@scene.remove this
+				entity.gun = @model
 
 		getItemClass = multimethod()
 				.dispatch (i) ->
