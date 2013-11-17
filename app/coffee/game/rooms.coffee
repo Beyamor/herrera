@@ -436,8 +436,8 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		return superRoomColors[(superRoomColorIndex + 1) % superRoomColors.length]
 
 	class ns.SuperRoom
-		@MIN_ROOM_DIM: 5
-		@MAX_ROOM_DIM: 12
+		@MIN_ROOM_DIM: 6
+		@MAX_ROOM_DIM: 14
 		@MIN_ROOM_RATIO: 0.7
 
 		constructor: (@sections) ->
