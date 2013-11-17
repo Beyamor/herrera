@@ -58,7 +58,7 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 					firingRate: random.inRange 3, 8
 					rechargeDelay: 0.5
 					rechargeSpeed: random.inRange 0.5, 3
-					damage: random.intInRange 4, 6
+					damage: random.any [4, 4, 5, 5, 5, 6, 6, 7]
 				}
 		
 		return ns
