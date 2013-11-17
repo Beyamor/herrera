@@ -55,7 +55,8 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 					toRoom		= @rooms[to.x][to.y]
 
 					inSameSuperRoom	= fromRoom.superRoom? and toRoom.superRoom? and
-								fromRoom.superoom is toRoom.super
+								fromRoom.superRoom is toRoom.superRoom
+
 					unless inSameSuperRoom
 						fromRoom.addExit direction
 						toRoom.addEntrance util.oppositeDirection direction
