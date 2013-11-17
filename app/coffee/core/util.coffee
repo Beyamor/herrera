@@ -210,6 +210,9 @@ define ['core/app'], (app) ->
 				arg[0] + Math.random() * (arg[1] - arg[0])
 			else
 				arg
+
+		clamp: (v, min, max) ->
+			Math.max(Math.min(v, max), min)
 	}
 
 	return util

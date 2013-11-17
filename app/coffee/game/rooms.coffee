@@ -417,7 +417,8 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			return {x: x, y: y}
 
 		addEntrance: (direction) ->
-			@entrance = @anyBorderPoint direction
+			@entrance		= @anyBorderPoint direction
+			@entranceDirection	= direction
 
 		addExit: (direction) ->
 			@exits[direction] = @anyBorderPoint direction
@@ -713,13 +714,27 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 				entrance = section.entrance
 				if section.entrance?
 					entranceCell	= @cells[entrance.x + xOffset][entrance.y + yOffset]
-					center		= @closestRoomCenter entranceCell
-					@makePath entranceCell, center
+					closestCenter	= @closestRoomCenter entranceCell
+
+					if section.entranceDirection is "north" or section.entranceDirection is "south"
+						section.entrance.x = util.clamp closestCenter.x - xOffset, 1, ROOM_WIDTH - 2
+					else
+						section.entrance.y = util.clamp closestCenter.y - yOffset, 1, ROOM_HEIGHT - 2
+					entranceCell = @cells[entrance.x + xOffset][entrance.y + yOffset]
+
+					@makePath entranceCell, closestCenter
 
 				for direction, exit of section.exits
 					exitCell	= @cells[exit.x + xOffset][exit.y + yOffset]
-					center		= @closestRoomCenter exitCell
-					@makePath exitCell, center
+					closestCenter	= @closestRoomCenter exitCell
+
+					if direction is "north" or direction is "south"
+						exit.x = util.clamp closestCenter.x - xOffset, 1, ROOM_WIDTH - 2
+					else
+						exit.y = util.clamp closestCenter.y - yOffset, 1, ROOM_HEIGHT - 2
+					exitCell = @cells[exit.x + xOffset][exit.y + yOffset]
+
+					@makePath exitCell, closestCenter
 
 		closePaths: ->
 			for path in @paths
