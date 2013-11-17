@@ -115,12 +115,11 @@ define ['game/consts', 'core/util'],
 				initialRoom	= unmergedRooms[initialIndex]
 				roomsToMerge	= [initialRoom]
 				superRoom	= []
-				desiredLength	= random.intInRange 2, MAX_SUPERROOM_SIZE
 				superRooms.push superRoom
 				unmergedRooms.remove initialRoom
 
 				# now, while we've got rooms to add to the superroom
-				while roomsToMerge.length > 0 and superRoom.length < desiredLength
+				while roomsToMerge.length > 0 and superRoom.length < MAX_SUPERROOM_SIZE
 					index	= random.intInRange roomsToMerge.length
 					room	= roomsToMerge[index]
 					roomsToMerge.remove room
@@ -140,12 +139,13 @@ define ['game/consts', 'core/util'],
 								neighbourX >= LEVEL_WIDTH or neighbourY >= LEVEL_HEIGHT
 
 						# we only want add reachable rooms
-						# e.g., rooms we can reach by exiting this one
+						# (connected from or to)
 						reachable = false
 						for {from: from, to: to} in connections
-							if from.x is room.x and from.y is room.y and
-								to.x is neighbourX and to.y is neighbourY
-									reachable = true
+							reachable or= from.x is room.x and from.y is room.y and
+									to.x is neighbourX and to.y is neighbourY
+							reachable or= to.x is room.x and to.y is room.y and
+									from.x is neighbourX and from.y is neighbourY
 						continue unless reachable
 
 						neighbour = rooms[neighbourX][neighbourY]
