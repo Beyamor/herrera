@@ -31,7 +31,7 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 
 			update: ->
 				if @isRecharging
-					@capacity += (app.elapsed / @rechargeSpeed) * @maxCapacity
+					@capacity += app.elapsed * @rechargeSpeed
 					if @capacity >= @maxCapacity
 						@capacity = @maxCapacity
 						@isRecharging = false
@@ -57,7 +57,7 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 					capacity: random.intInRange 10, 20
 					firingRate: random.inRange 3, 8
 					rechargeDelay: 0.5
-					rechargeSpeed: random.inRange 0.5, 3
+					rechargeSpeed: random.inRange 0.5, 10
 					damage: random.any [4, 4, 5, 5, 5, 6, 6, 7]
 				}
 		
