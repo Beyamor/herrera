@@ -429,8 +429,8 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			@superRoom.realize.apply(@superRoom, args)
 
 	class ns.SuperRoom
-		@MIN_ROOM_DIM: 5
-		@MAX_ROOM_DIM: 20
+		@MIN_ROOM_DIM: 6
+		@MAX_ROOM_DIM: 16
 
 
 		constructor: (@sections) ->
