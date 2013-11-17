@@ -1,11 +1,11 @@
-define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
-	(util, consts, rooms, layouts) ->
+define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts', "game/rooms/super-rooms"],
+	(util, consts, rooms, layouts, superRooms) ->
 		ns = {}
 
 		StartRoom			= rooms.StartRoom
-		RegularRoom			= rooms.RegularRoom
+		PrefabRoom			= rooms.PrefabRoom
 		EndRoom				= rooms.EndRoom
-		OrganicLayoutMiniDungeon	= rooms.OrganicLayoutMiniDungeon
+		OrganicLayout			= superRooms.OrganicLayout
 		SuperRoomSection		= rooms.SuperRoomSection
 
 		TILE_WIDTH	= TILE_HEIGHT	= consts.TILE_WIDTH
@@ -35,16 +35,17 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts'],
 					if room?
 						roomClass = switch room.type
 							when "start"		then StartRoom
-							when "regular"		then RegularRoom
+							when "regular"		then PrefabRoom
 							when "superroom"	then SuperRoomSection
 							when "end"		then EndRoom
 
+						console.log room.type unless roomClass?
 						return new roomClass i, j
 
 				# create superrooms
 				for superRoomList in layout.superRooms
 					sections = (@rooms[x][y] for {x: x, y: y} in superRoomList)
-					superRoom = new OrganicLayoutMiniDungeon sections
+					superRoom = new OrganicLayout sections
 
 				# set connections between them
 				@connections = []
