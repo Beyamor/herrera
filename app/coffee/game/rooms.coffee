@@ -437,6 +437,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 	class ns.SuperRoom
 		@MIN_ROOM_DIM: 6
 		@MAX_ROOM_DIM: 16
+		@MIN_ROOM_RATIO: 0.5
 
 		constructor: (@sections) ->
 			section.superRoom = this for section in @sections
@@ -489,6 +490,10 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 												left + width + 2 <= @widthInCells
 					for height in [ns.SuperRoom.MIN_ROOM_DIM..ns.SuperRoom.MAX_ROOM_DIM] when\
 												top + height + 2 <= @heightInCells
+
+						continue if (width / height) < ns.SuperRoom.MIN_ROOM_RATIO
+						continue if (height / width) < ns.SuperRoom.MIN_ROOM_RATIO
+
 						isValid = true
 						for i in [-2...width + 2]
 							for j in [-2...height + 2]
