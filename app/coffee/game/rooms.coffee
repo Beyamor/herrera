@@ -532,13 +532,24 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 			cell.type	= "floor"
 			cell.weight	= 1
 
-		neighbouringCells: ({x: x, y: y}) ->
+		neighbouringCells: ({x: x, y: y}, opts) ->
 			cells = []
 
-			cells.push @cells[x-1][y] if x > 0
-			cells.push @cells[x+1][y] if x < @widthInCells - 1
-			cells.push @cells[x][y-1] if y > 0
-			cells.push @cells[x][y+1] if y < @heightInCells - 1
+			left	= x > 0
+			right	= x < @widthInCells - 1
+			top	= y > 0
+			bottom	= y < @heightInCells - 1
+
+			cells.push @cells[x-1][y] if left
+			cells.push @cells[x+1][y] if right
+			cells.push @cells[x][y-1] if top
+			cells.push @cells[x][y+1] if bottom
+
+			if opts and opts.includeDiagonals
+				cells.push @cells[x-1][y-1] if left and top
+				cells.push @cells[x-1][y+1] if left and bottom
+				cells.push @cells[x+1][y-1] if right and top
+				cells.push @cells[x+1][y+1] if right and bottom
 
 			return _.filter cells, (cell) -> cell.isActive
 
@@ -673,7 +684,7 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 		closePaths: ->
 			for path in @paths
 				for cell in path
-					for neighbour in @neighbouringCells cell
+					for neighbour in @neighbouringCells cell, {includeDiagonals: true}
 						unless neighbour.type?
 							@setAsWall neighbour.x, neighbour.y
 
