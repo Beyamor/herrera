@@ -77,9 +77,11 @@ define ['core/app', 'core/graphics'],
 							else
 								" (#{displayValue difference})"
 
-					$description = $ '<div class="description">'
-					$description.text "#{property.label}: #{displayValue value}#{differenceDisplay}"
-					$description.attr 'class', comparision
+					$description = $('<div class="description">')
+							.text("#{property.label}: ")
+							.append($("<span>")
+								.text("#{displayValue value}#{differenceDisplay}")
+								.attr('class', "#{comparision} comparison"))
 					@$el.append $description
 
 				@hud.append @$el
