@@ -31,6 +31,8 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		aimLeft: 37
 		aimRight: 39
 		grab: 69
+		close: 27
+		inventory: 73
 
 	app.launch
 		width: 800

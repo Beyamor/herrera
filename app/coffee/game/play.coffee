@@ -22,6 +22,7 @@ define ['core/app', 'core/scenes', 'core/canvas',
 				@hudElements = []
 				@hudElements.push new hud.AmmoDisplay(@hud, player)
 
+				@windows = []
 
 			begin: ->
 				app.canvas.$el.after @hud
@@ -29,8 +30,21 @@ define ['core/app', 'core/scenes', 'core/canvas',
 			end: ->
 				@hud.remove()
 
+			update: ->
+				super() unless @windows.length > 0
+				window.update() for window in @windows when window.update?
+
 			render: ->
 				super()
 				element.render() for element in @hudElements
+
+			addWindow: (window) ->
+				app.container.append window.$el
+				@windows.push window
+				window.scene = this
+
+			removeWindow: (window) ->
+				window.$el.remove()
+				@windows.remove window
 
 		return ns

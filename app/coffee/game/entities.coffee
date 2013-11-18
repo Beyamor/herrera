@@ -2,9 +2,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
 	'game/consts',  'game/entities/graphics', "game/inventory",
-	'game/mixins', 'core/debug', 'game/entities/items'],
+	'game/mixins', 'core/debug', 'game/entities/items',
+	'game/inventory/ui'],
 	(app, entities, gfx, input, particles, util, bt, behaviours, \
-	guns, consts, entityGfx, inv, gameMixins, debug, items) ->
+	guns, consts, entityGfx, inv, gameMixins, debug, items, \
+	invUI) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -153,6 +155,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 					@grabbableItem.hideDisplay()
 					@grabbableItem.addTo @inventory
 					@grabbableItem = previousGrabbableItem = null
+
+				if input.pressed('inventory')
+					@scene.addWindow new invUI.InventoryDisplay @inventory
 
 				if input.pressed 192 # ~
 					debug.toggle "passThuWalls"

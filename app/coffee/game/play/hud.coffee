@@ -15,8 +15,8 @@ define ['core/canvas'], (canvas) ->
 			@hud.append @canvas.$el
 
 		render: ->
-			return unless @player.gun
-			gun = @player.gun
+			return unless @player.inventory.gun
+			gun = @player.inventory.gun
 
 			@canvas.clear()
 			context = @canvas.context
