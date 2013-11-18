@@ -22,7 +22,12 @@ define ['core/app', 'core/scenes', 'core/canvas',
 				@hudElements = []
 				@hudElements.push new hud.AmmoDisplay(@hud, player)
 
+
+			begin: ->
 				app.canvas.$el.after @hud
+
+			end: ->
+				@hud.remove()
 
 			render: ->
 				super()

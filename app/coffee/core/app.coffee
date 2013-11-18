@@ -50,6 +50,17 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			@container.attr('tabindex', 0).focus()
 			input.watch @container
 
+			Object.defineProperty this, "scene",
+				get: =>
+					@_scene
+
+				set: (newScene) =>
+					if @_scene? and @_scene.end?
+						@_scene.end()
+					@_scene = newScene
+					if @_scene? and @_scene.begin?
+						@_scene.begin()
+
 			if @assets
 				queue = new createjs.LoadQueue true
 				queue.addEventListener 'complete', => @start()
