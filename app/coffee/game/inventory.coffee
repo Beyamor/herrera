@@ -24,6 +24,5 @@ define ['game/entities/items'],
 			@accessors
 				isFull:
 					get: -> @items.length >= @capacity
-			
 
 		return ns

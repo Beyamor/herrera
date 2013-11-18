@@ -59,6 +59,10 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 			equip: (inventory) ->
 				inventory.gun = @model
 
+			@accessors
+				description:
+					get: -> "Gun"
+
 		getItemClass = multimethod()
 				.dispatch (i) ->
 					i.constructor
