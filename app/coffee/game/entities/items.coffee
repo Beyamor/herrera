@@ -4,7 +4,7 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 
 		Entity = entities.Entity
 
-		class ItemDisplay extends Entity
+		class ns.ItemDisplay extends Entity
 			constructor: (x, y, graphic) ->
 				super
 					x: x
@@ -19,7 +19,7 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 			hide: ->
 				@graphic.hide() if @graphic? and @graphic.hide?
 
-		class Item extends Entity
+		class ns.Item extends Entity
 			constructor: (opts) ->
 				super _.extend {
 					width: 24
@@ -32,7 +32,7 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				return if @isShowingDisplay
 				@isShowingDisplay = true
 
-				@display = new ItemDisplay @x, @y, @createDisplay(entity)
+				@display = new ns.ItemDisplay @x, @y, @createDisplay(entity)
 				@scene.add @display
 				@display.show()
 
@@ -44,10 +44,7 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				@scene.remove @display
 				@display = null
 
-			addTo: (inventory) ->
-				@scene.remove this
-
-		class Gun extends Item
+		class Gun extends ns.Item
 			constructor: (@model) ->
 				super
 					graphic: new gunSprites.GunSprite @model.model
@@ -59,9 +56,8 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 			createDisplay: (entity) ->
 				new displays.GunDisplay @scene.hud, @model, entity.inventory.gun
 
-			addTo: (inventory) ->
-				super()
-				inventory.add @model
+			equip: (inventory) ->
+				inventory.gun = @model
 
 		getItemClass = multimethod()
 				.dispatch (i) ->

@@ -153,7 +153,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 
 				if @grabbableItem? and input.pressed('grab') and not @inventory.isFull
 					@grabbableItem.hideDisplay()
-					@grabbableItem.addTo @inventory
+					@inventory.add @grabbableItem
 					@grabbableItem = previousGrabbableItem = null
 
 				if input.pressed('inventory')
