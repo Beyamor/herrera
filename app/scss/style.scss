@@ -1,3 +1,6 @@
+@import "common";
+@import "mixins";
+
 body {
 	margin: 0px;
 	padding: 0px;
@@ -8,11 +11,7 @@ body {
 }
 
 .debug-screen {
-	position: absolute;
-	left: 0px;
-	right: 0px;
-	top: 0px;
-	bottom: 0px;
+	@include full-screen;
 
 	.fps {
 		position: absolute;
@@ -24,11 +23,7 @@ body {
 }
 
 #game > .hud {
-	position: absolute;
-	left: 0px;
-	right: 0px;
-	top: 0px;
-	bottom: 0px;
+	@include full-screen;
 
 	.ammo-display {
 		position: absolute;
@@ -38,14 +33,7 @@ body {
 
 	.item-display {
 		position: absolute;
-		background-color: rgba(113, 197, 253, 0.8);
-		border-radius: 5px;
-		border-color: rgba(138, 212, 227, 0.8);
-		border-style: solid;
-		border-width: 2px;
-		color: #E3D9B8;
-		font-family: "Arial, Helvetica, sans-serif";
-		padding: 5px;
+		@include display-styling;
 	}
 
 	.gun-display {
