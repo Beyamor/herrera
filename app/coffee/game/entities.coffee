@@ -142,11 +142,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 				previousGrabbableItem	= @grabbableItem
 				@grabbableItem		= @scene.entities.collide this, 'item'
 
-				if previousGrabbableItem isnt @grabbableItem
-					if previousGrabbableItem?
-						previousGrabbableItem.hideDisplay()
-					if @grabbableItem?
-						@grabbableItem.showDisplay this
+				if previousGrabbableItem? and previousGrabbableItem isnt @grabbableItem
+					previousGrabbableItem.hideDisplay()
+
+				if @grabbableItem? and @vel.x is 0 and @vel.y is 0
+					@grabbableItem.showDisplay this
 
 				if @grabbableItem and input.pressed 'grab'
 					@grabbableItem.hideDisplay()

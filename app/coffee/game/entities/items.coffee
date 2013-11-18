@@ -29,11 +29,17 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				}, opts
 
 			showDisplay: (entity) ->
+				return if @isShowingDisplay
+				@isShowingDisplay = true
+
 				@display = new ItemDisplay @x, @y, @createDisplay(entity)
 				@scene.add @display
 				@display.show()
 
 			hideDisplay: ->
+				return unless @isShowingDisplay
+				@isShowingDisplay = false
+
 				@display.hide()
 				@scene.remove @display
 				@display = null
