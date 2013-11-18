@@ -60,5 +60,68 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 					rechargeSpeed: random.inRange 0.5, 10
 					damage: random.any [5, 5, 5, 6, 6, 7, 7, 8]
 				}
-		
+
+		comparableProperties = [{
+				name:	"damage"
+				label:	"Damage"
+				type:	"int"
+				better:	"higher"
+			}, {
+				name:	"maxCapacity"
+				label:	"Capacity"
+				type:	"int"
+				better:	"higher"
+			}, {
+				name:	"firingRate"
+				label:	"Firing rate"
+				type:	"float"
+				better:	"higher"
+			}, {
+				name:	"rechargeDelay"
+				label:	"Recharge delay"
+				type:	"float"
+				better:	"lower"
+			}, {
+				name:	"rechargeSpeed"
+				label:	"Recharge speed"
+				type:	"float"
+				better:	"higher"
+			}]
+
+		# g1 as compared to g2
+		ns.compare = (g1, g2) ->
+			for property in comparableProperties
+				v1	= if g1? then g1[property.name] else 0
+				v2	= if g2? then g2[property.name] else 0
+
+				difference = v1 - v2
+
+				comparison =
+					if g2?
+						if v1 == v2
+							"same"
+						else
+							if property.better is "higher"
+								if v1 > v2
+									"better"
+								else
+									"worse"
+							else
+								if v1 < v2
+									"better"
+								else
+									"worse"
+					else
+						if g1?
+							"better"
+						else
+							"same"
+
+				{
+					label:		property.label
+					type:		property.type
+					value:		v1
+					difference:	difference
+					comparison:	comparison
+				}
 		return ns

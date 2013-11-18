@@ -1,87 +1,34 @@
-define ['core/app', 'core/graphics'],
-	(app, gfx) ->
+define ['core/app', 'core/graphics', 'game/guns'],
+	(app, gfx, guns) ->
 		ns = {}
 
 		class ns.GunDisplay
-			@properties: [{
-				name:	"damage"
-				label:	"Damage"
-				type:	"int"
-				better:	"higher"
-			}, {
-				name:	"maxCapacity"
-				label:	"Capacity"
-				type:	"int"
-				better:	"higher"
-			}, {
-				name:	"firingRate"
-				label:	"Firing rate"
-				type:	"float"
-				better:	"higher"
-			}, {
-				name:	"rechargeDelay"
-				label:	"Recharge delay"
-				type:	"float"
-				better:	"lower"
-			}, {
-				name:	"rechargeSpeed"
-				label:	"Recharge speed"
-				type:	"float"
-				better:	"higher"
-			}]
-
-			constructor: (@hud, @gun, @prevGun) ->
+			constructor: (@hud, gun, prevGun) ->
+				@comparision = guns.compare gun, prevGun
 
 			show: ->
 				@$el = $ '<div class="item-display gun-display">'
-				for i in [0...ns.GunDisplay.properties.length]
-					property	= ns.GunDisplay.properties[i]
-					value		= @gun[property.name]
-					prevValue	= if @prevGun then @prevGun[property.name]
-
+				for property in @comparision
 					displayValue = (v) ->
 						switch property.type
 							when "int" then v.toFixed()
 							when "float" then v.toFixed(2)
 
-					comparision =
-						if @prevGun
-							if value == prevValue
-								"same"
-							else
-								if property.better is "higher"
-									if value > prevValue
-										"better"
-									else
-										"worse"
-								else
-									if value < prevValue
-										"better"
-									else
-										"worse"
-						else
-							"better"
-
-					difference =
-						if prevValue?
-							value - prevValue
-						else
-							value
-
 					differenceDisplay =
-						if difference is 0
+						if property.difference is 0
 							""
 						else
-							if difference > 0
-								" (+#{displayValue difference})"
+							if property.difference > 0
+								" (+#{displayValue property.difference})"
 							else
-								" (#{displayValue difference})"
+								" (#{displayValue property.difference})"
 
 					$description = $('<div class="description">')
 							.text("#{property.label}: ")
 							.append($("<span>")
-								.text("#{displayValue value}#{differenceDisplay}")
-								.attr('class', "#{comparision} comparison"))
+								.text("#{displayValue property.value}#{differenceDisplay}")
+								.attr('class', "#{property.comparison} comparison"))
+
 					@$el.append $description
 
 				@hud.append @$el
