@@ -13,6 +13,12 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 					centered: true
 					layer: -50
 
+			show: ->
+				@graphic.show() if @graphic? and @graphic.show?
+
+			hide: ->
+				@graphic.hide() if @graphic? and @graphic.hide?
+
 		class Item extends Entity
 			constructor: (opts) ->
 				super _.extend {
@@ -25,8 +31,10 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 			showDisplay: (entity) ->
 				@display = new ItemDisplay @x, @y, @createDisplay(entity)
 				@scene.add @display
+				@display.show()
 
 			hideDisplay: ->
+				@display.hide()
 				@scene.remove @display
 				@display = null
 

@@ -1,5 +1,5 @@
-define ['core/graphics'],
-	(gfx) ->
+define ['core/app', 'core/graphics'],
+	(app, gfx) ->
 		ns = {}
 
 		class ns.GunDisplay
@@ -32,7 +32,7 @@ define ['core/graphics'],
 
 			constructor: (@gun, @prevGun) ->
 
-			show: (hud) ->
+			show: ->
 				@$el = $ '<div class="item-display gun-display">'
 				for i in [0...ns.GunDisplay.properties.length]
 					property	= ns.GunDisplay.properties[i]
@@ -84,18 +84,24 @@ define ['core/graphics'],
 							when "better" then "green"
 							when "same" then "white"
 							when "worse" then "red"
-					@$el.append description
-				hud.append @$el
+					@$el.append $description
+
+				$('.hud', app.container).append @$el
+
+				@width	= @$el.outerWidth()
+				@height	= @$el.outerHeight()
 
 			hide: ->
-				return unless @$el
+				return unless @$el?
 
 				@$el.remove()
 				@$el = null
 
 			render: (_, point, camera) ->
-				#@$el.offset
-				#	left:	point.x - camera.x - @$el.width()/2
-				#	top:	point.y - camera.y - @$el.height()/2
+				return unless @$el?
+
+				@$el.offset
+					left:	point.x - camera.x - @width/2
+					top:	point.y - camera.y - @height/2
 
 		return ns
