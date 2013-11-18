@@ -1,10 +1,10 @@
 define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
-	'game/consts',  'game/entities/graphics',
+	'game/consts',  'game/entities/graphics', "game/inventory",
 	'game/mixins', 'core/debug', 'game/entities/items'],
 	(app, entities, gfx, input, particles, util, bt, behaviours, \
-	guns, consts, entityGfx, gameMixins, debug, items) ->
+	guns, consts, entityGfx, inv, gameMixins, debug, items) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -88,7 +88,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					type: 'player'
 					mixins:
 						updates: [
-							-> @gun
+							-> @inventory
 						]
 				
 				@speed = 400
@@ -96,7 +96,8 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@collisionHandlers =
 					wall: -> not debug.isEnabled "passThuWalls"
 
-				@gun = guns.GunModel.createRandom()
+				@inventory = new inv.Inventory 3
+				@inventory.addAndEquip guns.GunModel.createRandom()
 
 			update: ->
 				super()
@@ -114,7 +115,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@vel.x = dx * @speed
 				@vel.y = dy * @speed
 
-				if @gun
+				if @inventory.gun
 					dx = 0
 					dy = 0
 					tryingToShoot = false
@@ -133,10 +134,10 @@ define ['core/app', 'core/entities', 'core/graphics',
 						tryingToShoot = true
 
 					if tryingToShoot
-							if @gun.tryShooting()
+							if @inventory.gun.tryShooting()
 								shot = new ns.Shot @pos.x, @pos.y,
 										600, Math.atan2(dy, dx),
-										@gun.damage
+										@inventory.gun.damage
 								@scene.add shot
 
 				previousGrabbableItem	= @grabbableItem
@@ -148,9 +149,9 @@ define ['core/app', 'core/entities', 'core/graphics',
 				if @grabbableItem? and @vel.x is 0 and @vel.y is 0
 					@grabbableItem.showDisplay this
 
-				if @grabbableItem and input.pressed 'grab'
+				if @grabbableItem? and input.pressed('grab') and not @inventory.isFull
 					@grabbableItem.hideDisplay()
-					@grabbableItem.equip this
+					@grabbableItem.addTo @inventory
 					@grabbableItem = previousGrabbableItem = null
 
 				if input.pressed 192 # ~

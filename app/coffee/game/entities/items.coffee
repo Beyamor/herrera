@@ -44,6 +44,9 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				@scene.remove @display
 				@display = null
 
+			addTo: (inventory) ->
+				@scene.remove this
+
 		class Gun extends Item
 			constructor: (@model) ->
 				super
@@ -53,17 +56,12 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 							@model
 						]
 
-			equip: (entity) ->
-				if entity.gun?
-					oldGun		= new Gun entity.gun
-					oldGun.x	= entity.x
-					oldGun.y	= entity.y
-					@scene.add oldGun
-				@scene.remove this
-				entity.gun = @model
-
 			createDisplay: (entity) ->
-				new displays.GunDisplay @scene.hud, @model, entity.gun
+				new displays.GunDisplay @scene.hud, @model, entity.inventory.gun
+
+			addTo: (inventory) ->
+				super()
+				inventory.add @model
 
 		getItemClass = multimethod()
 				.dispatch (i) ->
