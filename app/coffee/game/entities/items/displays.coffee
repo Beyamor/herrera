@@ -91,6 +91,8 @@ define ['core/app', 'core/graphics'],
 				@width	= @$el.outerWidth()
 				@height	= @$el.outerHeight()
 
+				@$el.hide()
+
 			hide: ->
 				return unless @$el?
 
@@ -103,5 +105,6 @@ define ['core/app', 'core/graphics'],
 				@$el.offset
 					left:	point.x - camera.x - @width/2
 					top:	point.y - camera.y - @height/2
+				@$el.show()
 
 		return ns

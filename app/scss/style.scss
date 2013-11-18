@@ -38,5 +38,23 @@ body {
 
 	.item-display {
 		position: absolute;
+		background-color: rgba(113, 197, 253, 0.8);
+		border-radius: 5px;
+		border-color: rgba(138, 212, 227, 0.8);
+		border-style: solid;
+		border-width: 2px;
+		color: #F0ECE1;
+		font-family: "Tahoma, Geneva, sans-serif";
+		padding: 5px;
+	}
+
+	.gun-display {
+		.better {
+			color: green;
+		}
+
+		.worse {
+			color: red;
+		}
 	}
 }
