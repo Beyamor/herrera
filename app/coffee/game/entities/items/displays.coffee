@@ -79,11 +79,7 @@ define ['core/app', 'core/graphics'],
 
 					$description = $ '<div class="description">'
 					$description.text "#{property.label}: #{displayValue value}#{differenceDisplay}"
-					$description.attr 'class',
-						switch comparision
-							when "better" then "green"
-							when "same" then "white"
-							when "worse" then "red"
+					$description.attr 'class', comparision
 					@$el.append $description
 
 				$('.hud', app.container).append @$el
