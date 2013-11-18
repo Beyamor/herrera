@@ -30,7 +30,7 @@ define ['core/app', 'core/graphics'],
 				better:	"higher"
 			}]
 
-			constructor: (@gun, @prevGun) ->
+			constructor: (@hud, @gun, @prevGun) ->
 
 			show: ->
 				@$el = $ '<div class="item-display gun-display">'
@@ -82,7 +82,7 @@ define ['core/app', 'core/graphics'],
 					$description.attr 'class', comparision
 					@$el.append $description
 
-				$('.hud', app.container).append @$el
+				@hud.append @$el
 
 				@width	= @$el.outerWidth()
 				@height	= @$el.outerHeight()

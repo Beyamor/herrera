@@ -57,7 +57,7 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				entity.gun = @model
 
 			createDisplay: (entity) ->
-				new displays.GunDisplay @model, entity.gun
+				new displays.GunDisplay @scene.hud, @model, entity.gun
 
 		getItemClass = multimethod()
 				.dispatch (i) ->
