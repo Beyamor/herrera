@@ -3,14 +3,16 @@ define ['core/canvas'], (canvas) ->
 
 	class ns.AmmoDisplay
 		constructor: (@hud, @player) ->
-			@canvas = new canvas.Canvas {
+			@canvas = new canvas.Canvas
 				width: 100
 				height: 20
-			}
+				class: "ammo-display"
 
 			context = @canvas.context
 			context.fillStyle = context.strokeStyle = "#FACB0F"
 			context.lineWidth = 4
+
+			@hud.append @canvas.$el
 
 		render: ->
 			return unless @player.gun
@@ -25,9 +27,7 @@ define ['core/canvas'], (canvas) ->
 				context.rect 100 - (i + 1) * width, 0, width, 20
 				context.fillStyle = "#FACB0F"
 				context.fill()
-				context.strokeStyle	= "black"
+				context.strokeStyle = "black"
 				context.stroke()
-
-			@canvas.renderTo @hud, @hud.width - 100, 0
 
 	return ns

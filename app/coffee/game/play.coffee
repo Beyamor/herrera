@@ -17,18 +17,15 @@ define ['core/app', 'core/scenes', 'core/canvas',
 
 				@camera = new cameras.EntityFollower player, @camera
 
-				@hud = new canvas.Canvas {
-					width: app.width
-					height: app.height
-				}
+				@hud = $('<div class="hud">')
 
 				@hudElements = []
 				@hudElements.push new hud.AmmoDisplay(@hud, player)
 
+				app.canvas.$el.after @hud
+
 			render: ->
 				super()
-				@hud.clear()
-				hudElement.render() for hudElement in @hudElements
-				@hud.renderTo app.canvas
+				element.render() for element in @hudElements
 
 		return ns

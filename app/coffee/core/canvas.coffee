@@ -14,6 +14,9 @@ define ->
 
 			@setDims opts.width, opts.height
 
+			if opts.class?
+				@$el.attr "class", opts.class
+
 		clear: ->
 			@context.clearRect 0, 0, @$el.width(), @$el.height()
 			return this

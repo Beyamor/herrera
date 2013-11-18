@@ -2,7 +2,7 @@ define ['core/graphics'],
 	(gfx) ->
 		ns = {}
 
-		class ns.GunDisplay extends gfx.StandardGraphic
+		class ns.GunDisplay
 			@properties: [{
 				name:	"damage"
 				label:	"Damage"
@@ -31,15 +31,9 @@ define ['core/graphics'],
 			}]
 
 			constructor: (@gun, @prevGun) ->
-				super
-					width: 250
-					height: ns.GunDisplay.properties.length * 20
 
-			draw: (context) ->
-				context.font		= "16px Sans-serif"
-				context.strokeStyle	= "black"
-				context.lineWidth	= 3
-
+			show: (hud) ->
+				@$el = $ '<div class="item-display gun-display">'
 				for i in [0...ns.GunDisplay.properties.length]
 					property	= ns.GunDisplay.properties[i]
 					value		= @gun[property.name]
@@ -83,15 +77,25 @@ define ['core/graphics'],
 							else
 								" (#{displayValue difference})"
 
-					description = "#{property.label}: #{displayValue value}#{differenceDisplay}"
-
-					context.fillStyle =
+					$description = $ '<div class="description">'
+					$description.text "#{property.label}: #{displayValue value}#{differenceDisplay}"
+					$description.attr 'class',
 						switch comparision
 							when "better" then "green"
 							when "same" then "white"
 							when "worse" then "red"
+					@$el.append description
+				hud.append @$el
 
-					context.strokeText	description, 5, (i + 1) * 20 - 5
-					context.fillText	description, 5, (i + 1) * 20 - 5
+			hide: ->
+				return unless @$el
+
+				@$el.remove()
+				@$el = null
+
+			render: (_, point, camera) ->
+				#@$el.offset
+				#	left:	point.x - camera.x - @$el.width()/2
+				#	top:	point.y - camera.y - @$el.height()/2
 
 		return ns
