@@ -92,15 +92,18 @@ define ['core/app', 'core/graphics'],
 			hide: ->
 				return unless @$el?
 
-				@$el.remove()
-				@$el = null
+				@$el.hide 100, =>
+					@$el.remove()
+					@$el = null
 
 			render: (_, point, camera) ->
 				return unless @$el?
 
+				unless @$el.is(":visible")
+					@$el.show 100
+
 				@$el.offset
 					left:	point.x - camera.x - @width/2
 					top:	point.y - camera.y - @height/2
-				@$el.show()
 
 		return ns
