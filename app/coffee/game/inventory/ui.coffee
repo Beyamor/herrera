@@ -6,7 +6,10 @@ define ['core/input'],
 			constructor: (@inventory) ->
 				@$el = $('<div>')
 					.attr('class', 'inventory')
-					.text('Inventory')
+					.append(
+						$('<h1>')
+						.text("Inventory")
+					)
 
 				for item in @inventory.items
 					@$el.append(
