@@ -157,7 +157,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					@grabbableItem = previousGrabbableItem = null
 
 				if input.pressed('inventory')
-					@scene.addWindow new invUI.InventoryDisplay @inventory
+					@scene.addWindow new invUI.InventoryDisplay this, @inventory
 
 				if input.pressed 192 # ~
 					debug.toggle "passThuWalls"

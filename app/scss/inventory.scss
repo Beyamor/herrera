@@ -6,25 +6,35 @@ $height: 500px;
 
 #game > .inventory {
 	@include full-screen;
-	@include display-styling;
-	margin: ($screen-height - $height)/2 ($screen-width - $width)/2;
+	padding: ($screen-height - $height)/2 ($screen-width - $width)/2;
 
-	.close {
-		position: absolute;
-		right: 0px;
-		top: 0px;
-		color: red;
-		padding: 1px;
-		margin: 2px 3px;
-		cursor: pointer;
-		border-width: 1px;
-		border-style: solid;
-		border-color: rgba(0, 0, 0, 0);
-		border-radius: 3px;
+	.drop-zone {
+		@include full-screen;
+	}
 
-		&:hover {
-			border-color: red;
-			background-color: rgba(255, 0, 0, 0.2);
+	.main-window {
+		@include display-styling;
+		height: 100%;
+		width: 100%;
+		position: relative;
+
+		.close {
+			position: absolute;
+			right: 0px;
+			top: 0px;
+			color: red;
+			padding: 1px;
+			margin: 2px 3px;
+			cursor: pointer;
+			border-width: 1px;
+			border-style: solid;
+			border-color: rgba(0, 0, 0, 0);
+			border-radius: 3px;
+
+			&:hover {
+				border-color: red;
+				background-color: rgba(255, 0, 0, 0.2);
+			}
 		}
 	}
 }

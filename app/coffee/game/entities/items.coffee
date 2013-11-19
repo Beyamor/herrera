@@ -44,6 +44,12 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				@scene.remove @display
 				@display = null
 
+			equip: (inventory) ->
+				@isEquipped = true
+
+			unequip: (inventory) ->
+				@isEquipped = false
+
 		class Gun extends ns.Item
 			constructor: (@model) ->
 				super
@@ -57,7 +63,12 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				new displays.GunDisplay @scene.hud, @model, entity.inventory.gun
 
 			equip: (inventory) ->
+				super inventory
 				inventory.gun = @model
+
+			unequip: (inventory) ->
+				super inventory
+				inventory.gun = null
 
 			@accessors
 				description:

@@ -14,12 +14,16 @@ define ['game/entities/items'],
 				else
 					@add items.for item
 
-			update: ->
-				@gun.update() if @gun?
-
 			addAndEquip: (item) ->
 				@add item
 				@items[@items.length-1].equip this
+
+			remove: (item) ->
+				@items.remove item
+				item.unequip(this) is item.isEquipped
+
+			update: ->
+				@gun.update() if @gun?
 
 			@accessors
 				isFull:
