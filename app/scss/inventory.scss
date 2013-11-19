@@ -53,6 +53,11 @@ $horizontal-margin: ($screen-width - $width) / 2;
 		right: $horizontal-margin;
 		top: $vertical-margin;
 		bottom: $vertical-margin;
+		padding: 10px 20px;
+
+		h1 {
+			margin-left: 20px;
+		}
 
 		.item {
 			.equipped {
