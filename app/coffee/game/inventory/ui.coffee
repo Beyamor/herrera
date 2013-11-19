@@ -5,6 +5,8 @@ define ['core/app', 'core/input', 'core/util'],
 		random = util.random
 
 		class ns.InventoryDisplay
+			blocks: true
+
 			constructor: (@owner, @inventory) ->
 				@$el = $('<div>').addClass('inventory')
 
