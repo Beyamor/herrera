@@ -4,19 +4,55 @@
 $width: 600px;
 $height: 500px;
 
+$vertical-margin: ($screen-height - $height) / 2;
+$horizontal-margin: ($screen-width - $width) / 2;
+
 #game > .inventory {
 	@include full-screen;
-	padding: ($screen-height - $height)/2 ($screen-width - $width)/2;
 
 	.drop-zone {
-		@include full-screen;
+		position: absolute;
+
+		&.highlight {
+			background-color: rgba(100, 100, 200, 0.1);
+		}
+
+		&.left, &.right {
+			top: 0px;
+			bottom: 0px;
+			width: $horizontal-margin;
+
+			&.left {
+				left: 0px;
+			}
+
+			&.right {
+				right: 0px;
+			}
+		}
+
+		&.top, &.bottom {
+			left: $horizontal-margin;
+			right: $horizontal-margin;
+			height: $vertical-margin;
+
+			&.top {
+				top: 0px;
+			}
+
+			&.bottom {
+				bottom: 0px;
+			}
+		}
 	}
 
 	.main-window {
 		@include display-styling;
-		height: 100%;
-		width: 100%;
-		position: relative;
+		position: absolute;
+		left: $horizontal-margin;
+		right: $horizontal-margin;
+		top: $vertical-margin;
+		bottom: $vertical-margin;
 
 		.close {
 			position: absolute;

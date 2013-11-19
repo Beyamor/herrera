@@ -6,44 +6,50 @@ define ['core/input', 'core/util'],
 
 		class ns.InventoryDisplay
 			constructor: (@owner, @inventory) ->
-				@$el = $('<div>').attr('class', 'inventory')
+				@$el = $('<div>').addClass('inventory')
 
-				dropZone = $('<div>')
-					.attr('class', 'drop-zone')
-					.droppable(
-						drop: (event, ui) =>
-							item = $(ui.draggable).data("item")
-							inventory.remove item
+				dropZones = null
+				for which in ["left", "right", "top", "bottom"]
+					dropZone = $('<div>')
+						.addClass('drop-zone')
+						.addClass(which)
+						.droppable(
+							drop: (event, ui) =>
+								item = $(ui.draggable).data("item")
+								inventory.remove item
 
-							angle = random.angle()
-							item.x = @owner.x + 10 * Math.cos angle
-							item.y = @owner.y + 10 * Math.sin angle
-							@scene.add item
+								angle = random.angle()
+								item.x = @owner.x + 10 * Math.cos angle
+								item.y = @owner.y + 10 * Math.sin angle
+								@scene.add item
 
-							@rerender()
-					)
-				@$el.append dropZone
+								@rerender()
+								dropZones.removeClass 'highlight'
+
+							over: =>
+								dropZones.addClass 'highlight'
+
+							out: =>
+								dropZones.removeClass 'highlight'
+						)
+					@$el.append dropZone
+				dropZones = $('.drop-zone', @$el)
 
 				mainWindow = $('<div>')
-					.attr('class', 'main-window')
+					.addClass('main-window')
 					.append(
 						$('<h1>')
 						.text("Inventory")
-					).droppable(
-						over: (event) =>
-							dropZone.droppable "disable"
-						out: (event) =>
-							dropZone.droppable "enable"
 					)
 				@$el.append mainWindow
 
-				@items = $('<div>').attr('class', 'items')
+				@items = $('<div>').addClass('items')
 				mainWindow.append @items
 				@rerender()
 
 				mainWindow.append(
 					$('<div>')
-					.attr('class', 'close')
+					.addClass('close')
 					.text("X")
 					.click(=> @scene.removeWindow this)
 				)
@@ -54,7 +60,7 @@ define ['core/input', 'core/util'],
 					do (item) =>
 						itemEl = $('<div>').append(
 								$('<span>')
-								.attr('class', 'description')
+								.addClass('description')
 								.text(item.description)
 								.draggable(
 									revert: true
