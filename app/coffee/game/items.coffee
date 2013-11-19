@@ -1,5 +1,5 @@
-define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/displays'],
-	(entities, guns, gunSprites, displays) ->
+define ['core/entities', "game/guns",'game/guns/sprites'],
+	(entities, guns, gunSprites) ->
 		ns = {}
 
 		Entity = entities.Entity
@@ -49,41 +49,5 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 
 			unequip: (inventory) ->
 				@isEquipped = false
-
-		class Gun extends ns.Item
-			constructor: (@model) ->
-				super
-					graphic: new gunSprites.GunSprite @model.model
-					mixins:
-						updates: [
-							@model
-						]
-
-			createDisplay: (entity) ->
-				new displays.GunDisplay @scene.hud, @model, entity.inventory.gun
-
-			equip: (inventory) ->
-				for item in inventory.items
-					if item instanceof Gun and item.isEquipped
-						item.unequip inventory
-
-				inventory.gun = @model
-				super inventory
-
-			unequip: (inventory) ->
-				super inventory
-				inventory.gun = null
-
-			@accessors
-				description:
-					get: -> "Gun"
-
-		getItemClass = multimethod()
-				.dispatch (i) ->
-					i.constructor
-				.when guns.GunModel, -> Gun
-
-		ns.for = (i) ->
-			new (getItemClass i) i
 
 		return ns

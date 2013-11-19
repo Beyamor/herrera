@@ -1,12 +1,12 @@
-define ['core/app', 'core/graphics', 'game/guns'],
-	(app, gfx, guns) ->
+define ['core/app', 'core/entities', 'game/guns'],
+	(app, entities, guns) ->
 		ns = {}
 
-		class ns.GunDisplay
-			constructor: (@hud, gun, prevGun) ->
+		class GunDisplay
+			constructor: (gun, prevGun) ->
 				@comparision = guns.compare gun, prevGun
 
-			show: ->
+			show: (hud) ->
 				@$el = $ '<div class="item-display gun-display">'
 				for property in @comparision
 					displayValue = (v) ->
@@ -31,7 +31,7 @@ define ['core/app', 'core/graphics', 'game/guns'],
 
 					@$el.append $description
 
-				@hud.append @$el
+				hud.append @$el
 
 				@width	= @$el.outerWidth()
 				@height	= @$el.outerHeight()
@@ -54,5 +54,28 @@ define ['core/app', 'core/graphics', 'game/guns'],
 				@$el.offset
 					left:	point.x - camera.x - @width/2
 					top:	point.y - camera.y - @height/2
+
+		class DisplayEntity extends entities.Entity
+			constructor: (x, y, graphic) ->
+				super
+					x: x
+					y: y
+					graphic: graphic
+
+			added: ->
+				@graphic.show @scene.hud
+
+			removed: ->
+				@graphic.hide()
+
+
+		createGraphic = multimethod()
+				.dispatch (item, entity) ->
+					item.constructor
+				.when guns.Gun, (item, entity) ->
+					new GunDisplay item, entity.inventory.gun
+
+		ns.create = (item, entity) ->
+			new DisplayEntity item.x, item.y, createGraphic(item, entity)
 
 		return ns

@@ -2,11 +2,11 @@ define ['core/app', 'core/entities', 'core/graphics',
 	'core/input', 'core/particles', 'core/util',
 	'core/ai/bt', 'game/entities/behaviours', 'game/guns',
 	'game/consts',  'game/entities/graphics', "game/inventory",
-	'game/mixins', 'core/debug', 'game/entities/items',
-	'game/inventory/ui'],
+	'game/mixins', 'core/debug', 'game/items',
+	'game/inventory/ui', 'game/items/displays'],
 	(app, entities, gfx, input, particles, util, bt, behaviours, \
 	guns, consts, entityGfx, inv, gameMixins, debug, items, \
-	invUI) ->
+	invUI, itemDisplays) ->
 		ns = {}
 
 		Entity		= entities.Entity
@@ -99,7 +99,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					wall: -> not debug.isEnabled "passThuWalls"
 
 				@inventory = new inv.Inventory 3
-				@inventory.addAndEquip guns.GunModel.createRandom()
+				@inventory.addAndEquip guns.createRandom()
 
 			update: ->
 				super()
@@ -145,14 +145,18 @@ define ['core/app', 'core/entities', 'core/graphics',
 				previousGrabbableItem	= @grabbableItem
 				@grabbableItem		= @scene.entities.collide this, 'item'
 
-				if previousGrabbableItem? and previousGrabbableItem isnt @grabbableItem
-					previousGrabbableItem.hideDisplay()
+				if previousGrabbableItem? and previousGrabbableItem isnt @grabbableItem and @activeDisplay?
+					@scene.remove @activeDisplay
+					@activeDisplay = null
 
-				if @grabbableItem? and @vel.x is 0 and @vel.y is 0
-					@grabbableItem.showDisplay this
+				if @grabbableItem? and @vel.x is 0 and @vel.y is 0 and not @activeDisplay?
+					@activeDisplay = itemDisplays.create @grabbableItem, this
+					@scene.add @activeDisplay
 
 				if @grabbableItem? and input.pressed('grab') and not @inventory.isFull
-					@grabbableItem.hideDisplay()
+					if @activeDisplay
+						@scene.remove @activeDisplay
+						@activeDisplay = null
 					@inventory.add @grabbableItem
 					@grabbableItem = previousGrabbableItem = null
 
@@ -247,7 +251,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 				@scene.add new ns.DamageCounter @x, @y, damage
 
 				if @hp <= 0
-					loot = items.for guns.GunModel.createRandom()
+					loot = guns.createRandom()
 					loot.x = @x
 					loot.y = @y
 					@scene.add loot

@@ -1,15 +1,22 @@
-define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
-	(util, app, models, smgModel) ->
+define ['core/util', 'core/app', 'game/guns/models',
+	'game/items', 'game/guns/sprites',
+	'game/guns/smg-data'],
+	(util, app, models, \
+	items, sprites, \
+	smgModel) ->
 		ns = {}
 
 		random = util.random
 
 		SMG_MODEL = new models.Gun smgModel, parse: true
 
-		class ns.GunModel
+		class ns.Gun extends items.Item
 			constructor: ({capacity: @maxCapacity, firingRate: @firingRate, \
 					rechargeDelay: @rechargeDelay, rechargeSpeed: @rechargeSpeed, \
 					damage: @damage}) ->
+
+						super
+							graphic: new sprites.GunSprite SMG_MODEL.realize()
 
 						@capacity	= @maxCapacity
 						@isRecharging	= false
@@ -27,9 +34,10 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 								@canShoot = true
 						}
 
-						@model = SMG_MODEL.realize()
+						@description = "Gun"
 
 			update: ->
+				super()
 				if @isRecharging
 					@capacity += app.elapsed * @rechargeSpeed
 					if @capacity >= @maxCapacity
@@ -52,14 +60,26 @@ define ['core/util', 'core/app', 'game/guns/models', 'game/guns/smg-data'],
 
 				return true
 
-			@createRandom: ->
-				new ns.GunModel {
-					capacity: random.intInRange 10, 20
-					firingRate: random.inRange 3, 8
-					rechargeDelay: 0.5
-					rechargeSpeed: random.inRange 0.5, 10
-					damage: random.any [5, 5, 5, 6, 6, 7, 7, 8]
-				}
+			equip: (inventory) ->
+				for item in inventory.items
+					if item instanceof ns.Gun and item.isEquipped
+						item.unequip inventory
+
+				inventory.gun = this
+				super inventory
+
+			unequip: (inventory) ->
+				super inventory
+				inventory.gun = null
+
+		ns.createRandom = ->
+			new ns.Gun {
+				capacity: random.intInRange 10, 20
+				firingRate: random.inRange 3, 8
+				rechargeDelay: 0.5
+				rechargeSpeed: random.inRange 0.5, 10
+				damage: random.any [5, 5, 5, 6, 6, 7, 7, 8]
+			}
 
 		comparableProperties = [{
 				name:	"damage"

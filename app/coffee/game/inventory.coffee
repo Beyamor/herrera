@@ -1,5 +1,5 @@
-define ['game/entities/items'],
-	(items) ->
+define [],
+	() ->
 		ns = {}
 
 		class ns.Inventory
@@ -7,12 +7,9 @@ define ['game/entities/items'],
 				@items = []
 
 			add: (item) ->
-				if item instanceof items.Item
-					throw new Error "Inventory is full" if @isFull
-					@items.push item
-					item.scene.remove item if item.scene?
-				else
-					@add items.for item
+				throw new Error "Inventory is full" if @isFull
+				@items.push item
+				item.scene.remove item if item.scene?
 
 			addAndEquip: (item) ->
 				@add item
