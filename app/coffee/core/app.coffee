@@ -61,22 +61,60 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 					if @_scene? and @_scene.begin?
 						@_scene.begin()
 
-			if @assets
-				queue = new createjs.LoadQueue true
-				queue.addEventListener 'complete', => @start()
-				queue.addEventListener 'fileload', (e) ->
-					debug.logType 'load', "loaded #{e.item.src}"
-					
-				for [id, src] in @assets
-					queue.loadFile {id: id, src: src}
+			@loadAssets()
+			@loadTemplates()
 
-				# cool. uh, now, let's give 'em some way of getting those assets
-				@assets = {
-					get: (which) ->
-						result = queue.getResult which
-						throw new Error "Uknown asset #{which}" unless result
-						return result
-				}
-			else
-				@start()
+		tryStarting: ->
+			return unless @assetsLoaded and @templatesLoaded
+			@start()
+		
+		loadAssets: ->
+			queue = new createjs.LoadQueue true
+			queue.addEventListener 'complete', =>
+				@assetsLoaded = true
+				@tryStarting()
+			queue.addEventListener 'fileload', (e) ->
+				debug.logType 'load', "loaded #{e.item.src}"
+				
+			for [id, src] in @assets
+				queue.loadFile {id: id, src: src}
+
+			# also, like, give 'em a way to access the assets
+			@assets = {
+				get: (which) ->
+					result = queue.getResult which
+					throw new Error "Uknown asset #{which}" unless result
+					return result
+			}
+
+		loadTemplates: ->
+			templates		= @templates
+			@compiledTemplates	= {}
+			templatesLoaded		= 0
+			templatesToLoad		= @templates.length
+
+			for [alias, url] in templates
+				do (alias, url) =>
+					$.ajax
+						url: url
+						success: (template) =>
+							@compiledTemplates[alias] = Handlebars.compile template
+							++templatesLoaded
+
+							if templatesLoaded >= templatesToLoad
+								@templatesLoaded = true
+								@tryStarting()
+						error: ->
+							console.log "Couldn't load #{url}"
+
+			@templates = {
+				get: (which) =>
+					result = @compiledTemplates[which]
+					throw new Error "Unknown asset #{which}" unless result
+					return result
+				
+				compile: (which, context) =>
+					template = @templates.get which
+					template context
+			}
 	}

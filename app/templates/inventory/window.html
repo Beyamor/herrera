@@ -1,0 +1,31 @@
+<!-- drop zones -->
+<div class="drop-zone left"></div>
+<div class="drop-zone right"></div>
+<div class="drop-zone top"></div>
+<div class="drop-zone bottom"></div>
+
+<!-- the good stuff -->
+<div class="main-window">
+	<h1>Inventory</h1>
+	<div class="equip-box">
+	</div>
+	<div class="items">
+	{{#each items}}
+		<div class="item" data-item="{{this}}">
+			<span class="description">
+				{{description}}
+			</span>
+			{{#if isEquipped}}
+				<span class="equipped">
+					(equipped)
+				</span>
+			{{/if}}
+		</div>
+	{{/each}}
+	</div>
+</div>
+
+<!-- close button -->
+<div class="close">
+	X
+</div>

@@ -21,6 +21,10 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 		['portal-sprite', 'res/img/portal.png']
 	]
 
+	app.templates = [
+		['inventory-window', 'templates/inventory/window.html']
+	]
+
 	input.define
 		walkUp: 87
 		walkDown: 83

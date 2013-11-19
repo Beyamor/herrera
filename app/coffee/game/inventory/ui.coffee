@@ -8,67 +8,69 @@ define ['core/app', 'core/input', 'core/util'],
 			blocks: true
 
 			constructor: (@owner, @inventory) ->
-				@$el = $('<div>').addClass('inventory')
+				@$el = $('<div>')
+					.addClass('inventory')
+					.html(app.templates.compile 'inventory-window', @inventory)
 
-				dropZones = null
-				for which in ["left", "right", "top", "bottom"]
-					dropZone = $('<div>')
-						.addClass('drop-zone')
-						.addClass(which)
-						.droppable(
-							drop: (event, ui) =>
-								item = $(ui.draggable).data("item")
-								inventory.remove item
+				#dropZones = null
+				#for which in ["left", "right", "top", "bottom"]
+				#	dropZone = $('<div>')
+				#		.addClass('drop-zone')
+				#		.addClass(which)
+				#		.droppable(
+				#			drop: (event, ui) =>
+				#				item = $(ui.draggable).data("item")
+				#				inventory.remove item
 
-								angle = random.angle()
-								item.x = @owner.x + 10 * Math.cos angle
-								item.y = @owner.y + 10 * Math.sin angle
-								@scene.add item
+				#				angle = random.angle()
+				#				item.x = @owner.x + 10 * Math.cos angle
+				#				item.y = @owner.y + 10 * Math.sin angle
+				#				@scene.add item
 
-								@rerender()
-								dropZones.removeClass 'highlight'
+				#				@rerender()
+				#				dropZones.removeClass 'highlight'
 
-							over: =>
-								dropZones.addClass 'highlight'
+				#			over: =>
+				#				dropZones.addClass 'highlight'
 
-							out: =>
-								dropZones.removeClass 'highlight'
-						)
-					@$el.append dropZone
-				dropZones = $('.drop-zone', @$el)
+				#			out: =>
+				#				dropZones.removeClass 'highlight'
+				#		)
+				#	@$el.append dropZone
+				#dropZones = $('.drop-zone', @$el)
 
-				mainWindow = $('<div>')
-					.addClass('main-window')
-					.append(
-						$('<h1>')
-						.text("Inventory")
-					)
-				@$el.append mainWindow
+				#mainWindow = $('<div>')
+				#	.addClass('main-window')
+				#	.append(
+				#		$('<h1>')
+				#		.text("Inventory")
+				#	)
+				#@$el.append mainWindow
 
-				playerImage = app.assets.get 'player-sprite'
-				equipBox = $('<div>')
-						.addClass('equip-box')
-						.append(playerImage)
-						.droppable(
-							drop: (event, ui) =>
-								item = $(ui.draggable).data("item")
-								item.equip inventory
-								@rerender()
+				#playerImage = app.assets.get 'player-sprite'
+				#equipBox = $('<div>')
+				#		.addClass('equip-box')
+				#		.append(playerImage)
+				#		.droppable(
+				#			drop: (event, ui) =>
+				#				item = $(ui.draggable).data("item")
+				#				item.equip inventory
+				#				@rerender()
 
-							hoverClass: 'highlight'
-						)
-				mainWindow.append equipBox
+				#			hoverClass: 'highlight'
+				#		)
+				#mainWindow.append equipBox
 
-				@items = $('<div>').addClass('items')
-				mainWindow.append @items
-				@rerender()
+				#@items = $('<div>').addClass('items')
+				#mainWindow.append @items
+				#@rerender()
 
-				mainWindow.append(
-					$('<div>')
-					.addClass('close')
-					.text("X")
-					.click(=> @scene.removeWindow this)
-				)
+				#mainWindow.append(
+				#	$('<div>')
+				#	.addClass('close')
+				#	.text("X")
+				#	.click(=> @scene.removeWindow this)
+				#)
 
 			rerender: ->
 				@items.empty()
