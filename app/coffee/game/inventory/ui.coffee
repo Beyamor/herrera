@@ -1,6 +1,8 @@
-define ['core/input'],
-	(input) ->
+define ['core/input', 'core/util'],
+	(input, util) ->
 		ns = {}
+
+		random = util.random
 
 		class ns.InventoryDisplay
 			constructor: (@owner, @inventory) ->
@@ -12,9 +14,12 @@ define ['core/input'],
 						drop: (event, ui) =>
 							item = $(ui.draggable).data("item")
 							inventory.remove item
-							item.x = @owner.x
-							item.y = @owner.y
+
+							angle = random.angle()
+							item.x = @owner.x + 10 * Math.cos angle
+							item.y = @owner.y + 10 * Math.sin angle
 							@scene.add item
+
 							@rerender()
 					)
 				@$el.append dropZone
