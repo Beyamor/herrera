@@ -16,6 +16,6 @@ define ['core/input'],
 					)
 
 			update: ->
-				@scene.removeWindow(this) if input.pressed 'close'
+				@scene.removeWindow(this) if input.pressed('close') or input.pressed('inventory')
 
 		return ns
