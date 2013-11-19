@@ -17,6 +17,11 @@ define ['core/util', 'core/app', 'game/guns/models',
 
 						super
 							graphic: new sprites.GunSprite SMG_MODEL.realize()
+							mixins:
+								updates: [
+									'shotTimer'
+									'rechargeTimer'
+								]
 
 						@capacity	= @maxCapacity
 						@isRecharging	= false
@@ -43,9 +48,6 @@ define ['core/util', 'core/app', 'game/guns/models',
 					if @capacity >= @maxCapacity
 						@capacity = @maxCapacity
 						@isRecharging = false
-
-				@rechargeTimer.update()
-				@shotTimer.update()
 
 			tryShooting: ->
 				return false if (@capacity < 1) or not @canShoot

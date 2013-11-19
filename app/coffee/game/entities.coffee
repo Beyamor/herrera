@@ -90,7 +90,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					type: 'player'
 					mixins:
 						updates: [
-							-> @inventory
+							'inventory'
 						]
 				
 				@speed = 400
@@ -178,7 +178,7 @@ define ['core/app', 'core/entities', 'core/graphics',
 					mixins:
 						rotateGraphicToVel: true
 						updates: [
-							-> @behaviour
+							'behaviour'
 						]
 
 				@hp = 30

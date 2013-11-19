@@ -31,11 +31,9 @@ define ['core/mixins', 'core/app', 'core/util'],
 						@graphic.rotate Math.atan2(@vel.y, @vel.x)
 
 			updates: (thingsToUpdate) ->
-				thingsToUpdate = _.map thingsToUpdate, util.thunkWrap
-
 				update: ->
-					for thingThunk in thingsToUpdate
-						thing = thingThunk.call(this)
+					for property in thingsToUpdate
+						thing = @[property]
 						thing.update() if thing?
 
 		return ns
