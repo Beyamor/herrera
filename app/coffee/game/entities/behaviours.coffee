@@ -7,7 +7,6 @@ define ['core/app', 'core/util', 'core/ai/bt'], (app, util, bt) ->
 		from	= util.thunkWrap from
 		to	= util.thunkWrap to
 
-		begin: ->
 		update: ->
 			if util.distanceBetween(from(), to()) <= distance
 				return bt.SUCCESS
@@ -21,7 +20,6 @@ define ['core/app', 'core/util', 'core/ai/bt'], (app, util, bt) ->
 		timeout		= args.timeout
 		elapsed		= 0
 
-		begin: ->
 		update: ->
 			if minDistance?
 				distance = util.distanceBetween entity, target()

@@ -40,7 +40,7 @@ define ['core/app', 'core/util'], (app, util) ->
 
 			if @pendingBegin
 				@pendingBegin = false
-				child.begin()
+				child.begin() if child.begin?
 
 			result = child.update()
 			if result is SUCCESS
@@ -58,7 +58,7 @@ define ['core/app', 'core/util'], (app, util) ->
 		update: ->
 			if @pendingBegin
 				@pendingBegin = false
-				child.begin()
+				child.begin() if child.begin?
 
 			result = child.update()
 			if result is FAILURE
@@ -72,7 +72,7 @@ define ['core/app', 'core/util'], (app, util) ->
 			index = 0
 			while index < children.length
 				child = children[index]
-				child.begin() if index isnt @running
+				child.begin() if index isnt @running and child.begin?
 
 				result = child.update()
 				switch result
@@ -89,7 +89,7 @@ define ['core/app', 'core/util'], (app, util) ->
 
 	ns.cond = (check, body) ->
 		begin: ->
-			check.begin()
+			check.begin() if check.begin?
 			@bodyBegun = false
 
 		update: ->
@@ -98,13 +98,13 @@ define ['core/app', 'core/util'], (app, util) ->
 
 			unless @bodyBegun
 				@bodyBegun = true
-				body.begin()
+				body.begin() if body.begin?
 
 			return body.update()
 
 	ns.concurrently = (children...) ->
 		begin: ->
-			child.begin() for child in children
+			child.begin() for child in children when child.begin?
 
 		update: ->
 			allSuccess = true
@@ -121,7 +121,7 @@ define ['core/app', 'core/util'], (app, util) ->
 	ns.checkOnce = (check) ->
 		begin: ->
 			@hasChecked = false
-			check.begin()
+			check.begin() if check.begin?
 
 		update: ->
 			if @hasChecked
@@ -138,7 +138,7 @@ define ['core/app', 'core/util'], (app, util) ->
 
 		update: ->
 			if @pendingBegin
-				children[@index].begin()
+				children[@index].begin() if children[@index].begin?
 				@pendingBegin = false
 
 			result = children[@index].update()
@@ -159,15 +159,11 @@ define ['core/app', 'core/util'], (app, util) ->
 					RUNNING
 
 	ns.cb = (cb) ->
-		begin: ->
-
 		update: ->
 			cb()
 			return SUCCESS
 
 	ns.test = (test) ->
-		begin: ->
-
 		update: ->
 			if test()
 				SUCCESS
@@ -176,7 +172,7 @@ define ['core/app', 'core/util'], (app, util) ->
 
 	ns.or = (tests...) ->
 		begin: ->
-			test.begin() for test in tests
+			test.begin() for test in tests when test.begin?
 
 		update: ->
 			for test in tests
