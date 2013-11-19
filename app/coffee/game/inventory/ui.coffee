@@ -58,17 +58,27 @@ define ['core/input', 'core/util'],
 				@items.empty()
 				for item in @inventory.items
 					do (item) =>
-						itemEl = $('<div>').append(
-								$('<span>')
+						itemEl = $('<div>').addClass('item')
+
+						description = $('<span>')
 								.addClass('description')
 								.text(item.description)
 								.draggable(
 									revert: true
 									revertDuration: 50
+									start: -> $('.equipped', itemEl).hide()
+									stop: -> $('.equipped', itemEl).show()
 								)
 								.data("item", item)
+						itemEl.append description
+
+						if item.isEquipped
+							itemEl.append(
+								$('<span>')
+								.text('(equipped)')
+								.addClass('equipped')
 							)
-						itemEl.item = item
+
 						@items.append itemEl
 
 

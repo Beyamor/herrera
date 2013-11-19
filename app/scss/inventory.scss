@@ -54,6 +54,14 @@ $horizontal-margin: ($screen-width - $width) / 2;
 		top: $vertical-margin;
 		bottom: $vertical-margin;
 
+		.item {
+			.equipped {
+				font-size: small;
+				color: blue;
+				padding-left: 5px;
+			}
+		}
+
 		.close {
 			position: absolute;
 			right: 0px;
