@@ -61,9 +61,8 @@ define ['core/util', 'core/app', 'game/guns/models',
 				return true
 
 			equip: (inventory) ->
-				for item in inventory.items
-					if item instanceof ns.Gun and item.isEquipped
-						item.unequip inventory
+				if inventory.gun?
+					inventory.gun.unequip inventory
 
 				inventory.gun = this
 				super inventory
