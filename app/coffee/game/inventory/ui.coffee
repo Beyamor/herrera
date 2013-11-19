@@ -1,5 +1,5 @@
-define ['core/input', 'core/util'],
-	(input, util) ->
+define ['core/app', 'core/input', 'core/util'],
+	(app, input, util) ->
 		ns = {}
 
 		random = util.random
@@ -42,6 +42,20 @@ define ['core/input', 'core/util'],
 						.text("Inventory")
 					)
 				@$el.append mainWindow
+
+				playerImage = app.assets.get 'player-sprite'
+				equipBox = $('<div>')
+						.addClass('equip-box')
+						.append(playerImage)
+						.droppable(
+							drop: (event, ui) =>
+								item = $(ui.draggable).data("item")
+								item.equip inventory
+								@rerender()
+
+							hoverClass: 'highlight'
+						)
+				mainWindow.append equipBox
 
 				@items = $('<div>').addClass('items')
 				mainWindow.append @items

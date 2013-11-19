@@ -20,7 +20,7 @@ define ['game/entities/items'],
 
 			remove: (item) ->
 				@items.remove item
-				item.unequip(this) is item.isEquipped
+				item.unequip(this) if item.isEquipped
 
 			update: ->
 				@gun.update() if @gun?

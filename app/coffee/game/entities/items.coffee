@@ -63,8 +63,12 @@ define ['core/entities', "game/guns",'game/guns/sprites', 'game/entities/items/d
 				new displays.GunDisplay @scene.hud, @model, entity.inventory.gun
 
 			equip: (inventory) ->
-				super inventory
+				for item in inventory.items
+					if item instanceof Gun and item.isEquipped
+						item.unequip inventory
+
 				inventory.gun = @model
+				super inventory
 
 			unequip: (inventory) ->
 				super inventory
