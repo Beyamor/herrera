@@ -107,7 +107,11 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			for [alias, url] in templates
 				do (alias, url) =>
 					$.ajax
-						url: url
+						url:
+							if debug.isEnabled
+								"#{url}?bust=#{new Date().getTime()}"
+							else
+								url
 						success: (template) =>
 							@compiledTemplates[alias] = Handlebars.compile template
 							++templatesLoaded
