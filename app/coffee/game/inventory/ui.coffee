@@ -10,9 +10,14 @@ define ['core/app', 'core/input', 'core/util'],
 			constructor: (@owner, @inventory) ->
 				@$el = $('<div>')
 					.addClass('inventory')
-					.html(app.templates.compile 'inventory-window', @inventory)
+				@rerender()
 
-				$('.equip-box', @$el).append app.assets.get 'player-sprite'
+				$('.item .description', @$el).draggable(
+					revert: true
+					revertDuration: 50
+					start: -> $('.equipped', $(this).parent()).hide()
+					stop: -> $('.equipped', $(this).parent()).show()
+				)
 
 				#dropZones = null
 				#for which in ["left", "right", "top", "bottom"]
@@ -75,31 +80,30 @@ define ['core/app', 'core/input', 'core/util'],
 				#)
 
 			rerender: ->
-				@items.empty()
-				for item in @inventory.items
-					do (item) =>
-						itemEl = $('<div>').addClass('item')
+				@$el.html(app.templates.compile 'inventory-window', @inventory)
+				$('.equip-box', @$el).append app.assets.get 'player-sprite'
 
-						description = $('<span>')
-								.addClass('description')
-								.text(item.description)
-								.draggable(
-									revert: true
-									revertDuration: 50
-									start: -> $('.equipped', itemEl).hide()
-									stop: -> $('.equipped', itemEl).show()
-								)
-								.data("item", item)
-						itemEl.append description
+				#@items.empty()
+				#for item in @inventory.items
+				#	do (item) =>
+				#		itemEl = $('<div>').addClass('item')
 
-						if item.isEquipped
-							itemEl.append(
-								$('<span>')
-								.text('(equipped)')
-								.addClass('equipped')
-							)
+				#		description = $('<span>')
+				#				.addClass('description')
+				#				.text(item.description)
+				#				.draggable(
+				#								#				)
+				#				.data("item", item)
+				#		itemEl.append description
 
-						@items.append itemEl
+				#		if item.isEquipped
+				#			itemEl.append(
+				#				$('<span>')
+				#				.text('(equipped)')
+				#				.addClass('equipped')
+				#			)
+
+				#		@items.append itemEl
 
 
 			update: ->
