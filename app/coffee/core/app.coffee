@@ -90,6 +90,8 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 		loadTemplates: ->
 			templates		= @templates
 			@compiledTemplates	= {}
+
+			# ugh doing this ad hoc b/c require.js' text plugin don't work w/o optimizer
 			templatesLoaded		= 0
 			templatesToLoad		= @templates.length
 
