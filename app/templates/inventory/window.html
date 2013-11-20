@@ -11,8 +11,8 @@
 	</div>
 	<div class="items">
 	{{#each items}}
-		<div class="item" data-item="{{this}}">
-			<span class="description">
+		<div class="item">
+			<span class="description" data-item="{{@index}}">
 				{{description}}
 			</span>
 			{{#if isEquipped}}

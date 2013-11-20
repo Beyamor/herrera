@@ -18,6 +18,10 @@ define [],
 			remove: (item) ->
 				@items.remove item
 				item.unequip(this) if item.isEquipped
+				return item
+
+			removeByIndex: (item) ->
+				@remove @items[item]
 
 			update: ->
 				@gun.update() if @gun?

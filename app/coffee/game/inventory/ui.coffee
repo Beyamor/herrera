@@ -12,12 +12,38 @@ define ['core/app', 'core/input', 'core/util'],
 					.addClass('inventory')
 				@rerender()
 
-				$('.item .description', @$el).draggable(
-					revert: true
-					revertDuration: 50
-					start: -> $('.equipped', $(this).parent()).hide()
-					stop: -> $('.equipped', $(this).parent()).show()
-				)
+				$('.item .description', @$el)
+					.draggable(
+						revert: true
+						revertDuration: 50
+						start: -> $('.equipped', $(this).parent()).hide()
+						stop: -> $('.equipped', $(this).parent()).show()
+					)
+
+				dropZones = =>
+					$('.drop-zone', @$el)
+
+				dropZones()
+					.droppable(
+						drop: (event, ui) =>
+							index = $(ui.draggable).data("item")
+							item = @inventory.removeByIndex index
+
+							angle = random.angle()
+							item.x = @owner.x + 10 * Math.cos angle
+							item.y = @owner.y + 10 * Math.sin angle
+							@scene.add item
+
+							@rerender()
+							dropZones().removeClass 'highlight'
+
+						over: =>
+							dropZones().addClass 'highlight'
+
+						out: =>
+							dropZones().removeClass 'highlight'
+
+					)
 
 				#dropZones = null
 				#for which in ["left", "right", "top", "bottom"]
@@ -25,24 +51,7 @@ define ['core/app', 'core/input', 'core/util'],
 				#		.addClass('drop-zone')
 				#		.addClass(which)
 				#		.droppable(
-				#			drop: (event, ui) =>
-				#				item = $(ui.draggable).data("item")
-				#				inventory.remove item
-
-				#				angle = random.angle()
-				#				item.x = @owner.x + 10 * Math.cos angle
-				#				item.y = @owner.y + 10 * Math.sin angle
-				#				@scene.add item
-
-				#				@rerender()
-				#				dropZones.removeClass 'highlight'
-
-				#			over: =>
-				#				dropZones.addClass 'highlight'
-
-				#			out: =>
-				#				dropZones.removeClass 'highlight'
-				#		)
+				#					#		)
 				#	@$el.append dropZone
 				#dropZones = $('.drop-zone', @$el)
 
