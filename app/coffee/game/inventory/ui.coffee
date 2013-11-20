@@ -26,12 +26,13 @@ define ['core/app', 'core/input', 'core/util'],
 				dropZones()
 					.droppable(
 						drop: (event, ui) =>
-							index = $(ui.draggable).data("item")
-							item = @inventory.removeByIndex index
+							index	= $(ui.draggable).data("item")
+							item	= @inventory.atIndex index
+							@inventory.remove item
 
-							angle = random.angle()
-							item.x = @owner.x + 10 * Math.cos angle
-							item.y = @owner.y + 10 * Math.sin angle
+							angle	= random.angle()
+							item.x	= @owner.x + 10 * Math.cos angle
+							item.y	= @owner.y + 10 * Math.sin angle
 							@scene.add item
 
 							@rerender()
@@ -43,6 +44,17 @@ define ['core/app', 'core/input', 'core/util'],
 						out: =>
 							dropZones().removeClass 'highlight'
 
+					)
+
+				$('.equip-box', @$el)
+					.droppable(
+						drop: (event, ui) =>
+							index	= $(ui.draggable).data("item")
+							item	= @inventory.atIndex index
+							item.equip inventory
+							@rerender()
+
+						hoverClass: 'highlight'
 					)
 
 				#dropZones = null
@@ -67,14 +79,7 @@ define ['core/app', 'core/input', 'core/util'],
 				#equipBox = $('<div>')
 				#		.addClass('equip-box')
 				#		.append(playerImage)
-				#		.droppable(
-				#			drop: (event, ui) =>
-				#				item = $(ui.draggable).data("item")
-				#				item.equip inventory
-				#				@rerender()
-
-				#			hoverClass: 'highlight'
-				#		)
+				#		
 				#mainWindow.append equipBox
 
 				#@items = $('<div>').addClass('items')

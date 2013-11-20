@@ -20,8 +20,8 @@ define [],
 				item.unequip(this) if item.isEquipped
 				return item
 
-			removeByIndex: (item) ->
-				@remove @items[item]
+			atIndex: (index) ->
+				@items[index]
 
 			update: ->
 				@gun.update() if @gun?
