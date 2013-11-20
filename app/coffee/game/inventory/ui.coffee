@@ -12,6 +12,8 @@ define ['core/app', 'core/input', 'core/util'],
 					.addClass('inventory')
 					.html(app.templates.compile 'inventory-window', @inventory)
 
+				$('.equip-box', @$el).append app.assets.get 'player-sprite'
+
 				#dropZones = null
 				#for which in ["left", "right", "top", "bottom"]
 				#	dropZone = $('<div>')
