@@ -61,8 +61,17 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 					if @_scene? and @_scene.begin?
 						@_scene.begin()
 
-			@loadAssets()
-			@loadTemplates()
+			if @assets? and @assets.length isnt 0
+				@loadAssets()
+			else
+				@assetsLoaded = true
+
+			if @templates? and @templates.length isnt 0
+				@loadTemplates()
+			else
+				@templatesLoaded = true
+
+			@tryStarting()
 
 		tryStarting: ->
 			return unless @assetsLoaded and @templatesLoaded
