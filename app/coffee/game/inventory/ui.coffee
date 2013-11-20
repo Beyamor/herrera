@@ -72,6 +72,8 @@ define ['core/app', 'core/input', 'core/util'],
 						hoverClass: 'highlight'
 					)
 
+				$('.close', @$el).click => @scene.removeWindow this
+
 			update: ->
 				@scene.removeWindow(this) if input.pressed('close') or input.pressed('inventory')
 
