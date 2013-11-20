@@ -57,68 +57,9 @@ define ['core/app', 'core/input', 'core/util'],
 						hoverClass: 'highlight'
 					)
 
-				#dropZones = null
-				#for which in ["left", "right", "top", "bottom"]
-				#	dropZone = $('<div>')
-				#		.addClass('drop-zone')
-				#		.addClass(which)
-				#		.droppable(
-				#					#		)
-				#	@$el.append dropZone
-				#dropZones = $('.drop-zone', @$el)
-
-				#mainWindow = $('<div>')
-				#	.addClass('main-window')
-				#	.append(
-				#		$('<h1>')
-				#		.text("Inventory")
-				#	)
-				#@$el.append mainWindow
-
-				#playerImage = app.assets.get 'player-sprite'
-				#equipBox = $('<div>')
-				#		.addClass('equip-box')
-				#		.append(playerImage)
-				#		
-				#mainWindow.append equipBox
-
-				#@items = $('<div>').addClass('items')
-				#mainWindow.append @items
-				#@rerender()
-
-				#mainWindow.append(
-				#	$('<div>')
-				#	.addClass('close')
-				#	.text("X")
-				#	.click(=> @scene.removeWindow this)
-				#)
-
 			rerender: ->
 				@$el.html(app.templates.compile 'inventory-window', @inventory)
 				$('.equip-box', @$el).append app.assets.get 'player-sprite'
-
-				#@items.empty()
-				#for item in @inventory.items
-				#	do (item) =>
-				#		itemEl = $('<div>').addClass('item')
-
-				#		description = $('<span>')
-				#				.addClass('description')
-				#				.text(item.description)
-				#				.draggable(
-				#								#				)
-				#				.data("item", item)
-				#		itemEl.append description
-
-				#		if item.isEquipped
-				#			itemEl.append(
-				#				$('<span>')
-				#				.text('(equipped)')
-				#				.addClass('equipped')
-				#			)
-
-				#		@items.append itemEl
-
 
 			update: ->
 				@scene.removeWindow(this) if input.pressed('close') or input.pressed('inventory')
