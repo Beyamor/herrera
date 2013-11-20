@@ -17,6 +17,7 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			@previousTime = newTime
 
 		start: ->
+			@loadScreen.remove()
 			debug.init this
 			@init() if @init
 
@@ -47,6 +48,11 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 			}
 			@container.append @canvas.$el
 
+			@loadScreen = $('<div>')
+					.addClass('load-screen')
+					.text('Loading: 0%')
+			@container.append @loadScreen
+
 			@container.attr('tabindex', 0).focus()
 			input.watch @container
 
@@ -61,12 +67,16 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 					if @_scene? and @_scene.begin?
 						@_scene.begin()
 
+			@numberOfThingsToLoad = @numberOfThingsLoaded = 0
+
 			if @assets? and @assets.length isnt 0
+				@numberOfThingsToLoad += @assets.length
 				@loadAssets()
 			else
 				@assetsLoaded = true
 
 			if @templates? and @templates.length isnt 0
+				@numberOfThingsToLoad += @templates.length
 				@loadTemplates()
 			else
 				@templatesLoaded = true
@@ -76,14 +86,25 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 		tryStarting: ->
 			return unless @assetsLoaded and @templatesLoaded
 			@start()
+
+		updateLoadStatus: ->
+			++@numberOfThingsLoaded
+			percentage =
+				if @numberOfThingsToLoad isnt 0
+					(@numberOfThingsLoaded / @numberOfThingsToLoad * 100).toPrecision 3
+				else
+					100
+
+			@loadScreen.text "Loading: #{percentage}%"
 		
 		loadAssets: ->
 			queue = new createjs.LoadQueue true
 			queue.addEventListener 'complete', =>
 				@assetsLoaded = true
 				@tryStarting()
-			queue.addEventListener 'fileload', (e) ->
+			queue.addEventListener 'fileload', (e) =>
 				debug.logType 'load', "loaded #{e.item.src}"
+				@updateLoadStatus()
 				
 			for [id, src] in @assets
 				queue.loadFile {id: id, src: src}
@@ -115,6 +136,8 @@ define ['core/canvas', 'core/input', 'core/debug'], (cnvs, input, debug) ->
 						success: (template) =>
 							@compiledTemplates[alias] = Handlebars.compile template
 							++templatesLoaded
+
+							@updateLoadStatus()
 
 							if templatesLoaded >= templatesToLoad
 								@templatesLoaded = true

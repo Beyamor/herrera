@@ -10,6 +10,15 @@ body {
 	position: relative;
 }
 
+.load-screen {
+	@include full-screen;
+	background-color: black;
+	color: white;
+
+	text-align: center;
+	padding-top: 200px;
+}
+
 .debug-screen {
 	@include full-screen;
 
