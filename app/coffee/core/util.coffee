@@ -30,6 +30,7 @@ define ['core/app'], (app) ->
 			@callback	= args.callback
 			@loops		= args.loops
 			@elapsed	= 0
+			@running	= args.start
 
 		restart: ->
 			@elapsed	= 0

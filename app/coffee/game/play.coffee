@@ -1,8 +1,33 @@
 define ['core/app', 'core/scenes', 'core/canvas',
 	'core/cameras', 'game/levels', 'game/levels/layouts',
-	'game/levels/reification', 'game/play/hud'],
-	(app, scenes, canvas, cameras, levels, levelLayouts, levelReification, hud) ->
+	'game/levels/reification', 'game/play/hud', 'core/util'],
+	(app, scenes, canvas, cameras, levels, levelLayouts, levelReification, hud, util) ->
 		ns = {}
+
+		class BuildingScreen
+			constructor: ->
+				@el = $('<div class="load-screen">')
+				app.canvas.$el.after @el
+
+				@elipseCount = 0
+				@updateText()
+
+				@timer = new util.Timer
+						period: 0.2
+						loops: true
+						callback: =>
+							@elipseCount = (@elipseCount + 1) % 4
+							@updateText()
+						start: true
+
+			updateText: ->
+				@el.text "Building#{Array(@elipseCount+1).join(".")}"
+
+			update: ->
+				@timer.update()
+
+			remove: ->
+				@el.remove()
 
 		class ns.PlayScene extends scenes.Scene
 			constructor: ->
@@ -16,6 +41,8 @@ define ['core/app', 'core/scenes', 'core/canvas',
 
 				layout = levelLayouts.create()
 				worker.postMessage layout
+
+				@buildingScreen = new BuildingScreen
 
 			levelBuilt: (level) ->
 				reifier	= new levelReification.Reifier
@@ -31,6 +58,13 @@ define ['core/app', 'core/scenes', 'core/canvas',
 
 				@hudElements = []
 				@hudElements.push new hud.AmmoDisplay(@hud, player)
+
+				@buildingScreen.remove()
+				@buildingScreen = null
+
+			update: ->
+				super()
+				@buildingScreen.update() if @buildingScreen?
 
 			end: ->
 				super()
