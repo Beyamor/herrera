@@ -8,6 +8,12 @@ define ['core/app', 'core/scenes', 'core/canvas',
 			constructor: ->
 				super()
 
+				worker = new Worker 'js/game/levels/build-script.js'
+				worker.onerror = (message) ->
+					console.log message
+				worker.onmessage = (event) ->
+					console.log event.data
+
 				level	= levels.construct levelLayouts.create()
 				reifier	= new levelReification.Reifier
 				for e in reifier.reify(level)
