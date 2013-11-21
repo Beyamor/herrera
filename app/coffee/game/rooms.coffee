@@ -130,45 +130,41 @@ define ['core/util', 'game/consts'], (util, consts) ->
 			)
 		]
 
-	#class ns.SuperRoomSection extends ns.Room
-	#	constructor: (xIndex, yIndex) ->
-	#		super xIndex, yIndex
-	#		@exits = {}
+	anyBorderPoint = (direction) ->
+			switch direction
+				when "north"
+					x = random.intInRange 1, ROOM_WIDTH - 1
+					y = 0
 
-	#	anyBorderPoint: (direction) ->
-	#		switch direction
-	#			when "north"
-	#				x = random.intInRange 1, ROOM_WIDTH - 1
-	#				y = 0
+				when "south"
+					x = random.intInRange 1, ROOM_WIDTH - 1
+					y = ROOM_HEIGHT - 1
 
-	#			when "south"
-	#				x = random.intInRange 1, ROOM_WIDTH - 1
-	#				y = ROOM_HEIGHT - 1
+				when "east"
+					x = ROOM_WIDTH - 1
+					y = random.intInRange 1, ROOM_HEIGHT - 1
 
-	#			when "east"
-	#				x = ROOM_WIDTH - 1
-	#				y = random.intInRange 1, ROOM_HEIGHT - 1
+				when "west"
+					x = 0
+					y = random.intInRange 1, ROOM_HEIGHT - 1
 
-	#			when "west"
-	#				x = 0
-	#				y = random.intInRange 1, ROOM_HEIGHT - 1
+				else
+					throw new Error "Unrecognized direction #{direction}"
+			return {x: x, y: y}
 
-	#			else
-	#				throw new Error "Unrecognized direction #{direction}"
 
-	#		return {x: x, y: y}
+	ns.define 'superroom',
+		addEntrance: (direction) ->
+			@entrance		= anyBorderPoint direction
+			@entranceDirection	= direction
 
-	#	addEntrance: (direction) ->
-	#		@entrance		= @anyBorderPoint direction
-	#		@entranceDirection	= direction
+		addExit: (direction) ->
+			@exits[direction] = anyBorderPoint direction
 
-	#	addExit: (direction) ->
-	#		@exits[direction] = @anyBorderPoint direction
+		finalize: ->
+			@superRoom.finalize()
 
-	#	finalize: ->
-	#		@superRoom.finalize()
-
-	#	realize: (args...) ->
-	#		@superRoom.realize.apply(@superRoom, args)
+		realize: (args...) ->
+			@superRoom.realize.apply(@superRoom, args)
 
 	return ns
