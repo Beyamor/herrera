@@ -1,4 +1,5 @@
-importScripts '/app/js/require.js'
+# Ugh, use relative URLs since the absolutes are different on different hosts
+importScripts '../../require.js'
 
 pendingLayout = null
 self.onmessage = (event) ->
@@ -6,7 +7,7 @@ self.onmessage = (event) ->
 
 require {
 		urlArgs: 'bust=' + (new Date()).getTime(),
-		baseUrl: '/app/js/',
+		baseUrl: '../../',
 	},
 	['game/levels'],
 	(levels) =>
