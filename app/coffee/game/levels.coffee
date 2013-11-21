@@ -83,7 +83,7 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts', "game/r
 
 			# finalize the rooms
 			level.rooms.each (_, _, room) ->
-				rooms.finalize room if room?
+				rooms.finalize(room) if room?
 
 			# and build the connections
 			for {from: from, to: to, direction: direction} in connections

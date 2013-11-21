@@ -29,48 +29,55 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 	realizeTiles = (room, reifier) ->
 		tiles = []
 		room.tiles.each (i, j, type) =>
-			x = xOffset(room) + i * TILE_WIDTH
-			y = yOffset(room) + j * TILE_HEIGHT
+			x = room.xOffset + i * TILE_WIDTH
+			y = room.yOffset + j * TILE_HEIGHT
 
 			tile = reifier.reifyWallOrFloor x, y, type
 			tiles.push(tile) if tile?
 
 		return tiles
 
-	type		= (room) -> room.type
-	noImplError	= (room) -> throw new Error "Whoa, no implementation for #{room.type}"
-	ns._create	= multimethod().dispatch(type).default(->)
-	ns.addEntrance	= multimethod().dispatch(type).default(noImplError)
-	ns.addExit	= multimethod().dispatch(type).default(noImplError)
-	ns.finalize	= multimethod().dispatch(type).default(->)
-	ns.realize	= multimethod().dispatch(type).default(realizeTiles)
+	noop		= -> ->
+	noImplError	= -> -> throw new Error "Whoa, no implementation for #{@type}"
+	ns._create	= multimethod().default(noop)
+	ns._addEntrance	= multimethod().default(noImplError)
+	ns._addExit	= multimethod().default(noImplError)
+	ns._finalize	= multimethod().default(noop)
+	ns._realize	= multimethod().default(->
+		(reifier) ->
+			realizeTiles this, reifier
+	)
 
 	defineRoom = (type, methods) ->
 		for methodName, methodBody of methods
-			methodName =
-				if ns["_" + methodName]?
-					"_" + methodName
-				else
-					methodName
-			ns[methodName].when type, methodBody
-
-	xOffset = (room) ->
-		room.xIndex * (ROOM_WIDTH + 1) * TILE_WIDTH # +! for the spaces between rooms
-
-	yOffset = (room) ->
-		room.yIndex * (ROOM_HEIGHT + 1) * TILE_HEIGHT
+			do (methodName, methodBody) ->
+				ns["_" + methodName].when(type, -> methodBody)
 
 	ns.create = (type, xIndex, yIndex) ->
 		room = {
-			type:	type
-			xIndex:	xIndex
-			yIndex:	yIndex
-			tiles:	util.array2d ROOM_WIDTH, ROOM_HEIGHT
-			exits:	{}
+			type:		type
+			xIndex:		xIndex
+			yIndex:		yIndex
+			tiles:		util.array2d ROOM_WIDTH, ROOM_HEIGHT
+			exits:		{}
+			xOffset:	xIndex * (ROOM_WIDTH + 1) * TILE_WIDTH # +1 for the spaces between rooms
+			yOffset:	yIndex * (ROOM_HEIGHT + 1) * TILE_HEIGHT
 		}
 
-		ns._create room
+		(ns._create room.type).call(room)
 		return room
+
+	ns.addEntrance = (room, direction) ->
+		(ns._addEntrance room.type).call(room, direction)
+
+	ns.addExit = (room, direction)	->
+		(ns._addExit room.type).call(room, direction)
+
+	ns.finalize = (room) ->
+		(ns._finalize room.type).call(room)
+
+	ns.realize = (room, reifier) ->
+		(ns._realize room.type).call(room, reifier)
 
 	#class ns.Room
 	#	constructor: (@xIndex, @yIndex) ->
@@ -344,20 +351,20 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 	#		return super(reifier).concat enemies
 
 	defineRoom 'start',
-		create: ({tiles}) ->
+		create: ->
 			for i in [0...ROOM_WIDTH]
-				tiles[i][0] = "wall"
-				tiles[i][ROOM_HEIGHT-1] = "wall"
+				@tiles[i][0] = "wall"
+				@tiles[i][ROOM_HEIGHT-1] = "wall"
 
 			for j in [0...ROOM_HEIGHT]
-				tiles[0][j] = "wall"
-				tiles[ROOM_WIDTH-1][j] = "wall"
+				@tiles[0][j] = "wall"
+				@tiles[ROOM_WIDTH-1][j] = "wall"
 
 			for i in [1...ROOM_WIDTH-1]
 				for j in [1...ROOM_HEIGHT-1]
-					tiles[i][j] = "floor"
+					@tiles[i][j] = "floor"
 
-		addExit: ({tiles, exits}, direction) ->
+		addExit: (direction) ->
 			switch direction
 				when "west"
 					x = 0
@@ -372,24 +379,24 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					x = ROOM_WIDTH/2
 					y = ROOM_HEIGHT-1
 
-			tiles[x][y] = "."
-			exits[direction] = {x: x, y: y}
+			@tiles[x][y] = "."
+			@exits[direction] = {x: x, y: y}
 
 	defineRoom "end",
-		create: ({tiles}) ->
+		create: ->
 			for i in [0...ROOM_WIDTH]
-				tiles[i][0] = "wall"
-				tiles[i][ROOM_HEIGHT-1] = "wall"
+				@tiles[i][0] = "wall"
+				@tiles[i][ROOM_HEIGHT-1] = "wall"
 
 			for j in [0...ROOM_HEIGHT]
-				tiles[0][j] = "wall"
-				tiles[ROOM_WIDTH-1][j] = "wall"
+				@tiles[0][j] = "wall"
+				@tiles[ROOM_WIDTH-1][j] = "wall"
 
 			for i in [1...ROOM_WIDTH-1]
 				for j in [1...ROOM_HEIGHT-1]
-					tiles[i][j] = "floor"
+					@tiles[i][j] = "floor"
 
-		addEntrance: (room, direction) ->
+		addEntrance: (direction) ->
 			switch direction
 				when "west"
 					x = 0
@@ -404,56 +411,56 @@ define ['core/util', 'game/consts', 'game/room-data', 'game/room-features'], (ut
 					x = ROOM_WIDTH/2
 					y = ROOM_HEIGHT-1
 
-			room.tiles[x][y] = "."
-			room.entrance = {x: x, y: y}
+			@tiles[x][y] = "."
+			@entrance = {x: x, y: y}
 
-		realize: (room, reifier) ->
-			es = realizeTiles(room, reifier)
+		realize: (reifier) ->
+			es = realizeTiles(this, reifier)
 			es.push reifier.reifyPortal(
-				xOffset(room) + Math.floor(ROOM_WIDTH/2) * TILE_WIDTH,
-				yOffset(room) + Math.floor(ROOM_HEIGHT/2) * TILE_HEIGHT
+				@xOffset + Math.floor(ROOM_WIDTH/2) * TILE_WIDTH,
+				@yOffset + Math.floor(ROOM_HEIGHT/2) * TILE_HEIGHT
 			)
 			return es
 
-		#class ns.SuperRoomSection extends ns.Room
-		#	constructor: (xIndex, yIndex) ->
-		#		super xIndex, yIndex
-		#		@exits = {}
+	#class ns.SuperRoomSection extends ns.Room
+	#	constructor: (xIndex, yIndex) ->
+	#		super xIndex, yIndex
+	#		@exits = {}
 
-		#	anyBorderPoint: (direction) ->
-		#		switch direction
-		#			when "north"
-		#				x = random.intInRange 1, ROOM_WIDTH - 1
-		#				y = 0
+	#	anyBorderPoint: (direction) ->
+	#		switch direction
+	#			when "north"
+	#				x = random.intInRange 1, ROOM_WIDTH - 1
+	#				y = 0
 
-		#			when "south"
-		#				x = random.intInRange 1, ROOM_WIDTH - 1
-		#				y = ROOM_HEIGHT - 1
+	#			when "south"
+	#				x = random.intInRange 1, ROOM_WIDTH - 1
+	#				y = ROOM_HEIGHT - 1
 
-		#			when "east"
-		#				x = ROOM_WIDTH - 1
-		#				y = random.intInRange 1, ROOM_HEIGHT - 1
+	#			when "east"
+	#				x = ROOM_WIDTH - 1
+	#				y = random.intInRange 1, ROOM_HEIGHT - 1
 
-		#			when "west"
-		#				x = 0
-		#				y = random.intInRange 1, ROOM_HEIGHT - 1
+	#			when "west"
+	#				x = 0
+	#				y = random.intInRange 1, ROOM_HEIGHT - 1
 
-		#			else
-		#				throw new Error "Unrecognized direction #{direction}"
+	#			else
+	#				throw new Error "Unrecognized direction #{direction}"
 
-		#		return {x: x, y: y}
+	#		return {x: x, y: y}
 
-		#	addEntrance: (direction) ->
-		#		@entrance		= @anyBorderPoint direction
-		#		@entranceDirection	= direction
+	#	addEntrance: (direction) ->
+	#		@entrance		= @anyBorderPoint direction
+	#		@entranceDirection	= direction
 
-		#	addExit: (direction) ->
-		#		@exits[direction] = @anyBorderPoint direction
+	#	addExit: (direction) ->
+	#		@exits[direction] = @anyBorderPoint direction
 
-		#	finalize: ->
-		#		@superRoom.finalize()
+	#	finalize: ->
+	#		@superRoom.finalize()
 
-		#	realize: (args...) ->
-		#		@superRoom.realize.apply(@superRoom, args)
+	#	realize: (args...) ->
+	#		@superRoom.realize.apply(@superRoom, args)
 
 	return ns
