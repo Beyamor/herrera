@@ -6,7 +6,8 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util', 'g
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
 		LEVEL_WIDTH	= LEVEL_HEIGHT	= consts.LEVEL_WIDTH
 
-		random = util.random
+		random	= util.random
+		array2d	= util.array2d
 
 		class ns.Reifier
 			reifyFloor: (x, y, color) ->
@@ -35,7 +36,7 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util', 'g
 			reify: (level) ->
 				es = []
 
-				level.rooms.each (roomX, roomY, room) =>
+				array2d.each level.rooms, (roomX, roomY, room) =>
 					return unless room
 
 					numberOfEnemies = random.intInRange(2, 4)
@@ -43,7 +44,7 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util', 'g
 								numberOfEnemies: numberOfEnemies
 					es.push(e) for e in roomEntities
 
-				level.tiles.each (tileX, tileY, type) =>
+				array2d.each level.tiles, (tileX, tileY, type) =>
 					entity = @reifyWallOrFloor tileX * TILE_WIDTH, tileY * TILE_HEIGHT, type
 					if entity
 						es.push entity

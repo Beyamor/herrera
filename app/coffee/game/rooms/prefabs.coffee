@@ -3,6 +3,7 @@ define ['game/rooms', 'game/room-data', 'game/room-features',
 	(rooms, definitions, features,\
 	util, consts) ->
 		random = util.random
+		array2d = util.array2d
 
 		TILE_WIDTH	= TILE_HEIGHT	= consts.TILE_WIDTH
 		ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
@@ -192,7 +193,7 @@ define ['game/rooms', 'game/room-data', 'game/room-features',
 
 			addFeatures = (room) ->
 				areas = []
-				room.tiles.each (x, y, tile) =>
+				array2d.each room.tiles, (x, y, tile) =>
 					return unless tile is "."
 
 					# sooo many repeated checks
@@ -267,12 +268,12 @@ define ['game/rooms', 'game/room-data', 'game/room-features',
 				choice = translate applySkips random.any possibilities
 
 				tiles = realizeOrientation this, choice.definition, choice.orientation
-				@tiles.each (i, j) => @tiles[i][j] = tiles[i][j]
+				array2d.each @tiles, (i, j) => @tiles[i][j] = tiles[i][j]
 				addFeatures this
 			
 			realize: (reifier, {numberOfEnemies: numberOfEnemies}) ->
 				candidates = []
-				@tiles.each (tileX, tileY, tile) =>
+				array2d.each @tiles, (tileX, tileY, tile) =>
 					if tile is "."
 						candidates.push
 							x: @xOffset + tileX * TILE_WIDTH + TILE_WIDTH/2

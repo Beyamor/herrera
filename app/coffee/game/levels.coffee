@@ -82,7 +82,7 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/rooms/prefabs', 'game/le
 						direction: direction
 
 			# finalize the rooms
-			level.rooms.each (_, _, room) ->
+			util.array2d.each level.rooms, (_, _, room) ->
 				rooms.finalize(room) if room?
 
 			# and build the connections

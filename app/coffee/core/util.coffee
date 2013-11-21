@@ -17,12 +17,12 @@ define ['core/app'], (app) ->
 			a.push []
 			for j in [0...height]
 				a[i].push if constructor then constructor(i, j) else null
+		return a
 
-		a.each = (f) ->
+	array2d.each = (a, f) ->
 			for i in [0...a.length]
 				for j in [0...a[i].length]
 					f i, j, a[i][j]
-		return a
 
 	class Timer
 		constructor: (args) ->

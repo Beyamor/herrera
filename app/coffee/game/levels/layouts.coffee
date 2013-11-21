@@ -103,7 +103,7 @@ define ['game/consts', 'core/util'],
 			superRooms			= []
 			unmergedRooms			= []
 			desiredNumberOfSuperRooms	= 0 #random.any [0, 1, 1, 1, 2]
-			rooms.each (i, j, room) =>
+			util.array2d.each rooms, (i, j, room) =>
 				if room and room.type is "regular"
 					unmergedRooms.push({x: i, y: j})
 

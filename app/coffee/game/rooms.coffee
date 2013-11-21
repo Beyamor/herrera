@@ -2,12 +2,13 @@ define ['core/util', 'game/consts'], (util, consts) ->
 	ns = {}
 
 	random = util.random
+	array2d = util.array2d
 
 	TILE_WIDTH	= TILE_HEIGHT	= consts.TILE_WIDTH
 	ROOM_WIDTH	= ROOM_HEIGHT	= consts.ROOM_WIDTH
 	realizeTiles = (room, reifier) ->
 		tiles = []
-		room.tiles.each (i, j, type) =>
+		array2d.each room.tiles, (i, j, type) =>
 			x = room.xOffset + i * TILE_WIDTH
 			y = room.yOffset + j * TILE_HEIGHT
 

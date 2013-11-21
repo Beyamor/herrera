@@ -11,10 +11,13 @@ define ['core/app', 'core/scenes', 'core/canvas',
 				worker = new Worker 'js/game/levels/build-script.js'
 				worker.onerror = (message) ->
 					console.log message
-				worker.onmessage = (event) ->
-					console.log event.data
+				worker.onmessage = (event) =>
+					@levelBuilt(event.data)
 
-				level	= levels.construct levelLayouts.create()
+				layout = levelLayouts.create()
+				worker.postMessage layout
+
+			levelBuilt: (level) ->
 				reifier	= new levelReification.Reifier
 				for e in reifier.reify(level)
 					@add e
@@ -24,13 +27,10 @@ define ['core/app', 'core/scenes', 'core/canvas',
 				@camera = new cameras.EntityFollower player, @camera
 
 				@hud = $('<div class="hud">')
+				app.canvas.$el.after @hud
 
 				@hudElements = []
 				@hudElements.push new hud.AmmoDisplay(@hud, player)
-
-			begin: ->
-				super()
-				app.canvas.$el.after @hud
 
 			end: ->
 				super()
@@ -38,6 +38,7 @@ define ['core/app', 'core/scenes', 'core/canvas',
 
 			render: ->
 				super()
+				return unless @hudElements?
 				element.render() for element in @hudElements
 
 		return ns
