@@ -1,5 +1,5 @@
-define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts', "game/rooms/super-rooms"],
-	(util, consts, rooms, layouts, superRooms) ->
+define ['core/util', 'game/consts', 'game/rooms', 'game/rooms/prefabs', 'game/levels/layouts', "game/rooms/super-rooms"],
+	(util, consts, rooms, prefabRooms, layouts, superRooms) ->
 		ns = {}
 
 		StartRoom			= rooms.StartRoom
