@@ -16,18 +16,17 @@ define ['core/util', 'game/consts'], (util, consts) ->
 
 		return tiles
 
-	noop		= -> ->
-	noImplError	= -> -> throw new Error "Whoa, no implementation for #{@type}"
-	ns._create	= multimethod().default(noop)
-	ns._addEntrance	= multimethod().default(noImplError)
-	ns._addExit	= multimethod().default(noImplError)
-	ns._finalize	= multimethod().default(noop)
-	ns._realize	= multimethod().default(noop)
-
+	definitions = {}
 	ns.define = (type, methods) ->
+		definitions[type] = {}
 		for methodName, methodBody of methods
 			do (methodName, methodBody) ->
-				ns["_" + methodName].when(type, -> methodBody)
+				definitions[type][methodName] = methodBody
+
+	callDefinition = (room, methodName, args...) ->
+		if definitions[room.type]? and definitions[room.type][methodName]?
+			method = definitions[room.type][methodName]
+			method.apply room, args
 
 	ns.create = (type, xIndex, yIndex) ->
 		room = {
@@ -40,21 +39,21 @@ define ['core/util', 'game/consts'], (util, consts) ->
 			yOffset:	yIndex * (ROOM_HEIGHT + 1) * TILE_HEIGHT
 		}
 
-		(ns._create room.type).call(room)
+		callDefinition room, 'create'
 		return room
 
 	ns.addEntrance = (room, direction) ->
-		(ns._addEntrance room.type).call(room, direction)
+		callDefinition room, 'addEntrance', direction
 
 	ns.addExit = (room, direction)	->
-		(ns._addExit room.type).call(room, direction)
+		callDefinition room, 'addExit', direction
 
 	ns.finalize = (room) ->
-		(ns._finalize room.type).call(room)
+		callDefinition room, 'finalize'
 
 	ns.realize = (room, reifier, opts) ->
 		es = realizeTiles room, reifier
-		moreEs = (ns._realize room.type).call(room, reifier, opts)
+		moreEs = callDefinition room, 'realize', reifier, opts
 		if moreEs?
 			es = es.concat moreEs
 		return es
