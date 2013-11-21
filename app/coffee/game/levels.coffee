@@ -52,14 +52,8 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts', "game/r
 			level.rooms = util.array2d LEVEL_WIDTH, LEVEL_HEIGHT, (i, j) ->
 				room = layout.rooms[i][j]
 				if room?
-					roomClass = switch room.type
-						when "start"		then StartRoom
-						when "regular"		then PrefabRoom
-						when "superroom"	then SuperRoomSection
-						when "end"		then EndRoom
-
-					console.log "No room constructor for #{room.type}" unless roomClass?
-					return new roomClass i, j
+					if room.type is 'regular' then room.type = 'prefab'
+					rooms.create room.type, i, j
 
 			# create superrooms
 			for superRoomList in layout.superRooms
@@ -79,8 +73,8 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts', "game/r
 							fromRoom.superRoom is toRoom.superRoom
 
 				unless inSameSuperRoom
-					fromRoom.addExit direction
-					toRoom.addEntrance util.oppositeDirection direction
+					rooms.addExit fromRoom, direction
+					rooms.addEntrance toRoom, util.oppositeDirection(direction)
 
 					connections.push
 						from: fromRoom
@@ -89,7 +83,7 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts', "game/r
 
 			# finalize the rooms
 			level.rooms.each (_, _, room) ->
-				room.finalize() if room and room.finalize?
+				rooms.finalize room if room?
 
 			# and build the connections
 			for {from: from, to: to, direction: direction} in connections
@@ -160,7 +154,6 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/levels/layouts', "game/r
 							existingTile = getExistingTile level, neighbourX, neighbourY
 							if (not existingTile) or (existingTile is " ")
 								level.tiles[neighbourX][neighbourY] = "W"
-
 			console.log level
 			return level
 

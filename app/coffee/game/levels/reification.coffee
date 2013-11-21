@@ -1,5 +1,5 @@
-define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
-	(entities, staticEntities, consts, util) ->
+define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util', 'game/rooms'],
+	(entities, staticEntities, consts, util, rooms) ->
 		ns = {}
 
 		TILE_WIDTH	= TILE_HEIGHT	= consts.TILE_WIDTH
@@ -39,7 +39,7 @@ define ['game/entities', 'game/entities/statics', 'game/consts', 'core/util'],
 					return unless room
 
 					numberOfEnemies = random.intInRange(2, 4)
-					roomEntities = room.realize this,
+					roomEntities = rooms.realize room, this,
 								numberOfEnemies: numberOfEnemies
 					es.push(e) for e in roomEntities
 
