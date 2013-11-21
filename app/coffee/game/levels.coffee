@@ -154,7 +154,6 @@ define ['core/util', 'game/consts', 'game/rooms', 'game/rooms/prefabs', 'game/le
 							existingTile = getExistingTile level, neighbourX, neighbourY
 							if (not existingTile) or (existingTile is " ")
 								level.tiles[neighbourX][neighbourY] = "W"
-			console.log level
 			return level
 
 		return ns
