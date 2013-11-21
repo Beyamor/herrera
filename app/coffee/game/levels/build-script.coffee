@@ -10,9 +10,12 @@ require {
 	},
 	['game/levels'],
 	(levels) =>
+		construct = (layout) =>
+			postMessage(levels.construct layout)
+			self.close()
+
 		if pendingLayout?
-			postMessage(levels.construct pendingLayout)
+			construct pendingLayout
 		else
 			self.onmessage = (event) =>
-				layout = event.data
-				postMessage(levels.construct layout)
+				construct event.data
