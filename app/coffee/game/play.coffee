@@ -1,14 +1,14 @@
 define ['core/app', 'core/scenes', 'core/canvas',
-	'core/cameras', 'game/levels',
+	'core/cameras', 'game/levels', 'game/levels/layouts',
 	'game/levels/reification', 'game/play/hud'],
-	(app, scenes, canvas, cameras, levels, levelReification, hud) ->
+	(app, scenes, canvas, cameras, levels, levelLayouts, levelReification, hud) ->
 		ns = {}
 
 		class ns.PlayScene extends scenes.Scene
 			constructor: ->
 				super()
 
-				level	= new levels.Level
+				level	= levels.construct levelLayouts.create()
 				reifier	= new levelReification.Reifier
 				for e in reifier.reify(level)
 					@add e

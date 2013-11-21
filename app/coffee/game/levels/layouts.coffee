@@ -184,7 +184,7 @@ define ['game/consts', 'core/util'],
 				}
 			}
 
-		ns.createLayout = ->
+		ns.create = ->
 			attempts	= 0
 			maxAttempts	= 10
 
