@@ -23,6 +23,7 @@ define ['core/app', 'core/input', 'game/play', 'core/debug'], (app, input, play,
 
 	app.templates = [
 		['inventory-window', 'templates/inventory/window.html']
+		['inventory-item', 'templates/inventory/item.html']
 	]
 
 	input.define

@@ -7,33 +7,11 @@ define ['core/app', 'core/input', 'core/util'],
 		class ns.InventoryDisplay
 			blocks: true
 
-			constructor: (@owner, inventory) ->
+			constructor: (@owner, @inventory) ->
 				@$el = $('<div>')
 					.addClass('inventory')
 					.html(app.templates.compile 'inventory-window', inventory)
 				$('.equip-box', @$el).append app.assets.get 'player-sprite'
-
-				refreshEquipState = =>
-					$('.item .description', @$el).each ->
-						index		= $(this).data('item')
-						item		= inventory.atIndex index
-						equipped	= $('.equipped', $(this).parent())
-
-						if item.isEquipped
-							equipped.show()
-						else
-							equipped.hide()
-				refreshEquipState()
-
-				$('.item .description', @$el)
-					.draggable(
-						revert: true
-						revertDuration: 50
-						start: -> $('.equipped', $(this).parent()).hide()
-						stop: ->
-							$('.equipped', $(this).parent()).show()
-							refreshEquipState()
-					)
 
 				dropZones = =>
 					$('.drop-zone', @$el)
@@ -43,9 +21,8 @@ define ['core/app', 'core/input', 'core/util'],
 						drop: (event, ui) =>
 							el	= $(ui.draggable)
 							index	= el.data("item")
-							item	= inventory.atIndex index
+							item	= inventory.items[index]
 							inventory.remove item
-							el.parent().remove()
 
 							angle	= random.angle()
 							item.x	= @owner.x + 10 * Math.cos angle
@@ -53,6 +30,7 @@ define ['core/app', 'core/input', 'core/util'],
 							@scene.add item
 
 							dropZones().removeClass 'highlight'
+							@rerenderItems()
 
 						over: =>
 							dropZones().addClass 'highlight'
@@ -65,14 +43,36 @@ define ['core/app', 'core/input', 'core/util'],
 					.droppable(
 						drop: (event, ui) =>
 							index	= $(ui.draggable).data("item")
-							item	= inventory.atIndex index
+							item	= inventory.items[index]
 							item.equip inventory
-							refreshEquipState()
+							@rerenderItems()
 
 						hoverClass: 'highlight'
 					)
 
 				$('.close', @$el).click => @scene.removeWindow this
+
+				@rerenderItems()
+
+			rerenderItems: ->
+				items = $('.items', @$el)
+				items.empty()
+				for index in [0...@inventory.items.length]
+					do (index) =>
+						el = $(app.templates.compile 'inventory-item',
+							item: @inventory.items[index]
+							index: index
+						)
+
+						$('.description', el).draggable(
+							revert: true
+							revertDuration: 50
+							start: -> $('.equipped', el.parent()).hide()
+							stop: ->
+								$('.equipped', el.parent()).show()
+						)
+
+						items.append el
 
 			update: ->
 				@scene.removeWindow(this) if input.pressed('close') or input.pressed('inventory')
